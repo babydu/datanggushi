@@ -1,6 +1,7 @@
 // ===================== 固定配置常量 =====================
 const SAVE_KEY = "history_survivor_save_data";
-const CUSTOM_PACK_LIST_KEY = "customPackList"; // 【修改】改为存储剧本列表
+const CUSTOM_PACK_LIST_KEY = "customPackList"; // 存储剧本列表（多剧本管理）
+const CUSTOM_PACK_KEY = "customPackData"; // 存储当前自定义剧本（用于存档兼容）
 const DEFAULT_PACK_URL = "tang-dynasty-pack.json";
 const OPTION_DRAW_COUNT = 3;
 const DEADLY_OPTION_CHANCE = 0.25;
@@ -394,11 +395,22 @@ function handleFileUpload(file) {
         try {
             const customPack = JSON.parse(e.target.result);
             if (validatePackFormat(customPack, true)) {
+                // 1. 保存到 CUSTOM_PACK_KEY（兼容存档加载）
                 localStorage.setItem(CUSTOM_PACK_KEY, JSON.stringify(customPack));
+                
+                // 2. 保存到剧本列表（支持多剧本管理）
+                const packEntry = saveCustomPackToList(customPack);
+                
                 appState.customPack = customPack;
-                renderCustomPackCard(customPack);
-                setTimeout(() => selectPack('custom'), 50);
-                showUploadError("剧本上传成功！已自动选中该剧本，可点击确认进入游戏。", false);
+                
+                // 3. 更新剧本列表显示
+                renderCustomPackCards();
+                
+                // 4. 自动选中新上传的剧本
+                setTimeout(() => {
+                    selectCustomPackFromList(packEntry);
+                    showUploadError(`剧本「${packEntry.packName}」上传成功！已自动选中，可点击确认进入游戏。`, false);
+                }, 100);
             }
         } catch (err) {
             showUploadError("JSON格式解析失败！请检查文件格式是否正确。");
@@ -427,8 +439,6 @@ function renderCustomPackCard(pack) {
 
 
 // ===================== 自定义剧本多存档管理 =====================
-
-// 【重写】获取所有自定义剧本列表
 function getCustomPackList() {
     try {
         const listStr = localStorage.getItem(CUSTOM_PACK_LIST_KEY);
@@ -531,37 +541,6 @@ function confirmDeletePack(packId, packName) {
     if (confirm(`确定要删除剧本「${packName}」吗？此操作不可恢复！`)) {
         deleteCustomPack(packId);
     }
-}
-
-// 【重写】处理文件上传
-function handleFileUpload(file) {
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-        showUploadError("请上传符合格式的JSON文件！");
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const customPack = JSON.parse(e.target.result);
-            if (validatePackFormat(customPack, true)) {
-                // 保存到列表
-                const packEntry = saveCustomPackToList(customPack);
-                appState.customPack = customPack;
-                renderCustomPackCards();
-                
-                // 自动选中新上传的剧本
-                setTimeout(() => {
-                    selectCustomPackFromList(packEntry);
-                    showUploadError(`剧本「${packEntry.packName}」上传成功！已自动选中，可点击确认进入游戏。`, false);
-                }, 100);
-            }
-        } catch (err) {
-            showUploadError("JSON格式解析失败！请检查文件格式是否正确。");
-            console.error(err);
-        }
-    };
-    reader.readAsText(file);
 }
 
 
@@ -1340,10 +1319,18 @@ function gameEnd(isSuccess, desc) {
     clearCountdown();
     clearGameProgress();
 
-    // 【新增】通关时标记当前卷为已解锁
+    // 【修复】通关时解锁下一卷
     if (isSuccess) {
         const packId = appState.selectedPackType === 'default' ? 'default_pack' : 'custom_pack';
-        unlockVolume(packId, appState.gameState.currentVolume.id);
+        const volumeList = appState.gameState.currentPack.volumeList || [];
+        const currentVolumeId = appState.gameState.currentVolume.id;
+        const currentIndex = volumeList.findIndex(v => v.id === currentVolumeId);
+        
+        // 解锁下一卷（如果存在）
+        if (currentIndex >= 0 && currentIndex < volumeList.length - 1) {
+            const nextVolume = volumeList[currentIndex + 1];
+            unlockVolume(packId, nextVolume.id);
+        }
     }
 
     const scoreResult = calculateScore(appState.gameState, isSuccess);
@@ -1389,7 +1376,65 @@ function gameEnd(isSuccess, desc) {
         weaknessBox.style.display = 'none';
     }
 
+    // 【新增】通关成功且有下一卷时，添加"进入下一卷"按钮
+    const endControlBox = document.getElementById('end-control-box');
+    if (isSuccess) {
+        const volumeList = appState.gameState.currentPack.volumeList || [];
+        const currentVolumeId = appState.gameState.currentVolume.id;
+        const currentIndex = volumeList.findIndex(v => v.id === currentVolumeId);
+        
+        if (currentIndex >= 0 && currentIndex < volumeList.length - 1) {
+            const nextVolume = volumeList[currentIndex + 1];
+            const nextVolumeUnlocked = isVolumeUnlocked(
+                appState.selectedPackType === 'default' ? 'default_pack' : 'custom_pack',
+                nextVolume.id,
+                volumeList
+            );
+            
+            if (nextVolumeUnlocked) {
+                endControlBox.innerHTML = `
+                    <button class="btn btn-success" onclick="enterNextVolume()">进入下一卷：${nextVolume.name}</button>
+                    <button class="btn btn-info" onclick="goToReview()">查看完整闯关复盘</button>
+                    <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
+                `;
+                switchPage('end-page');
+                return;
+            }
+        }
+    }
+    
     switchPage('end-page');
+}
+
+// 【新增】进入下一卷
+function enterNextVolume() {
+    const volumeList = appState.gameState.currentPack.volumeList || [];
+    const currentVolumeId = appState.gameState.currentVolume.id;
+    const currentIndex = volumeList.findIndex(v => v.id === currentVolumeId);
+    
+    if (currentIndex < 0 || currentIndex >= volumeList.length - 1) {
+        alert("没有下一卷可以进入！");
+        return;
+    }
+    
+    const nextVolume = volumeList[currentIndex + 1];
+    
+    // 重置游戏状态
+    appState.gameState = initGameState();
+    appState.gameState.currentPack = appState.selectedPack;
+    appState.selectedVolume = nextVolume;
+    appState.gameState.currentVolume = nextVolume;
+    appState.triggeredEventIds = [];
+    
+    // 跳转到关卡选择页面（如果有多个身份则先选身份）
+    if (nextVolume.identityList.length === 1) {
+        appState.gameState.currentIdentity = nextVolume.identityList[0];
+        goToLevelSelectDirectly();
+    } else {
+        renderIdentityList();
+        document.getElementById('identity-subtitle').innerText = `当前篇章：${nextVolume.name} | 剧本：${appState.selectedPack.packInfo.packName}`;
+        switchPage('identity-page');
+    }
 }
 
 // ===================== 复盘页面渲染 =====================
@@ -1745,7 +1790,59 @@ function getFallbackDefaultPack() {
                 "isFirst": false,
                 "unlockCondition": "volume_zhenguan_pass",
                 "inheritFrom": "zhenguan",
-                "identityList": []
+                "identityList": [
+                    {
+                        "id": "merchant",
+                        "name": "商人",
+                        "description": "继承家业，从事丝绸、茶叶、瓷器贸易。你需要精通唐代商业制度、市场行情、外贸规则，在繁华的商海中纵横捭阖。",
+                        "levelList": [
+                            {
+                                "level": 1,
+                                "story": "开元年间，你的父亲已在长安经营丝绸生意多年。如今父亲年迈，将家业交到你手中。你需要决定今年丝绸生意的经营策略。",
+                                "knowledgeTag": ["唐代商业", "丝绸贸易"],
+                                "optionPool": [
+                                    {
+                                        "id": "opt_correct",
+                                        "type": "correct",
+                                        "text": "长期客户优先，保证品质，稳定供货",
+                                        "isCorrect": true,
+                                        "result": "你选择了稳健经营策略，优先保证老客户的品质需求，虽然利润略低，但赢得了良好口碑。",
+                                        "history": "唐代商业重视信用，长安东西市都有自己的行会组织，守信用的商人会得到官府的褒奖和税收优惠。",
+                                        "knowledgeTag": ["唐代商业制度", "商业信用"],
+                                        "healthChange": 5,
+                                        "debuffChange": -1,
+                                        "endGame": false
+                                    },
+                                    {
+                                        "id": "opt_minor1",
+                                        "type": "minor_wrong",
+                                        "text": "降低品质压缩成本，追求更高利润",
+                                        "isCorrect": false,
+                                        "result": "你选择了偷工减料，虽然短期利润增加，但客户发现品质问题后纷纷退货，还被官府以「欺行霸市」的名义处罚。",
+                                        "history": "唐代《唐律疏议·杂律》规定，商品质量不符标准的，杖六十；造成伤亡的，以故伤论罪。",
+                                        "knowledgeTag": ["唐代商业制度", "商品质量"],
+                                        "healthChange": -15,
+                                        "debuffChange": 2,
+                                        "endGame": false
+                                    },
+                                    {
+                                        "id": "opt_deadly",
+                                        "type": "deadly",
+                                        "text": "勾结胡商走私禁品",
+                                        "isCorrect": false,
+                                        "result": "你铤而走险，与胡商勾结走私禁品。不料被市舶司查获，以「通番」之罪论处，没收全部财产，身陷囹圄。",
+                                        "history": "唐代对走私管控严格，《唐律》规定私自出口军器、典籍、丝织物至境外者，流放二千里；通番者罪加一等。",
+                                        "knowledgeTag": ["唐代外贸制度", "走私处罚"],
+                                        "healthChange": -100,
+                                        "debuffChange": 0,
+                                        "endGame": true,
+                                        "endDesc": "你因走私禁品被官府查获，最终流放边疆，家业尽毁，游戏结束。"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     };
