@@ -79,6 +79,138 @@ const TUTORIAL_STEPS = [
     }
 ];
 
+// ===================== 多结局判定系统 =====================
+const ENDING_CONFIG = {
+    // 通用结局
+    commonEndings: [
+        {
+            id: 'death_early',
+            name: '英年早逝',
+            icon: '💀',
+            condition: (state) => state.health <= 0,
+            description: '你因长期做出错误选择，耗尽生机，在历史长河中黯然退场...',
+            color: '#c62828'
+        },
+        {
+            id: 'average_life',
+            name: '平淡一生',
+            icon: '🌾',
+            condition: (state) => state.correctRate < 0.6 && state.isSuccess,
+            description: '你度过了平凡的一生，虽无大富大贵，但也安稳踏实...',
+            color: '#8b4513'
+        },
+        {
+            id: 'success_career',
+            name: '功成名就',
+            icon: '🎖️',
+            condition: (state) => state.correctRate >= 0.7 && state.health > 30 && state.isSuccess,
+            description: '你凭借对历史的深刻理解，在仕途上平步青云，成就了一番事业...',
+            color: '#2e7d32'
+        },
+        {
+            id: 'scholar_gentry',
+            name: '学而优则仕',
+            icon: '📜',
+            condition: (state) => state.correctRate >= 0.85 && state.isSuccess,
+            description: '你的历史学问出类拔萃，被世人尊为学究，大家风范流芳百世...',
+            color: '#1565c0'
+        },
+        {
+            id: 'perfect_history',
+            name: '千古流芳',
+            icon: '👑',
+            condition: (state) => state.correctRate >= 0.95 && state.health > 50 && state.isSuccess && state.noHelpUsed,
+            description: '你以近乎完美的历史知识，一路过关斩将，最终成为一代宗师，令后人敬仰！',
+            color: '#ffd700'
+        }
+    ],
+    // 身份特定结局
+    identityEndings: {
+        farmer: [
+            {
+                id: 'farmer_rich',
+                name: '富甲一方',
+                icon: '🏠',
+                condition: (state) => state.wealth >= 300 && state.isSuccess,
+                description: '你通过勤勉耕作，积累财富，成为当地有名的地主乡绅...'
+            },
+            {
+                id: 'farmer_scholar',
+                name: '耕读传家',
+                icon: '📚',
+                condition: (state) => state.correctRate >= 0.8 && state.isSuccess,
+                description: '你虽为农户，却好读诗书，最终培养出下一代书生...'
+            }
+        ],
+        merchant: [
+            {
+                id: 'merchant_king',
+                name: '富可敌国',
+                icon: '💰',
+                condition: (state) => state.wealth >= 500 && state.isSuccess,
+                description: '你的商号遍布大唐各地，财富惊人，连朝廷都要向你借贷...'
+            }
+        ]
+    }
+};
+
+function determineEnding(gameState, isSuccess) {
+    const state = {
+        health: gameState.health,
+        correctRate: gameState.gameRecord.length > 0 
+            ? gameState.levelPassed / gameState.gameRecord.length 
+            : 0,
+        helpUsed: 3 - gameState.helpTimes,
+        wealth: gameState.wealth || 0,
+        isSuccess: isSuccess,
+        noHelpUsed: gameState.helpTimes === 3
+    };
+    
+    // 首先检查身份特定结局
+    const identityId = gameState.currentIdentity?.id;
+    if (identityId && ENDING_CONFIG.identityEndings[identityId]) {
+        for (const ending of ENDING_CONFIG.identityEndings[identityId]) {
+            if (ending.condition(state)) {
+                return ending;
+            }
+        }
+    }
+    
+    // 然后检查通用结局（按优先级排序）
+    const sortedEndings = [...ENDING_CONFIG.commonEndings].sort((a, b) => {
+        const aScore = calculateEndingScore(a, state);
+        const bScore = calculateEndingScore(b, state);
+        return bScore - aScore;
+    });
+    
+    for (const ending of sortedEndings) {
+        if (ending.condition(state)) {
+            return ending;
+        }
+    }
+    
+    // 默认结局
+    return {
+        id: 'default',
+        name: '历史过客',
+        icon: '🍃',
+        condition: () => true,
+        description: '你如历史长河中的一片落叶，悄然飘过...',
+        color: '#5a3817'
+    };
+}
+
+function calculateEndingScore(ending, state) {
+    let score = 0;
+    // 根据达成条件计算得分
+    if (ending.id === 'perfect_history') score = 100;
+    else if (ending.id === 'scholar_gentry') score = 85;
+    else if (ending.id === 'success_career') score = 70;
+    else if (ending.id === 'average_life') score = 50;
+    else if (ending.id === 'death_early') score = 20;
+    return score;
+}
+
 // ===================== 音效系统常量 =====================
 const AUDIO_CONFIG = {
     enabled: true,
@@ -187,6 +319,180 @@ const AudioSystem = {
         AUDIO_CONFIG.enabled = !AUDIO_CONFIG.enabled;
         return AUDIO_CONFIG.enabled;
     }
+}
+
+// ===================== 学识积分与爵位系统 =====================
+const KNOWLEDGE_KEY = 'history_survivor_knowledge';
+const RANK_KEY = 'history_survivor_rank';
+
+// 学识积分配置
+const KNOWLEDGE_CONFIG = {
+    correct: 10,           // 答对 +10
+    wrong: -3,             // 答错 -3
+    streak: {              // 连胜加成
+        3: 5,              // 3连胜额外 +5
+        5: 15,             // 5连胜额外 +15
+        10: 50             // 10连胜额外 +50
+    },
+    timeBonus: {          // 时间加成
+        fast: 3,           // 3秒内答题 +3
+        medium: 1           // 5秒内答题 +1
+    },
+    levelComplete: 50      // 完成关卡额外 +50
+};
+
+// 爵位等级配置
+const RANK_CONFIG = {
+    ranks: [
+        { id: 'commoner', name: '庶人', minPoints: 0, title: '白丁', icon: '👤' },
+        { id: 'tenant', name: '佃农', minPoints: 100, title: '田舍郎', icon: '🌾' },
+        { id: 'owner', name: '自耕农', minPoints: 300, title: '田主', icon: '🏠' },
+        { id: 'rich', name: '富农', minPoints: 600, title: '殷实户', icon: '💰' },
+        { id: 'landlord', name: '地主', minPoints: 1000, title: '地主', icon: '🏘️' },
+        { id: 'gentry', name: '乡绅', minPoints: 1500, title: '乡贤', icon: '📜' },
+        { id: 'official', name: '县尉', minPoints: 2500, title: '父母官', icon: '🏛️' },
+        { id: 'magistrate', name: '县令', minPoints: 4000, title: '县令', icon: '🎖️' },
+        { id: 'sima', name: '司马', minPoints: 6000, title: '司马', icon: '⚔️' },
+        { id: 'cishi', name: '刺史', minPoints: 9000, title: '刺史', icon: '🦅' },
+        { id: 'taishou', name: '太守', minPoints: 13000, title: '太守', icon: '🏯' },
+        { id: 'shangshu', name: '尚书', minPoints: 18000, title: '尚书', icon: '📚' },
+        { id: 'jiangjun', name: '将军', minPoints: 25000, title: '将军', icon: '🛡️' },
+        { id: 'wanghou', name: '王侯', minPoints: 35000, title: '王侯', icon: '👑' }
+    ],
+    // 爵位特权
+    privileges: {
+        'rich': { healthBonus: 10 },
+        'landlord': { wealthBonus: 50 },
+        'gentry': { debuffImmunity: 1 },
+        'official': { helpTimesBonus: 2 },
+        'magistrate': { streakBonus: 1.5 },
+        'sima': { correctBonus: 1.1 },
+        'cishi': { figureUnlock: true },
+        'taishou': { talentUnlock: true },
+        'shangshu': { allEndingsUnlock: true },
+        'jiangjun': { prestigeBonus: 1.2 },
+        'wanghou': { title: '千古一帝' }
+    }
+};
+
+// 学识与爵位状态
+let knowledgeState = {
+    totalPoints: 0,       // 累计学识
+    currentPoints: 0,      // 当前学识（可用于本局）
+    currentRank: 'commoner',
+    highestRank: 'commoner',
+    rankProgress: 0         // 距离下一爵位的进度百分比
+};
+
+function loadKnowledgeState() {
+    try {
+        const saved = localStorage.getItem(KNOWLEDGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            knowledgeState.totalPoints = parsed.totalPoints || 0;
+            knowledgeState.highestRank = parsed.highestRank || 'commoner';
+        }
+    } catch (e) {
+        console.warn('加载学识状态失败');
+    }
+    updateRankFromPoints();
+}
+
+function saveKnowledgeState() {
+    try {
+        localStorage.setItem(KNOWLEDGE_KEY, JSON.stringify({
+            totalPoints: knowledgeState.totalPoints,
+            highestRank: knowledgeState.highestRank
+        }));
+    } catch (e) {
+        console.warn('保存学识状态失败');
+    }
+}
+
+function updateRankFromPoints() {
+    const points = knowledgeState.totalPoints;
+    let newRank = RANK_CONFIG.ranks[0];
+    
+    for (const rank of RANK_CONFIG.ranks) {
+        if (points >= rank.minPoints) {
+            newRank = rank;
+        } else {
+            break;
+        }
+    }
+    
+    if (newRank.id !== knowledgeState.currentRank) {
+        knowledgeState.currentRank = newRank.id;
+        if (RANK_CONFIG.ranks.findIndex(r => r.id === newRank.id) > 
+            RANK_CONFIG.ranks.findIndex(r => r.id === knowledgeState.highestRank)) {
+            knowledgeState.highestRank = newRank.id;
+        }
+    }
+    
+    // 计算进度
+    const currentIndex = RANK_CONFIG.ranks.findIndex(r => r.id === knowledgeState.currentRank);
+    if (currentIndex < RANK_CONFIG.ranks.length - 1) {
+        const currentMin = newRank.minPoints;
+        const nextMin = RANK_CONFIG.ranks[currentIndex + 1].minPoints;
+        knowledgeState.rankProgress = ((points - currentMin) / (nextMin - currentMin)) * 100;
+    } else {
+        knowledgeState.rankProgress = 100;
+    }
+}
+
+function addKnowledgePoints(points, source) {
+    knowledgeState.totalPoints += points;
+    if (points > 0) {
+        knowledgeState.currentPoints += points;
+        if (appState.gameState) {
+            appState.gameState.currentKnowledge = (appState.gameState.currentKnowledge || 0) + points;
+        }
+        updateRankFromPoints();
+        saveKnowledgeState();
+    }
+    return knowledgeState.currentPoints;
+}
+
+function getRankInfo(rankId) {
+    return RANK_CONFIG.ranks.find(r => r.id === rankId) || RANK_CONFIG.ranks[0];
+}
+
+function getCurrentRankPrivileges() {
+    const rankId = knowledgeState.currentRank;
+    return RANK_CONFIG.privileges[rankId] || {};
+}
+
+function calculateKnowledgeForAnswer(isCorrect, timeUsed, consecutiveCorrect, levelComplete) {
+    let points = 0;
+    
+    if (isCorrect) {
+        points += KNOWLEDGE_CONFIG.correct;
+        
+        // 连胜加成
+        if (consecutiveCorrect >= 10) {
+            points += KNOWLEDGE_CONFIG.streak[10];
+        } else if (consecutiveCorrect >= 5) {
+            points += KNOWLEDGE_CONFIG.streak[5];
+        } else if (consecutiveCorrect >= 3) {
+            points += KNOWLEDGE_CONFIG.streak[3];
+        }
+        
+        // 时间加成
+        if (timeUsed <= 3) {
+            points += KNOWLEDGE_CONFIG.timeBonus.fast;
+        } else if (timeUsed <= 5) {
+            points += KNOWLEDGE_CONFIG.timeBonus.medium;
+        }
+        
+        // 完成关卡加成
+        if (levelComplete) {
+            points += KNOWLEDGE_CONFIG.levelComplete;
+        }
+    } else {
+        points += KNOWLEDGE_CONFIG.wrong;
+    }
+    
+    return Math.max(0, points);
 }
 
 // ===================== 成就系统 =====================
@@ -542,7 +848,8 @@ function initGameState() {
         consecutiveCorrect: 0,
         pendingDeathOption: null,
         isFromSave: false,
-        gameRecord: []
+        gameRecord: [],
+        currentKnowledge: 0  // 本局获得的学识积分
     };
 }
 
@@ -1351,6 +1658,8 @@ function startGame() {
     if (!appState.gameState.isFromSave) {
         appState.gameState = initGameState();
         appState.triggeredEventIds = [];
+        // 重置当前学识积分
+        knowledgeState.currentPoints = 0;
         appState.gameState.currentPack = appState.selectedPack;
         appState.gameState.currentVolume = appState.selectedVolume;
         appState.gameState.currentIdentity = appState.selectedVolume.identityList.find(
@@ -1555,6 +1864,16 @@ function processNormalOption(option) {
         // 每日任务：答对计数
         addDailyCorrectCount();
         
+        // 计算学识积分
+        const timeUsed = getCurrentTimeConfig().baseTime - appState.countdown.remainingTime;
+        const knowledgePoints = calculateKnowledgeForAnswer(
+            true,
+            timeUsed,
+            appState.gameState.consecutiveCorrect,
+            true
+        );
+        const knowledgeGained = addKnowledgePoints(knowledgePoints, 'answer');
+        
         if (appState.gameState.consecutiveCorrect >= 4) {
             const recoverResult = updateAttribute('health', 10);
             healthRecovered = recoverResult.newValue - recoverResult.oldValue;
@@ -1566,6 +1885,8 @@ function processNormalOption(option) {
         }
     } else {
         appState.gameState.consecutiveCorrect = 0;
+        // 答错也扣学识积分
+        addKnowledgePoints(KNOWLEDGE_CONFIG.wrong, 'wrong_answer');
     }
 
     updateGameUI();
@@ -1866,7 +2187,7 @@ function gameEnd(isSuccess, desc) {
     
     // 检查并解锁成就
     checkAndUnlockAchievements(appState.gameState, isSuccess);
-
+    
     // 【修复】通关时解锁下一卷
     if (isSuccess) {
         const packId = appState.selectedPackType === 'default' ? 'default_pack' : 'custom_pack';
@@ -1880,23 +2201,56 @@ function gameEnd(isSuccess, desc) {
             unlockVolume(packId, nextVolume.id);
         }
     }
-
+    
+    // 计算学识积分
+    const knowledgeGained = appState.gameState.currentKnowledge || 0;
+    
     const scoreResult = calculateScore(appState.gameState, isSuccess);
     const weaknessResult = analyzeWeakness(appState.gameState.gameRecord);
-
+    
+    // 获取结局
+    const ending = determineEnding(appState.gameState, isSuccess);
+    
+    // 获取爵位信息
+    const rankInfo = getRankInfo(knowledgeState.currentRank);
+    
     document.getElementById('end-title').innerText = isSuccess ? "恭喜你，通关成功！" : "游戏结束";
     document.getElementById('end-title').className = isSuccess ? "end-title end-success" : "end-title end-fail";
-    document.getElementById('end-desc').innerText = desc;
-
+    
+    // 显示结局信息
+    const endingHtml = `
+        <div class="ending-display" style="text-align: center; margin-bottom: 20px;">
+            <div class="ending-icon" style="font-size: 4rem; margin-bottom: 10px;">${ending.icon}</div>
+            <div class="ending-name" style="font-size: 1.5rem; color: ${ending.color}; font-weight: bold;">${ending.name}</div>
+            <div class="ending-desc" style="color: var(--text-muted); margin-top: 10px;">${ending.description}</div>
+        </div>
+    `;
+    document.getElementById('end-desc').innerHTML = endingHtml + `<p style="margin-top: 15px;">${desc}</p>`;
+    
+    // 显示爵位信息
+    const rankHtml = `
+        <div class="rank-display" style="text-align: center; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%); border-radius: 12px;">
+            <div style="font-size: 2.5rem; margin-bottom: 5px;">${rankInfo.icon}</div>
+            <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;">当前爵位：${rankInfo.name}</div>
+            <div style="font-size: 0.9rem; color: var(--text-muted);">${rankInfo.title}</div>
+            <div style="margin-top: 10px;">
+                <span style="color: var(--success);">+${knowledgeGained}</span> 学识
+                <span style="color: var(--text-muted); margin-left: 15px;">累计：${knowledgeState.totalPoints}</span>
+            </div>
+        </div>
+    `;
+    
     document.getElementById('score-level').innerText = scoreResult.level.name;
     document.getElementById('score-desc').innerText = scoreResult.level.desc;
     document.getElementById('total-score').innerText = scoreResult.totalScore;
-
+    
     document.getElementById('end-stats').innerHTML = `
+        ${rankHtml}
         <p><strong>剧本名称：</strong>${appState.gameState.currentPack.packInfo.packName}</p>
         <p><strong>游戏篇章：</strong>${appState.gameState.currentVolume.name}</p>
         <p><strong>朝代背景：</strong>${appState.gameState.currentVolume.dynasty}</p>
         <p><strong>最终身份：</strong>${appState.gameState.currentIdentity.name}</p>
+        <p><strong>结局：</strong><span style="color: ${ending.color};">${ending.icon} ${ending.name}</span></p>
         <p><strong>选择关卡数：</strong>${appState.gameState.userSelectedLevelCount} / 总关卡数${appState.gameState.totalLevel}</p>
         <p><strong>答题总数：</strong>${appState.gameState.gameRecord.length} 题</p>
         <p><strong>正确答题数：</strong>${appState.gameState.levelPassed} 题</p>
@@ -2412,6 +2766,9 @@ window.onload = async () => {
     
     // 初始化音效系统（延迟初始化，需要用户交互）
     setTimeout(() => AudioSystem.init(), 1000);
+    
+    // 加载学识积分和爵位状态
+    loadKnowledgeState();
     
     // 加载成就状态
     loadAchievementState();
