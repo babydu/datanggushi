@@ -1165,4 +1165,33 @@ body {
     margin-bottom: 20px;
 }
 
+/* ===================== 每日任务弹窗样式 ===================== */
+.daily-task-modal .modal-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.daily-task-content {
+    max-width: 360px;
+}
+
+.daily-task-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: achievement-bounce 0.6s ease;
+}
+
+.daily-task-title {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.daily-task-desc {
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
 

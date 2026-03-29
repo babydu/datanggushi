@@ -364,6 +364,141 @@ function getAchievementStats() {
     };
 }
 
+// ===================== 每日任务系统 =====================
+const DAILY_TASK_KEY = 'history_survivor_daily_tasks';
+
+// 简化版每日任务定义
+const DAILY_TASKS = [
+    {
+        id: 'daily_login',
+        name: '每日登录',
+        description: '每日首次进入游戏',
+        reward: { type: 'helpTimes', value: 1 },
+        check: (state) => state.loginCount >= 1
+    },
+    {
+        id: 'daily_answer_3',
+        name: '每日答题',
+        description: '每日答对3道题',
+        reward: { type: 'helpTimes', value: 1 },
+        check: (state) => state.correctCount >= 3
+    }
+];
+
+let dailyTaskState = {
+    lastLoginDate: null,
+    loginCount: 0,
+    correctCount: 0,
+    completedTasks: []
+};
+
+function loadDailyTaskState() {
+    try {
+        const saved = localStorage.getItem(DAILY_TASK_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // 检查是否是今天的数据
+            const today = new Date().toDateString();
+            if (parsed.lastLoginDate === today) {
+                dailyTaskState = parsed;
+            } else {
+                // 重置任务状态
+                dailyTaskState = {
+                    lastLoginDate: today,
+                    loginCount: parsed.loginCount ? parsed.loginCount + 1 : 1,
+                    correctCount: 0,
+                    completedTasks: []
+                };
+                saveDailyTaskState();
+            }
+        } else {
+            // 首次登录
+            dailyTaskState = {
+                lastLoginDate: new Date().toDateString(),
+                loginCount: 1,
+                correctCount: 0,
+                completedTasks: []
+            };
+            saveDailyTaskState();
+        }
+    } catch (e) {
+        console.warn('加载每日任务状态失败');
+    }
+}
+
+function saveDailyTaskState() {
+    try {
+        localStorage.setItem(DAILY_TASK_KEY, JSON.stringify(dailyTaskState));
+    } catch (e) {
+        console.warn('保存每日任务状态失败');
+    }
+}
+
+function checkAndCompleteDailyTasks() {
+    const rewards = [];
+    
+    DAILY_TASKS.forEach(task => {
+        if (!dailyTaskState.completedTasks.includes(task.id)) {
+            if (task.check(dailyTaskState)) {
+                dailyTaskState.completedTasks.push(task.id);
+                rewards.push(task.reward);
+            }
+        }
+    });
+    
+    if (rewards.length > 0) {
+        saveDailyTaskState();
+        
+        // 发放奖励
+        rewards.forEach(reward => {
+            if (reward.type === 'helpTimes' && appState.gameState) {
+                updateAttribute('helpTimes', reward.value);
+            }
+        });
+        
+        showDailyTaskRewardPopup(rewards);
+    }
+    
+    return rewards;
+}
+
+function addDailyCorrectCount() {
+    dailyTaskState.correctCount++;
+    saveDailyTaskState();
+    checkAndCompleteDailyTasks();
+}
+
+function showDailyTaskRewardPopup(rewards) {
+    const rewardText = rewards.map(r => {
+        if (r.type === 'helpTimes') return `求救次数 +${r.value}`;
+        return JSON.stringify(r);
+    }).join('、');
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal daily-task-modal';
+    modal.innerHTML = `
+        <div class="modal-content daily-task-content">
+            <div class="daily-task-icon">🎁</div>
+            <div class="daily-task-title">每日任务奖励！</div>
+            <div class="daily-task-desc">完成任务获得：${rewardText}</div>
+            <button class="btn" onclick="this.closest('.modal').remove()">确定</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('active'), 50);
+}
+
+function getDailyTaskStats() {
+    return {
+        tasks: DAILY_TASKS.map(t => ({
+            ...t,
+            isCompleted: dailyTaskState.completedTasks.includes(t.id)
+        })),
+        loginCount: dailyTaskState.loginCount,
+        correctCount: dailyTaskState.correctCount
+    };
+}
+
 // ===================== 全局状态管理 =====================
 let appState = {
     defaultPack: null,
@@ -1417,6 +1552,9 @@ function processNormalOption(option) {
         appState.gameState.consecutiveCorrect++;
         appState.gameState.levelPassed++;
         
+        // 每日任务：答对计数
+        addDailyCorrectCount();
+        
         if (appState.gameState.consecutiveCorrect >= 4) {
             const recoverResult = updateAttribute('health', 10);
             healthRecovered = recoverResult.newValue - recoverResult.oldValue;
@@ -2277,6 +2415,10 @@ window.onload = async () => {
     
     // 加载成就状态
     loadAchievementState();
+    
+    // 初始化每日任务
+    loadDailyTaskState();
+    checkAndCompleteDailyTasks();
     
     // 添加全局按钮点击音效
     document.addEventListener('click', (e) => {
