@@ -79,6 +79,116 @@ const TUTORIAL_STEPS = [
     }
 ];
 
+// ===================== 音效系统常量 =====================
+const AUDIO_CONFIG = {
+    enabled: true,
+    volume: 0.5,
+    sounds: {
+        correct: { file: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU', fallback: 'correct' },
+        wrong: { file: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU', fallback: 'wrong' },
+        click: { file: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU', fallback: 'click' },
+        success: { file: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU', fallback: 'success' },
+        fail: { file: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU', fallback: 'fail' }
+    }
+};
+
+// 音效系统对象
+const AudioSystem = {
+    context: null,
+    initialized: false,
+    
+    init() {
+        if (this.initialized) return;
+        try {
+            this.context = new (window.AudioContext || window.webkitAudioContext)();
+            this.initialized = true;
+        } catch (e) {
+            console.warn('Web Audio API 不可用，音效功能已禁用');
+            AUDIO_CONFIG.enabled = false;
+        }
+    },
+    
+    play(soundType) {
+        if (!AUDIO_CONFIG.enabled || !this.context) return;
+        
+        // 确保 AudioContext 处于活动状态
+        if (this.context.state === 'suspended') {
+            this.context.resume();
+        }
+        
+        const oscillator = this.context.createOscillator();
+        const gainNode = this.context.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.context.destination);
+        
+        const volume = AUDIO_CONFIG.volume;
+        gainNode.gain.value = volume;
+        
+        switch (soundType) {
+            case 'correct':
+                oscillator.frequency.value = 523.25; // C5
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(volume, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(this.context.currentTime + 0.3);
+                break;
+                
+            case 'wrong':
+                oscillator.frequency.value = 200;
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(volume * 0.5, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.4);
+                oscillator.start();
+                oscillator.stop(this.context.currentTime + 0.4);
+                break;
+                
+            case 'click':
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(volume * 0.3, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.05);
+                oscillator.start();
+                oscillator.stop(this.context.currentTime + 0.05);
+                break;
+                
+            case 'success':
+                oscillator.frequency.value = 523.25;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(volume, this.context.currentTime);
+                oscillator.start();
+                oscillator.frequency.setValueAtTime(523.25, this.context.currentTime);
+                oscillator.frequency.setValueAtTime(659.25, this.context.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, this.context.currentTime + 0.2); // G5
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.5);
+                oscillator.stop(this.context.currentTime + 0.5);
+                break;
+                
+            case 'fail':
+                oscillator.frequency.value = 400;
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(volume * 0.5, this.context.currentTime);
+                oscillator.start();
+                oscillator.frequency.setValueAtTime(400, this.context.currentTime);
+                oscillator.frequency.setValueAtTime(300, this.context.currentTime + 0.15);
+                oscillator.frequency.setValueAtTime(200, this.context.currentTime + 0.3);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.5);
+                oscillator.stop(this.context.currentTime + 0.5);
+                break;
+        }
+    },
+    
+    setVolume(vol) {
+        AUDIO_CONFIG.volume = Math.max(0, Math.min(1, vol));
+    },
+    
+    toggle() {
+        AUDIO_CONFIG.enabled = !AUDIO_CONFIG.enabled;
+        return AUDIO_CONFIG.enabled;
+    }
+};
+
 // ===================== 全局状态管理 =====================
 let appState = {
     defaultPack: null,
@@ -1056,6 +1166,9 @@ async function selectOption(option, index, levelData) {
     clearCountdown();
     appState.gameState.selectedOption = option;
 
+    // 初始化音效系统（需要用户交互后才能播放）
+    AudioSystem.init();
+    
     // 禁用所有选项
     const optionBtns = document.querySelectorAll('.option-btn');
     optionBtns.forEach(btn => {
@@ -1064,6 +1177,15 @@ async function selectOption(option, index, levelData) {
             btn.classList.add(option.isCorrect ? 'correct' : 'wrong');
         }
     });
+    
+    // 播放音效
+    if (option.isCorrect) {
+        AudioSystem.play('correct');
+    } else if (option.endGame) {
+        AudioSystem.play('fail');
+    } else {
+        AudioSystem.play('wrong');
+    }
 
     // 记录闯关数据
     const correctOption = appState.gameState.currentOptions.find(opt => opt.isCorrect);
@@ -1420,6 +1542,14 @@ function analyzeWeakness(gameRecord) {
 function gameEnd(isSuccess, desc) {
     clearCountdown();
     clearGameProgress();
+    
+    // 播放结局音效
+    AudioSystem.init();
+    if (isSuccess) {
+        AudioSystem.play('success');
+    } else {
+        AudioSystem.play('fail');
+    }
 
     // 【修复】通关时解锁下一卷
     if (isSuccess) {
@@ -1963,6 +2093,17 @@ window.onload = async () => {
     
     // 初始化新手引导
     initTutorial();
+    
+    // 初始化音效系统（延迟初始化，需要用户交互）
+    setTimeout(() => AudioSystem.init(), 1000);
+    
+    // 添加全局按钮点击音效
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn')) {
+            AudioSystem.init();
+            AudioSystem.play('click');
+        }
+    }, true);
 };
 
 // ===================== 新手引导系统 =====================
