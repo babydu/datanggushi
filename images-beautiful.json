@@ -1,0 +1,146 @@
+{
+    "packInfo": {
+        "packName": "图片美化+第二关修复测试剧本",
+        "dynasty": "测试时代",
+        "version": "4.2",
+        "author": "最终修复版",
+        "description": "用于测试图片布局美化和第二关Bug修复的剧本，包含3个完整关卡，确保能顺利通关。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 }
+    },
+    "timeLimitConfig": { "baseTime": 25, "healthDeductPerSecond": 1 },
+    "volumeList": [
+        {
+            "id": "final_test",
+            "name": "最终测试卷",
+            "subtitle": "图片美化+第二关修复",
+            "dynasty": "测试时代",
+            "description": "本卷用于测试图片美化效果和第二关Bug修复，包含3个关卡，确保能顺利通关。",
+            "isFirst": true,
+            "identityList": [
+                {
+                    "id": "final_tester",
+                    "name": "最终测试员",
+                    "description": "你是最终测试员，验证图片美化和第二关修复是否成功。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "【第一关：图片美化测试】\n\n如果优化成功，你应该能看到：\n1. 漂亮的圆形选项字母\n2. 带渐变边框和阴影的图片\n3. 鼠标悬停时图片会轻微放大\n\n请选择正确选项！",
+                            "knowledgeTag": ["图片美化", "第一关测试"],
+                            "optionPool": [
+                                {
+                                    "id": "opt1_correct",
+                                    "type": "correct",
+                                    "text": "✅ 这是正确选项！图片布局是不是变好看了？",
+                                    "image": "https://picsum.photos/seed/beautiful1/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "🎉 太棒了！图片美化成功！现在请继续进入第二关，验证Bug是否修复！",
+                                    "history": "第一关完成，准备进入第二关..."
+                                },
+                                {
+                                    "id": "opt1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是错误选项（也有美化图片）",
+                                    "image": "https://picsum.photos/seed/beautiful2/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。但图片是不是变好看了？再试一次吧！",
+                                    "history": "继续加油！"
+                                },
+                                {
+                                    "id": "opt1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是纯文字选项，用于测试兼容性",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。纯文字选项也完美兼容！",
+                                    "history": "向后兼容没问题！"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "【第二关：Bug修复验证】\n\n🎉 恭喜！你成功进入了第二关！\n\n这说明之前的“第二关无法进入”的Bug已经修复了！\n\n请继续选择正确选项，验证能否顺利进入第三关！",
+                            "knowledgeTag": ["第二关测试", "Bug修复验证"],
+                            "optionPool": [
+                                {
+                                    "id": "opt2_correct",
+                                    "type": "correct",
+                                    "text": "✅ 太棒了！Bug修复成功！我能进入第二关了！",
+                                    "image": "https://picsum.photos/seed/bugfixed1/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "🚀 完美！第二关顺利通过！现在请继续进入第三关，验证整个流程是否完全通畅！",
+                                    "history": "第二关完成，准备进入第三关..."
+                                },
+                                {
+                                    "id": "opt2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是第二关的错误选项",
+                                    "image": "https://picsum.photos/seed/bugfixed2/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。但你能在第二关，说明Bug已经修复了！",
+                                    "history": "继续测试！"
+                                },
+                                {
+                                    "id": "opt2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 第二关的纯文字选项",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。再试一次吧！",
+                                    "history": "加油！"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "【第三关：完整流程验证】\n\n🏆 太厉害了！你成功进入了第三关！\n\n这说明：\n1. 图片美化成功 ✅\n2. 第二关Bug修复成功 ✅\n3. 整个流程完全通畅 ✅\n\n请选择最后一个正确选项，完成整个测试！",
+                            "knowledgeTag": ["第三关测试", "完整流程验证"],
+                            "optionPool": [
+                                {
+                                    "id": "opt3_correct",
+                                    "type": "correct",
+                                    "text": "🏆 完美！所有测试都通过了！图片好看，流程顺畅！",
+                                    "image": "https://picsum.photos/seed/successfinal/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "🎊 恭喜你！所有测试圆满完成！\n\n✅ 图片布局美化成功\n✅ 第二关Bug修复成功\n✅ 多关卡流程完全通畅\n\n现在你可以放心使用图片功能了！",
+                                    "history": "测试圆满完成！"
+                                },
+                                {
+                                    "id": "opt3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是第三关的错误选项",
+                                    "image": "https://picsum.photos/seed/finalwrong/500/300",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。但你能到第三关，说明所有功能都正常！",
+                                    "history": "再试一次吧！"
+                                },
+                                {
+                                    "id": "opt3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 第三关的纯文字选项",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。再试一次，完成最终测试！",
+                                    "history": "加油！"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+

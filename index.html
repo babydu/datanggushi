@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史生存模拟器</title>
+    <!-- 引入独立CSS文件 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 欢迎页 -->
+    <div id="welcome-page" class="page active">
+        <h1 class="title">历史生存模拟器</h1>
+        <p class="subtitle">卷解锁版 | 以史为鉴，在历史长河中活下去</p>
+        <div class="intro-text">
+            本游戏完全实现框架与剧情分离，采用多卷篇章解锁机制，强制从第一卷开始，通关上卷解锁下卷。<br>
+            新增属性上限控制、随机选项池、限时答题、历史人物特殊事件、成绩评定、完整复盘功能。
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+            <button class="btn" onclick="switchPage('pack-page')">选择剧本</button>
+            <button class="btn btn-success" id="load-save-btn" disabled onclick="loadGameProgress()">读取存档</button>
+            <button class="btn btn-info" onclick="switchPage('format-page')">剧本格式说明</button>
+        </div>
+    </div>
+
+    <!-- 剧本格式说明页 -->
+    <div id="format-page" class="page">
+        <h1 class="title">剧本格式说明</h1>
+        <div class="format-tip">
+            剧本文件为标准JSON格式，核心新增<strong>多卷篇章解锁机制</strong>与<strong>属性配置系统</strong>，完全向下兼容旧版本剧本。<br>
+            支持无限拓展卷数、身份、关卡，无需修改框架代码，一键导入即可游玩。
+        </div>
+        <div class="story-box" style="font-family: 'Consolas', monospace; font-size: 0.9rem; overflow-x: auto;">
+<pre>
+{
+  "packInfo": {
+    "packName": "唐朝历史生存剧本",
+    "dynasty": "唐朝",
+    "version": "3.0",
+    "author": "官方内置",
+    "description": "分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷"
+  },
+  // 全局属性配置
+  "attributeConfig": {
+    "health": { "name": "生命值", "max": 100, "min": 0 },
+    "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+    "debuff": { "name": "负面状态", "max": 5, "min": 0 },
+    "wealth": { "name": "财富值", "max": 1000, "min": 0 },
+    "officialRank": { "name": "官职品级", "max": 9, "min": 0 }
+  },
+  // 全局限时配置
+  "timeLimitConfig": {
+    "baseTime": 10,
+    "healthDeductPerSecond": 1,
+    "freezeOnModal": true
+  },
+  // 全局成绩配置
+  "scoreConfig": {},
+  // 全局特殊事件
+  "specialEvents": [],
+  // 【核心新增】卷列表（解锁机制）
+  "volumeList": [
+    {
+      "id": "zhenguan",
+      "name": "贞观卷",
+      "subtitle": "贞观之治·父辈的起点",
+      "dynasty": "唐朝贞观年间",
+      "description": "贞观年间，唐太宗励精图治，天下初定，百废待兴。你将作为一名普通百姓，在这个盛世的起点，开启你的人生。",
+      "isFirst": true, // 【新增】标记为第一卷
+      "unlockCondition": null, // 第一卷无需解锁
+      "inheritFrom": null,
+      "identityList": []
+    },
+    {
+      "id": "kaiyuan",
+      "name": "开元卷",
+      "subtitle": "开元盛世·子辈的传承",
+      "dynasty": "唐朝开元年间",
+      "description": "开元年间，唐朝达到鼎盛，四海升平，万邦来朝。你将继承父辈的家业，在这个全盛时代，续写家族的传奇。",
+      "isFirst": false,
+      "unlockCondition": "volume_zhenguan_pass", // 【新增】通关上一卷的ID_pass
+      "inheritFrom": "zhenguan",
+      "identityList": []
+    }
+  ]
+}
+</pre>
+        </div>
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('welcome-page')">返回首页</button>
+            <button class="btn" onclick="switchPage('pack-page')">去选择剧本</button>
+        </div>
+    </div>
+
+    <!-- 剧本选择页 -->
+    <div id="pack-page" class="page">
+        <h1 class="title">选择游戏剧本</h1>
+        <p class="subtitle">选择内置剧本，或上传自定义JSON剧本文件</p>
+
+        <div class="upload-area" id="upload-area">
+            <h3>上传自定义剧本</h3>
+            <p style="margin: 15px 0;">点击选择或拖拽JSON剧本文件到此处，即可导入</p>
+            <input type="file" id="pack-upload" class="upload-input" accept=".json" />
+            <button class="btn" onclick="document.getElementById('pack-upload').click()">选择JSON文件</button>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">支持符合格式标准的JSON剧本文件，上传后会自动缓存到浏览器本地</p>
+        </div>
+
+        <div id="upload-error" style="display: none;"></div>
+
+        <div class="pack-card" id="default-pack-card" data-pack-type="default">
+            <div class="pack-title">唐朝历史生存剧本（内置完整版）</div>
+            <div class="pack-meta">
+                <span>朝代：唐朝</span>
+                <span>篇章数量：2卷</span>
+                <span>作者：官方内置</span>
+                <span>版本：3.0</span>
+            </div>
+            <div class="pack-desc">分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷，所有剧情均基于唐代正史、律令设计。</div>
+        </div>
+
+        <!-- 【修改】自定义剧本列表容器 -->
+        <div id="custom-pack-container" style="width: 100%;">
+            <p style="text-align: center; color: var(--text-muted); padding: 20px;">暂无上传的自定义剧本</p>
+        </div>
+
+
+        <div class="format-tip">
+            提示：自定义剧本上传后，会永久保存在浏览器本地，刷新页面无需重新上传；若要更换剧本，重新上传新文件即可覆盖。
+        </div>
+
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('welcome-page')">返回首页</button>
+            <button class="btn" id="confirm-pack-btn" disabled onclick="confirmPack()">确认剧本，下一步</button>
+        </div>
+    </div>
+
+    <!-- 【新增】卷选择页（带解锁机制） -->
+    <div id="volume-page" class="page">
+        <h1 class="title">选择游戏篇章</h1>
+        <p class="subtitle" id="volume-pack-subtitle">当前剧本：唐朝历史生存剧本</p>
+        <div class="volume-grid" id="volume-grid">
+            <!-- 卷卡片由JS动态生成 -->
+        </div>
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('pack-page')">返回剧本选择</button>
+            <button class="btn" id="confirm-volume-btn" disabled onclick="confirmVolume()">确认篇章，下一步</button>
+        </div>
+    </div>
+
+    <!-- 身份选择页 -->
+    <div id="identity-page" class="page">
+        <h1 class="title">选择你的身份</h1>
+        <p class="subtitle" id="identity-subtitle">当前篇章：贞观卷 | 剧本：唐朝历史生存剧本</p>
+        <div class="identity-grid" id="identity-grid">
+            <!-- 身份卡片由JS动态生成 -->
+        </div>
+        <button class="btn" id="confirm-identity-btn" disabled onclick="goToLevelSelect()">确认身份，下一步</button>
+        <button class="btn btn-secondary" onclick="switchPage('volume-page')">返回篇章选择</button>
+    </div>
+
+    <!-- 关卡数量选择页 -->
+    <div id="level-select-page" class="page">
+        <h1 class="title">选择游玩关卡数</h1>
+        <div class="level-select-box">
+            <div class="level-select-title" id="level-select-identity">当前身份：农户</div>
+            <div class="level-select-desc" id="level-select-desc">
+                该身份总共有 <span id="total-level-count">10</span> 个关卡，你可以选择1~总关卡数之间的任意数量，完成所选关卡即可通关。
+            </div>
+            <div class="level-input-group">
+                <input type="range" class="level-slider" id="level-slider" min="1" max="10" value="10">
+                <div class="level-display">选择关卡数：<span id="selected-level-count">10</span> 关</div>
+            </div>
+            <div class="format-tip">
+                提示：默认选择全部关卡，滑动滑块可调整游玩的关卡数量，选择后将从第1关开始连续游玩。
+            </div>
+        </div>
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('identity-page')">返回身份选择</button>
+            <button class="btn" onclick="startGame()">确认，开始游戏</button>
+        </div>
+    </div>
+
+    <!-- 游戏主页面 -->
+    <div id="game-page" class="page">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">篇章</div>
+                <div class="status-value" id="volume-text">贞观卷</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">身份</div>
+                <div class="status-value" id="identity-text">农户</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">关卡进度</div>
+                <div class="status-value" id="level-text">1/10</div>
+            </div>
+            <div class="status-item countdown-item">
+                <div class="status-label">剩余时间</div>
+                <div class="status-value countdown-value" id="countdown-text">10s</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">剩余求救</div>
+                <div class="status-value" id="help-text">3次</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">生命值 <span id="debuff-tag"></span><span id="streak-tag"></span></div>
+                <div class="health-bar">
+                    <div class="health-fill" id="health-fill" style="width: 100%"></div>
+                </div>
+                <div class="status-value" id="health-text">100</div>
+            </div>
+        </div>
+
+        <div class="story-box" id="story-text">
+            剧情文本将根据选中的剧本动态加载
+        </div>
+
+        <div class="options-box" id="options-box">
+            <!-- 选项由JS动态生成 -->
+        </div>
+
+        <div class="control-box">
+            <button class="btn" id="help-btn" onclick="useHelp()">使用求救机会</button>
+            <button class="btn btn-warning" onclick="saveGameProgress()">保存进度</button>
+            <button class="btn btn-secondary" onclick="restartGame()">重新开始</button>
+            <button class="btn btn-secondary" onclick="exitToHome()">退出到首页</button>
+        </div>
+    </div>
+
+    <!-- 历史知识点弹窗 -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="history-modal-title">历史知识点解析</h3>
+            <div class="modal-text" id="history-modal-text"></div>
+            <button class="btn" onclick="closeHistoryModal()">确认，继续前行</button>
+        </div>
+    </div>
+
+    <!-- 必死选项求救弹窗 -->
+    <div id="death-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" style="color: var(--danger);">⚠️ 致命选择</h3>
+            <div class="modal-text" id="death-modal-text"></div>
+            <div class="modal-buttons" id="death-modal-buttons">
+                <!-- 按钮由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 特殊事件弹窗 -->
+    <div id="event-modal" class="modal dialog-modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="event-modal-title">特殊事件</h3>
+            <div class="dialog-character" id="event-character"></div>
+            <div class="dialog-content" id="event-content"></div>
+            <div id="event-effect" class="dialog-effect" style="display: none;"></div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeEventModal()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结局页 -->
+    <div id="end-page" class="page">
+        <h1 class="end-title" id="end-title">游戏结束</h1>
+        
+        <div id="score-card" class="score-card">
+            <div class="score-level" id="score-level">进士及第</div>
+            <div class="score-desc" id="score-desc">你顺利通过了本次考验，对本朝代的历史有基本的掌握。</div>
+            <div class="score-total">综合得分：<span id="total-score">85</span>分</div>
+        </div>
+
+        <div class="end-stats" id="end-stats">
+            <!-- 结局统计由JS动态生成 -->
+        </div>
+
+        <div id="weakness-box" class="weakness-box" style="display: none;">
+            <div class="weakness-title">📊 知识点薄弱环节分析</div>
+            <div id="weakness-list">
+                <!-- 薄弱项由JS动态生成 -->
+            </div>
+        </div>
+
+        <div class="modal-text" id="end-desc"></div>
+        <div class="control-box" id="end-control-box">
+            <button class="btn btn-info" id="review-btn" onclick="goToReview()">查看完整闯关复盘</button>
+            <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
+        </div>
+    </div>
+
+    <!-- 复盘页面 -->
+    <div id="review-page" class="page">
+        <h1 class="review-title">闯关完整复盘</h1>
+        <div id="review-content">
+            <!-- 复盘内容由JS动态生成 -->
+        </div>
+        <div class="control-box">
+            <button class="btn" onclick="switchPage('end-page')">返回结局页</button>
+            <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
+        </div>
+    </div>
+
+    <!-- 引入独立JS文件 -->
+    <script src="game.js"></script>
+</body>
+</html>
+

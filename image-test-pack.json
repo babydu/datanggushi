@@ -1,0 +1,146 @@
+{
+    "packInfo": {
+        "packName": "图片选项测试剧本",
+        "dynasty": "测试朝代",
+        "version": "4.0",
+        "author": "图片功能测试",
+        "description": "用于测试选项图片功能的剧本，包含「文字+图片」、「仅图片」、「仅文字」三种选项模式，图片使用免费占位图服务。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 }
+    },
+    "timeLimitConfig": { "baseTime": 20, "healthDeductPerSecond": 1 },
+    "volumeList": [
+        {
+            "id": "image_test",
+            "name": "图片功能测试卷",
+            "subtitle": "测试三种图片显示模式",
+            "dynasty": "测试时代",
+            "description": "本卷用于测试选项图片功能，包含3个关卡，分别测试不同的图片显示模式。",
+            "isFirst": true,
+            "identityList": [
+                {
+                    "id": "tester",
+                    "name": "测试员",
+                    "description": "你是一名功能测试员，专门测试新加入的图片选项功能。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "【第一关：文字+图片模式】\n\n这是一个测试关卡，所有选项都同时显示文字和图片。请观察图片和文字，选择正确的答案。",
+                            "knowledgeTag": ["图片测试", "文字+图片模式"],
+                            "optionPool": [
+                                {
+                                    "id": "opt1_correct",
+                                    "type": "correct",
+                                    "text": "这是正确选项（图片为随机风景）",
+                                    "image": "images/企业对员工罚款2.png",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "恭喜！你选对了！这个选项同时显示了文字和图片。",
+                                    "history": "这是图片功能测试的历史知识点。"
+                                },
+                                {
+                                    "id": "opt1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "这是错误选项A（图片为随机建筑）",
+                                    "image": "images/企业罚款员工.png",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。不过你看到了图片和文字的组合显示效果。",
+                                    "history": "这是错误选项的历史知识点。"
+                                },
+                                {
+                                    "id": "opt1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "这是错误选项B（图片为随机人物）",
+                                    "image": "images/企业罚款员工3.jpg",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。图片功能运行正常！",
+                                    "history": "这是另一个错误选项的历史知识点。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "【第二关：仅图片模式】\n\n这是一个测试关卡，正确选项仅显示图片，隐藏文字。请根据图片内容做出选择。",
+                            "knowledgeTag": ["图片测试", "仅图片模式"],
+                            "optionPool": [
+                                {
+                                    "id": "opt2_correct",
+                                    "type": "correct",
+                                    "text": "（这是正确选项的文字，被隐藏了）",
+                                    "image": "https://picsum.photos/seed/onlyimagecorrect/400/250",
+                                    "imageOnly": true,
+                                    "isCorrect": true,
+                                    "result": "恭喜！你通过图片选对了！这个选项只显示了图片，隐藏了文字。",
+                                    "history": "仅图片模式适合用图片直接表达的场景（如文物、地图、场景等）。"
+                                },
+                                {
+                                    "id": "opt2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "这是错误选项A（文字+图片）",
+                                    "image": "https://picsum.photos/seed/onlyimagewrong1/400/200",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。注意观察：有的选项只显示图片哦！",
+                                    "history": "这是错误选项的历史知识点。"
+                                },
+                                {
+                                    "id": "opt2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "这是错误选项B（仅文字，无图片）",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。这个选项没有图片，是纯文字选项。",
+                                    "history": "纯文字选项依然完美兼容！"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "【第三关：混合模式】\n\n这是一个测试关卡，三个选项分别使用不同的模式：\nA. 仅文字\nB. 文字+图片\nC. 仅图片\n\n请根据实际情况做出选择！",
+                            "knowledgeTag": ["图片测试", "混合模式"],
+                            "optionPool": [
+                                {
+                                    "id": "opt3_correct",
+                                    "type": "correct",
+                                    "text": "这是正确选项（文字+图片模式）",
+                                    "image": "https://picsum.photos/seed/finalcorrect/400/220",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "🎉 恭喜！你完成了所有图片功能测试！\n\n三种模式都运行正常：\n1. 仅文字（兼容旧剧本）\n2. 文字+图片（新增）\n3. 仅图片（新增）",
+                                    "history": "图片功能测试圆满完成！你可以开始制作自己的带图剧本了！"
+                                },
+                                {
+                                    "id": "opt3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "这是错误选项A（仅文字模式，无图片）",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。这是一个仅文字的选项，和旧剧本完全兼容。",
+                                    "history": "仅文字选项是我们的老朋友了！"
+                                },
+                                {
+                                    "id": "opt3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "（这是错误选项B的文字，被隐藏了）",
+                                    "image": "https://picsum.photos/seed/finalwrong/400/200",
+                                    "imageOnly": true,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，你选错了。这是一个仅图片的选项，很酷吧！",
+                                    "history": "仅图片模式适合视觉化的题目！"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+

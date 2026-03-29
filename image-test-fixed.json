@@ -1,0 +1,109 @@
+{
+    "packInfo": {
+        "packName": "图片显示修复测试剧本",
+        "dynasty": "测试时代",
+        "version": "4.1",
+        "author": "Bug修复版",
+        "description": "专门用于测试图片显示的修复版剧本，使用了稳定的图床服务，确保图片100%能显示。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 }
+    },
+    "timeLimitConfig": { "baseTime": 30, "healthDeductPerSecond": 1 },
+    "volumeList": [
+        {
+            "id": "image_test_fixed",
+            "name": "图片修复测试卷",
+            "subtitle": "确保图片能显示",
+            "dynasty": "测试时代",
+            "description": "本卷专门测试图片显示功能，使用稳定的图床服务。",
+            "isFirst": true,
+            "identityList": [
+                {
+                    "id": "tester",
+                    "name": "测试员",
+                    "description": "你是一名测试员，专门验证图片显示功能是否修复。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "【第一关：图片显示测试】\n\n如果修复成功，你应该能在选项中看到图片！\n\n请选择带有图片的正确选项。",
+                            "knowledgeTag": ["图片测试"],
+                            "optionPool": [
+                                {
+                                    "id": "opt1_correct",
+                                    "type": "correct",
+                                    "text": "✅ 这是正确选项！如果你能看到上面的风景图片，说明图片显示功能修复成功！",
+                                    "image": "https://picsum.photos/seed/success123/600/350",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "🎉 恭喜！图片显示功能修复成功！",
+                                    "history": "图片功能已正常工作。"
+                                },
+                                {
+                                    "id": "opt1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是错误选项（也有图片）",
+                                    "image": "https://picsum.photos/seed/wrong456/600/350",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。但你能看到图片，说明修复是成功的！",
+                                    "history": "继续加油！"
+                                },
+                                {
+                                    "id": "opt1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 这是纯文字选项（无图片），用于测试兼容性",
+                                    "image": "",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "很遗憾，选错了。但纯文字选项显示正常，说明向后兼容没问题！",
+                                    "history": "旧剧本依然完美兼容。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "【第二关：多图测试】\n\n这一关有多个带图片的选项，确保所有图片都能正常显示。",
+                            "knowledgeTag": ["多图测试"],
+                            "optionPool": [
+                                {
+                                    "id": "opt2_correct",
+                                    "type": "correct",
+                                    "text": "✅ 正确选项（图片1：海边）",
+                                    "image": "https://picsum.photos/seed/beach789/600/350",
+                                    "imageOnly": false,
+                                    "isCorrect": true,
+                                    "result": "太棒了！多张图片都能正常显示！",
+                                    "history": "图片功能完全正常！"
+                                },
+                                {
+                                    "id": "opt2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 错误选项（图片2：山脉）",
+                                    "image": "https://picsum.photos/seed/mountain012/600/350",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "选错了，但山脉图片显示正常！",
+                                    "history": "继续测试！"
+                                },
+                                {
+                                    "id": "opt2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "❌ 错误选项（图片3：森林）",
+                                    "image": "https://picsum.photos/seed/forest345/600/350",
+                                    "imageOnly": false,
+                                    "isCorrect": false,
+                                    "result": "选错了，但森林图片显示正常！",
+                                    "history": "所有图片都能正常加载！"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
