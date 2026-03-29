@@ -187,7 +187,182 @@ const AudioSystem = {
         AUDIO_CONFIG.enabled = !AUDIO_CONFIG.enabled;
         return AUDIO_CONFIG.enabled;
     }
+}
+
+// ===================== 成就系统 =====================
+const ACHIEVEMENT_KEY = 'history_survivor_achievements';
+
+// 简化版成就定义（5个核心成就）
+const ACHIEVEMENTS = [
+    {
+        id: 'first_pass',
+        name: '初出茅庐',
+        description: '首次通关任意篇章',
+        icon: '🎖️',
+        condition: (state) => state.stats.volumeCount >= 1,
+        type: 'volume'
+    },
+    {
+        id: 'streak_5',
+        name: '连胜达人',
+        description: '连续答对5题',
+        icon: '🔥',
+        condition: (state) => state.stats.maxConsecutiveCorrect >= 5,
+        type: 'streak'
+    },
+    {
+        id: 'perfect_health',
+        name: '极限生存',
+        description: '生命值≤10通关',
+        icon: '💀',
+        condition: (state) => state.stats.lowHealthPass && state.stats.passSuccess,
+        type: 'special'
+    },
+    {
+        id: 'all_correct',
+        name: '知识渊博',
+        description: '答对所有题目',
+        icon: '🧠',
+        condition: (state) => state.stats.allCorrect,
+        type: 'special'
+    },
+    {
+        id: 'all_identities',
+        name: '全家福',
+        description: '体验所有身份',
+        icon: '👨‍👩‍👧‍👦',
+        condition: (state) => state.stats.identityCount >= 3,
+        type: 'collection'
+    }
+];
+
+// 成就状态管理
+let achievementState = {
+    unlocked: [],
+    unlockTime: {}
 };
+
+function loadAchievementState() {
+    try {
+        const saved = localStorage.getItem(ACHIEVEMENT_KEY);
+        if (saved) {
+            achievementState = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.warn('加载成就状态失败');
+    }
+}
+
+function saveAchievementState() {
+    try {
+        localStorage.setItem(ACHIEVEMENT_KEY, JSON.stringify(achievementState));
+    } catch (e) {
+        console.warn('保存成就状态失败');
+    }
+}
+
+function checkAndUnlockAchievements(gameState, isSuccess) {
+    if (!isSuccess) return;
+    
+    const state = {
+        stats: {
+            maxConsecutiveCorrect: gameState.consecutiveCorrect || 0,
+            lowHealthPass: gameState.health <= 10 && gameState.health > 0,
+            allCorrect: gameState.levelPassed === gameState.userSelectedLevelCount,
+            identityCount: getUnlockedIdentityCount()
+        }
+    };
+    
+    // 初出茅庐：首次通关任意篇章
+    if (!achievementState.unlocked.includes('first_pass')) {
+        unlockAchievement('first_pass');
+    }
+    
+    // 连胜达人：连续答对5题
+    if (!achievementState.unlocked.includes('streak_5') && state.stats.maxConsecutiveCorrect >= 5) {
+        unlockAchievement('streak_5');
+    }
+    
+    // 极限生存：生命值≤10通关
+    if (!achievementState.unlocked.includes('perfect_health') && state.stats.lowHealthPass) {
+        unlockAchievement('perfect_health');
+    }
+    
+    // 知识渊博：答对所有题目
+    if (!achievementState.unlocked.includes('all_correct') && state.stats.allCorrect) {
+        unlockAchievement('all_correct');
+    }
+    
+    // 全家福：体验所有身份
+    if (!achievementState.unlocked.includes('all_identities') && state.stats.identityCount >= 3) {
+        unlockAchievement('all_identities');
+    }
+}
+
+function unlockAchievement(achievementId) {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement || achievementState.unlocked.includes(achievementId)) return;
+    
+    achievementState.unlocked.push(achievementId);
+    achievementState.unlockTime[achievementId] = new Date().toLocaleString();
+    saveAchievementState();
+    
+    // 显示成就解锁弹窗
+    showAchievementPopup(achievement);
+    
+    // 播放成就解锁音效
+    AudioSystem.init();
+    AudioSystem.play('success');
+}
+
+function showAchievementPopup(achievement) {
+    const modal = document.createElement('div');
+    modal.className = 'modal achievement-modal';
+    modal.innerHTML = `
+        <div class="modal-content achievement-content">
+            <div class="achievement-icon">${achievement.icon}</div>
+            <div class="achievement-title">成就解锁！</div>
+            <div class="achievement-name">${achievement.name}</div>
+            <div class="achievement-desc">${achievement.description}</div>
+            <button class="btn" onclick="this.closest('.modal').remove()">确定</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('active'), 50);
+}
+
+function getUnlockedIdentityCount() {
+    // 简化：返回已解锁身份的估计数量
+    const identities = new Set();
+    const saveData = localStorage.getItem('history_survivor_save_data');
+    if (saveData) {
+        try {
+            const data = JSON.parse(saveData);
+            if (data?.gameState?.currentIdentity) {
+                identities.add(data.gameState.currentIdentity.id);
+            }
+        } catch (e) {}
+    }
+    // 如果通关了第一卷的农户，认为已解锁1个身份
+    const unlockedVolumes = localStorage.getItem('unlocked_volumes_default_pack');
+    if (unlockedVolumes && JSON.parse(unlockedVolumes).includes('kaiyuan')) {
+        identities.add('farmer');
+        identities.add('merchant');
+    }
+    return identities.size;
+}
+
+function getAchievementStats() {
+    return {
+        total: ACHIEVEMENTS.length,
+        unlocked: achievementState.unlocked.length,
+        list: ACHIEVEMENTS.map(a => ({
+            ...a,
+            isUnlocked: achievementState.unlocked.includes(a.id),
+            unlockTime: achievementState.unlockTime[a.id] || null
+        }))
+    };
+}
 
 // ===================== 全局状态管理 =====================
 let appState = {
@@ -1550,6 +1725,9 @@ function gameEnd(isSuccess, desc) {
     } else {
         AudioSystem.play('fail');
     }
+    
+    // 检查并解锁成就
+    checkAndUnlockAchievements(appState.gameState, isSuccess);
 
     // 【修复】通关时解锁下一卷
     if (isSuccess) {
@@ -2096,6 +2274,9 @@ window.onload = async () => {
     
     // 初始化音效系统（延迟初始化，需要用户交互）
     setTimeout(() => AudioSystem.init(), 1000);
+    
+    // 加载成就状态
+    loadAchievementState();
     
     // 添加全局按钮点击音效
     document.addEventListener('click', (e) => {

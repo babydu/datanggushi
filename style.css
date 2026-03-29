@@ -1125,4 +1125,44 @@ body {
     border-top: 1px dashed #d4b894;
 }
 
+/* ===================== 成就弹窗样式 ===================== */
+.achievement-modal .modal-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.achievement-content {
+    max-width: 360px;
+}
+
+.achievement-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: achievement-bounce 0.6s ease;
+}
+
+@keyframes achievement-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.achievement-title {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.achievement-name {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.achievement-desc {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
 
