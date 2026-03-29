@@ -8,6 +8,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 新手引导遮罩层 -->
+    <div id="tutorial-overlay" class="tutorial-overlay" style="display: none;">
+        <div id="tutorial-highlight" class="tutorial-highlight"></div>
+        <div id="tutorial-tooltip" class="tutorial-tooltip">
+            <div id="tutorial-content" class="tutorial-content"></div>
+            <div id="tutorial-buttons" class="tutorial-buttons">
+                <button class="btn btn-secondary" id="tutorial-skip-btn" onclick="skipTutorial()">跳过引导</button>
+                <button class="btn" id="tutorial-next-btn" onclick="nextTutorialStep()">下一步</button>
+            </div>
+            <div id="tutorial-progress" class="tutorial-progress"></div>
+        </div>
+    </div>
+
     <!-- 欢迎页 -->
     <div id="welcome-page" class="page active">
         <h1 class="title">历史生存模拟器</h1>
@@ -17,7 +30,7 @@
             新增属性上限控制、随机选项池、限时答题、历史人物特殊事件、成绩评定、完整复盘功能。
         </div>
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-            <button class="btn" onclick="switchPage('pack-page')">选择剧本</button>
+            <button class="btn" id="start-game-btn" onclick="switchPage('pack-page')">选择剧本</button>
             <button class="btn btn-success" id="load-save-btn" disabled onclick="loadGameProgress()">读取存档</button>
             <button class="btn btn-info" onclick="switchPage('format-page')">剧本格式说明</button>
         </div>
@@ -226,7 +239,7 @@
 
         <div class="control-box">
             <button class="btn" id="help-btn" onclick="useHelp()">使用求救机会</button>
-            <button class="btn btn-warning" onclick="saveGameProgress()">保存进度</button>
+            <button class="btn btn-warning" id="save-btn" onclick="saveGameProgress()">保存进度</button>
             <button class="btn btn-secondary" onclick="restartGame()">重新开始</button>
             <button class="btn btn-secondary" onclick="exitToHome()">退出到首页</button>
         </div>

@@ -18,6 +18,67 @@ const DEFAULT_ATTRIBUTE_CONFIG = {
 };
 const UNLOCK_KEY_PREFIX = "unlocked_volumes_"; // 【新增】卷解锁状态存储前缀
 
+// ===================== 新手引导常量 =====================
+const TUTORIAL_KEY = "history_survivor_tutorial_completed";
+const TUTORIAL_STEPS = [
+    {
+        id: "welcome",
+        target: "#start-game-btn",
+        content: "欢迎来到历史生存模拟器！点击这里开始选择剧本，开启你的历史之旅。",
+        position: "bottom",
+        highlightPadding: 10
+    },
+    {
+        id: "pack-select",
+        target: "#confirm-pack-btn",
+        content: "选择一个剧本，点击确认按钮进入游戏。内置唐朝剧本包含多卷内容。",
+        position: "bottom",
+        highlightPadding: 10
+    },
+    {
+        id: "volume-select",
+        target: "#confirm-volume-btn",
+        content: "每个剧本包含多个篇章，通关当前篇章后可解锁下一篇章。",
+        position: "bottom",
+        highlightPadding: 10
+    },
+    {
+        id: "identity-select",
+        target: "#confirm-identity-btn",
+        content: "选择你想要体验的身份，不同身份有不同的人生历程和挑战。",
+        position: "bottom",
+        highlightPadding: 10
+    },
+    {
+        id: "level-select",
+        target: "#level-select-page .btn:not(.btn-secondary)",
+        content: "滑块选择本次游玩的关卡数量，完成所选关卡即可通关。",
+        position: "top",
+        highlightPadding: 10
+    },
+    {
+        id: "game-start",
+        target: "#game-page",
+        content: "游戏开始！阅读剧情故事，从选项中选择你的决定。答对恢复生命值，答错会扣除生命。",
+        position: "center",
+        highlightPadding: 0
+    },
+    {
+        id: "help-btn",
+        target: "#help-btn",
+        content: "遇到难题？点击使用求救机会，可以获得正确答案的提示，但会消耗求救次数。",
+        position: "top",
+        highlightPadding: 10
+    },
+    {
+        id: "save-btn",
+        target: "#save-btn",
+        content: "记得随时保存进度！中断后可以从首页读取存档继续游戏。",
+        position: "top",
+        highlightPadding: 10
+    }
+];
+
 // ===================== 全局状态管理 =====================
 let appState = {
     defaultPack: null,
@@ -33,7 +94,12 @@ let appState = {
         isPaused: false,
         currentConfig: null
     },
-    triggeredEventIds: []
+    triggeredEventIds: [],
+    tutorial: {
+        isActive: false,
+        currentStep: 0,
+        isCompleted: false
+    }
 };
 
 // 初始化游戏状态
@@ -248,6 +314,42 @@ function switchPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     window.scrollTo(0, 0);
+    
+    // 触发新手引导（仅首次）
+    if (!appState.tutorial.isCompleted && !appState.tutorial.isActive) {
+        if (pageId === 'pack-page') {
+            setTimeout(() => startTutorial(), 500);
+        }
+    }
+    
+    // 更新新手引导步骤
+    if (appState.tutorial.isActive) {
+        setTimeout(() => {
+            updateTutorialForPage(pageId);
+        }, 100);
+    }
+}
+
+function updateTutorialForPage(pageId) {
+    const pageStepMap = {
+        'pack-page': 1,      // 选择剧本
+        'volume-page': 2,     // 选择卷
+        'identity-page': 3,   // 选择身份
+        'level-select-page': 4, // 选择关卡
+        'game-page': 5,      // 游戏开始
+        'end-page': -1       // 结束
+    };
+    
+    const targetStep = pageStepMap[pageId];
+    if (targetStep === undefined) return;
+    
+    if (targetStep === -1) {
+        // 页面结束时不显示引导
+        document.getElementById('tutorial-overlay').style.display = 'none';
+    } else {
+        document.getElementById('tutorial-overlay').style.display = 'block';
+        showTutorialStep(targetStep);
+    }
 }
 
 // ===================== 剧本选择核心逻辑 =====================
@@ -1858,6 +1960,127 @@ window.onload = async () => {
     
     bindPackCardEvents();
     updateSaveButtonStatus();
+    
+    // 初始化新手引导
+    initTutorial();
 };
+
+// ===================== 新手引导系统 =====================
+function initTutorial() {
+    const tutorialCompleted = localStorage.getItem(TUTORIAL_KEY);
+    if (!tutorialCompleted) {
+        appState.tutorial.isActive = false;
+        appState.tutorial.currentStep = 0;
+        appState.tutorial.isCompleted = false;
+    } else {
+        appState.tutorial.isCompleted = true;
+    }
+}
+
+function startTutorial() {
+    if (appState.tutorial.isCompleted) return;
+    
+    appState.tutorial.isActive = true;
+    appState.tutorial.currentStep = 0;
+    
+    // 显示遮罩
+    document.getElementById('tutorial-overlay').style.display = 'block';
+    
+    showTutorialStep(0);
+}
+
+function showTutorialStep(stepIndex) {
+    if (stepIndex >= TUTORIAL_STEPS.length) {
+        completeTutorial();
+        return;
+    }
+    
+    const step = TUTORIAL_STEPS[stepIndex];
+    const contentEl = document.getElementById('tutorial-content');
+    const progressEl = document.getElementById('tutorial-progress');
+    const tooltipEl = document.getElementById('tutorial-tooltip');
+    const highlightEl = document.getElementById('tutorial-highlight');
+    
+    // 更新内容
+    contentEl.innerHTML = step.content;
+    progressEl.innerText = `${stepIndex + 1} / ${TUTORIAL_STEPS.length}`;
+    
+    // 定位高亮
+    const targetEl = document.querySelector(step.target);
+    if (!targetEl) {
+        // 元素不存在，跳过这一步
+        nextTutorialStep();
+        return;
+    }
+    
+    const rect = targetEl.getBoundingClientRect();
+    const padding = step.highlightPadding || 0;
+    
+    highlightEl.style.left = `${rect.left - padding}px`;
+    highlightEl.style.top = `${rect.top - padding}px`;
+    highlightEl.style.width = `${rect.width + padding * 2}px`;
+    highlightEl.style.height = `${rect.height + padding * 2}px`;
+    
+    // 定位提示框 - 先设置为可见以获取正确的高度
+    tooltipEl.style.visibility = 'hidden';
+    tooltipEl.style.display = 'block';
+    tooltipEl.className = 'tutorial-tooltip';
+    
+    const tooltipHeight = tooltipEl.offsetHeight;
+    const tooltipWidth = tooltipEl.offsetWidth;
+    
+    let tooltipLeft = rect.left + rect.width / 2;
+    let tooltipTop;
+    
+    if (step.position === 'bottom') {
+        tooltipTop = rect.bottom + padding + 15;
+        tooltipEl.classList.add('tutorial-tooltip-bottom');
+    } else if (step.position === 'top') {
+        tooltipTop = rect.top - padding - tooltipHeight - 15;
+        tooltipEl.classList.add('tutorial-tooltip-top');
+    } else if (step.position === 'center') {
+        tooltipTop = window.innerHeight / 2 - tooltipHeight / 2;
+        tooltipLeft = window.innerWidth / 2;
+        tooltipEl.classList.add('tutorial-tooltip-center');
+    }
+    
+    // 调整位置确保不超出屏幕
+    tooltipTop = Math.max(10, Math.min(tooltipTop, window.innerHeight - tooltipHeight - 10));
+    tooltipLeft = Math.max(tooltipWidth / 2, Math.min(tooltipLeft, window.innerWidth - tooltipWidth / 2));
+    
+    tooltipEl.style.left = `${tooltipLeft}px`;
+    tooltipEl.style.top = `${tooltipTop}px`;
+    tooltipEl.style.transform = 'translateX(-50%)';
+    tooltipEl.style.visibility = 'visible';
+    
+    appState.tutorial.currentStep = stepIndex;
+}
+
+function nextTutorialStep() {
+    const nextIndex = appState.tutorial.currentStep + 1;
+    if (nextIndex >= TUTORIAL_STEPS.length) {
+        completeTutorial();
+    } else {
+        showTutorialStep(nextIndex);
+    }
+}
+
+function skipTutorial() {
+    completeTutorial();
+}
+
+function completeTutorial() {
+    document.getElementById('tutorial-overlay').style.display = 'none';
+    appState.tutorial.isActive = false;
+    appState.tutorial.isCompleted = true;
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+}
+
+function resetTutorial() {
+    localStorage.removeItem(TUTORIAL_KEY);
+    appState.tutorial.isCompleted = false;
+    appState.tutorial.isActive = false;
+    appState.tutorial.currentStep = 0;
+}
 
 

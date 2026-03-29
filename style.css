@@ -1054,4 +1054,75 @@ body {
     margin-bottom: 5px;
 }
 
+/* ===================== 新手引导样式 ===================== */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    pointer-events: none;
+}
+
+.tutorial-highlight {
+    position: absolute;
+    border: 3px solid var(--primary);
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.tutorial-tooltip {
+    position: fixed;
+    max-width: 320px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
+    z-index: 10000;
+    pointer-events: auto;
+}
+
+.tutorial-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom-color: var(--primary);
+}
+
+.tutorial-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.tutorial-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tutorial-buttons .btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.tutorial-progress {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #d4b894;
+}
+
 
