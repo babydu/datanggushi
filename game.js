@@ -321,7 +321,7 @@ const AudioSystem = {
     }
 }
 
-// ===================== 学识积分与爵位系统 =====================
+// ===================== 学识积分与爵位系统（按身份差异化）=====================
 const KNOWLEDGE_KEY = 'history_survivor_knowledge';
 const RANK_KEY = 'history_survivor_rank';
 
@@ -341,47 +341,152 @@ const KNOWLEDGE_CONFIG = {
     levelComplete: 50      // 完成关卡额外 +50
 };
 
-// 爵位等级配置
-const RANK_CONFIG = {
-    ranks: [
-        { id: 'commoner', name: '庶人', minPoints: 0, title: '白丁', icon: '👤' },
-        { id: 'tenant', name: '佃农', minPoints: 100, title: '田舍郎', icon: '🌾' },
-        { id: 'owner', name: '自耕农', minPoints: 300, title: '田主', icon: '🏠' },
-        { id: 'rich', name: '富农', minPoints: 600, title: '殷实户', icon: '💰' },
-        { id: 'landlord', name: '地主', minPoints: 1000, title: '地主', icon: '🏘️' },
-        { id: 'gentry', name: '乡绅', minPoints: 1500, title: '乡贤', icon: '📜' },
-        { id: 'official', name: '县尉', minPoints: 2500, title: '父母官', icon: '🏛️' },
-        { id: 'magistrate', name: '县令', minPoints: 4000, title: '县令', icon: '🎖️' },
-        { id: 'sima', name: '司马', minPoints: 6000, title: '司马', icon: '⚔️' },
-        { id: 'cishi', name: '刺史', minPoints: 9000, title: '刺史', icon: '🦅' },
-        { id: 'taishou', name: '太守', minPoints: 13000, title: '太守', icon: '🏯' },
-        { id: 'shangshu', name: '尚书', minPoints: 18000, title: '尚书', icon: '📚' },
-        { id: 'jiangjun', name: '将军', minPoints: 25000, title: '将军', icon: '🛡️' },
-        { id: 'wanghou', name: '王侯', minPoints: 35000, title: '王侯', icon: '👑' }
+// 按身份类型划分的爵位体系
+const IDENTITY_BASED_RANKS = {
+    // 农户身份爵位体系
+    farmer: [
+        { id: 'pauper', name: '赤贫', minPoints: 0, title: '身无立锥之地', icon: '🙏', description: '一贫如洗的雇农' },
+        { id: 'tenant', name: '佃农', minPoints: 100, title: '租人田者', icon: '🌾', description: '租用他人土地的农民' },
+        { id: 'micro', name: '微农', minPoints: 300, title: '薄田数亩', icon: '🌱', description: '拥有少量土地的农民' },
+        { id: 'small', name: '小农', minPoints: 600, title: '自给自足', icon: '🏠', description: '能够自给自足的自耕农' },
+        { id: 'middle', name: '中农', minPoints: 1000, title: '小有余粮', icon: '🌾', description: '有余裕的中等农户' },
+        { id: 'rich_farmer', name: '富农', minPoints: 1500, title: '殷实户', icon: '💰', description: '雇佣劳动力的富户' },
+        { id: 'landlord', name: '地主', minPoints: 2500, title: '良田千亩', icon: '🏘️', description: '拥有大量土地的地主' },
+        { id: 'gentry', name: '乡绅', minPoints: 4000, title: '乡贤', icon: '📜', description: '退隐官员或地方贤达' },
+        { id: 'county_official', name: '县尉', minPoints: 6000, title: '父母官', icon: '🏛️', description: '县级官员' },
+        { id: 'magistrate', name: '县令', minPoints: 9000, title: '一县之尊', icon: '🎖️', description: '县级最高长官' },
+        { id: ' prefect', name: '太守', minPoints: 13000, title: '一郡之守', icon: '🏯', description: '郡级长官' },
+        { id: 'minister', name: '尚书', minPoints: 18000, title: '部堂大人', icon: '📚', description: '中央各部首长' },
+        { id: 'general', name: '将军', minPoints: 25000, title: '镇守一方', icon: '⚔️', description: '军级将领' },
+        { id: 'duke', name: '王侯', minPoints: 35000, title: '封疆裂土', icon: '👑', description: '王侯将相' }
     ],
-    // 爵位特权
-    privileges: {
-        'rich': { healthBonus: 10 },
-        'landlord': { wealthBonus: 50 },
-        'gentry': { debuffImmunity: 1 },
-        'official': { helpTimesBonus: 2 },
-        'magistrate': { streakBonus: 1.5 },
-        'sima': { correctBonus: 1.1 },
-        'cishi': { figureUnlock: true },
-        'taishou': { talentUnlock: true },
-        'shangshu': { allEndingsUnlock: true },
-        'jiangjun': { prestigeBonus: 1.2 },
-        'wanghou': { title: '千古一帝' }
+    
+    // 商户身份爵位体系
+    merchant: [
+        { id: 'apprentice', name: '学徒', minPoints: 0, title: '店小二', icon: '🧑‍🍳', description: '商铺学徒' },
+        { id: 'assistant', name: '伙计', minPoints: 100, title: '伙计', icon: '👨‍💼', description: '店员或帮工' },
+        { id: 'clerk', name: '掌柜', minPoints: 300, title: '掌柜', icon: '💼', description: '独立经营的店主' },
+        { id: 'shop_owner', name: '东家', minPoints: 600, title: '商铺东主', icon: '🏪', description: '拥有店铺的业主' },
+        { id: 'trader', name: '行商', minPoints: 1000, title: '行商坐贾', icon: '🚢', description: '从事长途贸易的商人' },
+        { id: 'major_merchant', name: '大贾', minPoints: 1500, title: '富甲一方', icon: '💎', description: '声名显赫的大商人' },
+        { id: 'guild_master', name: '豪商', minPoints: 2500, title: '行业翘楚', icon: '🏆', description: '行业公会领袖' },
+        { id: 'royal_merchant', name: '皇商', minPoints: 4000, title: '供奉内廷', icon: '👑', description: '为皇室采购的商人' },
+        { id: 'provincial_merchant', name: '省商', minPoints: 6000, title: '一省首富', icon: '🌟', description: '省级商业巨头' },
+        { id: 'national_merchant', name: '国商', minPoints: 9000, title: '富可敌国', icon: '🏅', description: '全国知名富商' },
+        { id: 'banker', name: '钱庄主', minPoints: 13000, title: '金融巨擘', icon: '🏦', description: '经营钱庄银行' },
+        { id: 'industrialist', name: '工场主', minPoints: 18000, title: '百业之首', icon: '🏭', description: '手工业工场主' },
+        { id: 'commercial_emperor', name: '商圣', minPoints: 25000, title: '商道至尊', icon: '📜', description: '商业传奇人物' },
+        { id: 'commercial_legend', name: '首富', minPoints: 35000, title: '富甲天下', icon: '💰', description: '天下首富' }
+    ],
+    
+    // 学子身份爵位体系
+    scholar: [
+        { id: 'child', name: '童生', minPoints: 0, title: '白身', icon: '📖', description: '尚未考取功名的读书人' },
+        { id: 'xiucai', name: '秀才', minPoints: 100, title: '相公', icon: '🎓', description: '考取功名的最低级别' },
+        { id: 'juren', name: '举人', minPoints: 300, title: '举人老爷', icon: '📜', description: '省级考试及格者' },
+        { id: 'jinshi', name: '贡士', minPoints: 600, title: '贡士', icon: '🎖️', description: '礼部主持的全国性考试及格者' },
+        { id: 'jinshi2', name: '进士', minPoints: 1000, title: '进士及第', icon: '🏆', description: '最终及第的读书人' },
+        { id: 'jinshi3', name: '传胪', minPoints: 1500, title: '传胪', icon: '🥇', description: '二甲第一名' },
+        { id: 'hanlin', name: '翰林', minPoints: 2500, title: '词臣', icon: '📚', description: '翰林院官员' },
+        { id: 'censor', name: '御史', minPoints: 4000, title: '言官', icon: '⚖️', description: '朝廷监察官员' },
+        { id: 'minister2', name: '尚书', minPoints: 6000, title: '部堂', icon: '🏛️', description: '中央各部首长' },
+        { id: 'prime', name: '内阁', minPoints: 9000, title: '首辅', icon: '👑', description: '内阁大学士' },
+        { id: 'academician', name: '院士', minPoints: 13000, title: '帝师', icon: '🎓', description: '太子太师' },
+        { id: 'grand_master', name: '大宗师', minPoints: 18000, title: '学究天人', icon: '📖', description: '学术泰斗' },
+        { id: 'saint', name: '圣人', minPoints: 25000, title: '至圣先师', icon: '🙏', description: '儒家圣贤' },
+        { id: 'sage_king', name: '圣王', minPoints: 35000, title: '垂拱而治', icon: '✨', description: '内圣外王' }
+    ]
+};
+
+// 通用爵位体系（用于未知身份或默认显示）
+const COMMON_RANKS = [
+    { id: 'commoner', name: '庶人', minPoints: 0, title: '白丁', icon: '👤' },
+    { id: 'scholar1', name: '士人', minPoints: 100, title: '读书人', icon: '📚' },
+    { id: 'scholar2', name: '士绅', minPoints: 300, title: '地方贤达', icon: '🏛️' },
+    { id: 'scholar3', name: '乡贤', minPoints: 600, title: '乡绅', icon: '📜' },
+    { id: 'scholar4', name: '名流', minPoints: 1000, title: '社会名流', icon: '⭐' },
+    { id: 'official1', name: '县尉', minPoints: 1500, title: '父母官', icon: '🏛️' },
+    { id: 'official2', name: '县令', minPoints: 2500, title: '一县之尊', icon: '🎖️' },
+    { id: 'official3', name: '郡守', minPoints: 4000, title: '一郡之守', icon: '🏯' },
+    { id: 'official4', name: '尚书', minPoints: 6000, title: '部堂大人', icon: '📚' },
+    { id: 'minister', name: '将军', minPoints: 9000, title: '镇守一方', icon: '⚔️' },
+    { id: 'duke', name: '王侯', minPoints: 13000, title: '封疆裂土', icon: '👑' },
+    { id: 'marquis', name: '公卿', minPoints: 18000, title: '位列公卿', icon: '🏅' },
+    { id: 'imperial', name: '皇室', minPoints: 25000, title: '龙子凤孙', icon: '🐉' },
+    { id: 'sage', name: '圣贤', minPoints: 35000, title: '千古一圣', icon: '✨' }
+];
+
+// 获取当前身份对应的爵位体系
+function getIdentityRankConfig(identityId) {
+    if (!identityId) return COMMON_RANKS;
+    
+    const identityLower = identityId.toLowerCase();
+    
+    if (identityLower.includes('farmer') || identityLower.includes('农') || identityLower.includes('耕')) {
+        return IDENTITY_BASED_RANKS.farmer;
+    } else if (identityLower.includes('merchant') || identityLower.includes('商') || identityLower.includes('贾') || identityLower.includes('店')) {
+        return IDENTITY_BASED_RANKS.merchant;
+    } else if (identityLower.includes('scholar') || identityLower.includes('学子') || identityLower.includes('读书') || identityLower.includes('儒')) {
+        return IDENTITY_BASED_RANKS.scholar;
+    } else if (identityLower.includes('official') || identityLower.includes('官') || identityLower.includes('仕')) {
+        return IDENTITY_BASED_RANKS.scholar; // 官员也走学子路线
+    }
+    
+    return COMMON_RANKS;
+}
+
+// 爵位特权配置
+const RANK_PRIVILEGES = {
+    farmer: {
+        'middle': { healthBonus: 10 },
+        'rich_farmer': { wealthBonus: 50 },
+        'landlord': { debuffImmunity: 1 },
+        'gentry': { helpTimesBonus: 1 },
+        'county_official': { helpTimesBonus: 2 },
+        'magistrate': { streakBonus: 1.2 },
+        'prefect': { correctBonus: 1.1 },
+        'minister': { allEndingsUnlock: true },
+        'general': { prestigeBonus: 1.2 },
+        'duke': { title: '田园诗画家' }
+    },
+    merchant: {
+        'trader': { healthBonus: 5 },
+        'major_merchant': { wealthBonus: 100 },
+        'guild_master': { debuffImmunity: 1 },
+        'royal_merchant': { helpTimesBonus: 2 },
+        'provincial_merchant': { streakBonus: 1.2 },
+        'national_merchant': { correctBonus: 1.1 },
+        'banker': { allEndingsUnlock: true },
+        'industrialist': { prestigeBonus: 1.2 },
+        'commercial_emperor': { title: '商道传人' }
+    },
+    scholar: {
+        'juren': { healthBonus: 5 },
+        'jinshi': { wealthBonus: 30 },
+        'hanlin': { debuffImmunity: 1 },
+        'censor': { helpTimesBonus: 2 },
+        'minister2': { streakBonus: 1.2 },
+        'prime': { correctBonus: 1.15 },
+        'academician': { allEndingsUnlock: true },
+        'grand_master': { prestigeBonus: 1.2 },
+        'saint': { title: '万世师表' }
     }
 };
 
-// 学识与爵位状态
+// 爵位等级配置（统一格式，用于兼容性）
+const RANK_CONFIG = {
+    ranks: COMMON_RANKS,
+    privileges: RANK_PRIVILEGES
+};
+
+// 学识与爵位状态（新增身份字段）
 let knowledgeState = {
     totalPoints: 0,       // 累计学识
     currentPoints: 0,      // 当前学识（可用于本局）
     currentRank: 'commoner',
     highestRank: 'commoner',
-    rankProgress: 0         // 距离下一爵位的进度百分比
+    rankProgress: 0,        // 距离下一爵位的进度百分比
+    currentIdentityType: null // 当前身份类型
 };
 
 function loadKnowledgeState() {
@@ -391,6 +496,7 @@ function loadKnowledgeState() {
             const parsed = JSON.parse(saved);
             knowledgeState.totalPoints = parsed.totalPoints || 0;
             knowledgeState.highestRank = parsed.highestRank || 'commoner';
+            knowledgeState.currentIdentityType = parsed.currentIdentityType || null;
         }
     } catch (e) {
         console.warn('加载学识状态失败');
@@ -402,18 +508,29 @@ function saveKnowledgeState() {
     try {
         localStorage.setItem(KNOWLEDGE_KEY, JSON.stringify({
             totalPoints: knowledgeState.totalPoints,
-            highestRank: knowledgeState.highestRank
+            highestRank: knowledgeState.highestRank,
+            currentIdentityType: knowledgeState.currentIdentityType
         }));
     } catch (e) {
         console.warn('保存学识状态失败');
     }
 }
 
-function updateRankFromPoints() {
+// 更新学识等级（按身份差异化）
+function updateRankFromPoints(identityId = null) {
     const points = knowledgeState.totalPoints;
-    let newRank = RANK_CONFIG.ranks[0];
     
-    for (const rank of RANK_CONFIG.ranks) {
+    // 确定身份类型
+    if (identityId) {
+        knowledgeState.currentIdentityType = identityId;
+    }
+    
+    // 获取当前身份对应的爵位体系
+    const rankList = getIdentityRankConfig(knowledgeState.currentIdentityType);
+    
+    let newRank = rankList[0];
+    
+    for (const rank of rankList) {
         if (points >= rank.minPoints) {
             newRank = rank;
         } else {
@@ -421,19 +538,23 @@ function updateRankFromPoints() {
         }
     }
     
-    if (newRank.id !== knowledgeState.currentRank) {
+    if (newRank.id !== knowledgeState.currentRank || knowledgeState.currentIdentityType !== identityId) {
         knowledgeState.currentRank = newRank.id;
-        if (RANK_CONFIG.ranks.findIndex(r => r.id === newRank.id) > 
-            RANK_CONFIG.ranks.findIndex(r => r.id === knowledgeState.highestRank)) {
+        
+        // 检查是否突破最高爵位（在同一身份体系下）
+        const currentIndex = rankList.findIndex(r => r.id === newRank.id);
+        const highestIndex = rankList.findIndex(r => r.id === knowledgeState.highestRank);
+        
+        if (currentIndex > highestIndex) {
             knowledgeState.highestRank = newRank.id;
         }
     }
     
     // 计算进度
-    const currentIndex = RANK_CONFIG.ranks.findIndex(r => r.id === knowledgeState.currentRank);
-    if (currentIndex < RANK_CONFIG.ranks.length - 1) {
+    const currentIndex = rankList.findIndex(r => r.id === knowledgeState.currentRank);
+    if (currentIndex < rankList.length - 1) {
         const currentMin = newRank.minPoints;
-        const nextMin = RANK_CONFIG.ranks[currentIndex + 1].minPoints;
+        const nextMin = rankList[currentIndex + 1].minPoints;
         knowledgeState.rankProgress = ((points - currentMin) / (nextMin - currentMin)) * 100;
     } else {
         knowledgeState.rankProgress = 100;
@@ -453,13 +574,39 @@ function addKnowledgePoints(points, source) {
     return knowledgeState.currentPoints;
 }
 
+// 获取爵位信息（支持按身份差异化）
 function getRankInfo(rankId) {
-    return RANK_CONFIG.ranks.find(r => r.id === rankId) || RANK_CONFIG.ranks[0];
+    const rankList = getIdentityRankConfig(knowledgeState.currentIdentityType);
+    return rankList.find(r => r.id === rankId) || rankList[0];
 }
 
+// 获取当前爵位特权（支持按身份差异化）
 function getCurrentRankPrivileges() {
     const rankId = knowledgeState.currentRank;
-    return RANK_CONFIG.privileges[rankId] || {};
+    const identityType = knowledgeState.currentIdentityType || 'farmer';
+    
+    // 尝试从身份特定的特权配置中获取
+    if (RANK_PRIVILEGES[identityType] && RANK_PRIVILEGES[identityType][rankId]) {
+        return RANK_PRIVILEGES[identityType][rankId];
+    }
+    
+    // 回退到通用特权
+    const rankList = getIdentityRankConfig(identityType);
+    const rankIndex = rankList.findIndex(r => r.id === rankId);
+    
+    // 根据爵位等级给予相应特权
+    const privileges = {};
+    if (rankIndex >= 4) privileges.healthBonus = 5;
+    if (rankIndex >= 6) privileges.wealthBonus = 30;
+    if (rankIndex >= 8) privileges.debuffImmunity = 1;
+    if (rankIndex >= 10) privileges.helpTimesBonus = 1;
+    
+    return privileges;
+}
+
+// 获取爵位列表（用于显示）
+function getRankList(identityType = null) {
+    return getIdentityRankConfig(identityType || knowledgeState.currentIdentityType);
 }
 
 function calculateKnowledgeForAnswer(isCorrect, timeUsed, consecutiveCorrect, levelComplete) {
@@ -1177,12 +1324,40 @@ function getDailyTaskStats() {
 
 function updateWelcomeRankDisplay() {
     const rankInfo = getRankInfo(knowledgeState.currentRank);
+    const rankList = getRankList();
     
     document.getElementById('welcome-rank-icon').textContent = rankInfo.icon;
     document.getElementById('welcome-rank-name').textContent = rankInfo.name;
-    document.getElementById('welcome-rank-title').textContent = rankInfo.title;
+    document.getElementById('welcome-rank-title').textContent = rankInfo.title || rankInfo.name;
     document.getElementById('rank-progress-fill').style.width = `${knowledgeState.rankProgress}%`;
     document.getElementById('welcome-rank-points').textContent = `${knowledgeState.totalPoints} 学识`;
+    
+    // 更新身份类型提示
+    const rankDisplayBox = document.getElementById('rank-display-box');
+    if (rankDisplayBox) {
+        const existingTypeLabel = rankDisplayBox.querySelector('.identity-type-label');
+        if (existingTypeLabel) {
+            existingTypeLabel.remove();
+        }
+        
+        // 添加身份类型标签
+        if (knowledgeState.currentIdentityType) {
+            const typeLabel = document.createElement('span');
+            typeLabel.className = 'identity-type-label';
+            typeLabel.style.fontSize = '0.8rem';
+            typeLabel.style.color = 'var(--text-muted)';
+            typeLabel.style.marginLeft = '10px';
+            
+            const identityTypeNames = {
+                farmer: '农户',
+                merchant: '商户', 
+                scholar: '学子',
+                common: '通用'
+            };
+            typeLabel.textContent = `【${identityTypeNames[knowledgeState.currentIdentityType] || '通用'}】`;
+            document.getElementById('welcome-rank-name').after(typeLabel);
+        }
+    }
 }
 
 // ===================== 全局状态管理 =====================
@@ -1192,21 +1367,145 @@ let appState = {
     selectedPackType: null,
     selectedPack: null,
     selectedVolume: null,
+    selectedIdentity: null,  // 当前选择的身份
     gameState: null,
     countdown: {
         timerId: null,
         remainingTime: 0,
         isRunning: false,
         isPaused: false,
-        currentConfig: null
+        currentConfig: null,
+        overTimeSeconds: 0,      // 超时秒数（用于渐进式扣血）
+        totalDamage: 0           // 累计超时扣血
     },
     triggeredEventIds: [],
     tutorial: {
         isActive: false,
         currentStep: 0,
         isCompleted: false
+    },
+    // 世代传承相关状态
+    inheritance: {
+        previousVolumeId: null,      // 上一卷ID
+        previousIdentityId: null,     // 上一卷身份ID
+        previousIdentityType: null,  // 上一卷身份类型
+        inheritedPoints: 0,         // 继承的学识积分
+        inheritanceRate: 0.3        // 继承比例
     }
 };
+
+// ===================== 世代传承系统 =====================
+// 获取身份类型（农户/商户/学子）
+function getIdentityType(identityId) {
+    if (!identityId) return 'common';
+    
+    const idLower = identityId.toLowerCase();
+    
+    if (idLower.includes('farmer') || idLower.includes('农') || idLower.includes('耕') || idLower.includes('农户')) {
+        return 'farmer';
+    } else if (idLower.includes('merchant') || idLower.includes('商') || idLower.includes('贾') || idLower.includes('店') || idLower.includes('掌柜')) {
+        return 'merchant';
+    } else if (idLower.includes('scholar') || idLower.includes('学子') || idLower.includes('读书') || idLower.includes('儒') || idLower.includes('秀') || idLower.includes('举')) {
+        return 'scholar';
+    } else if (idLower.includes('official') || idLower.includes('官') || idLower.includes('仕')) {
+        return 'scholar'; // 官员走学子路线
+    } else if (idLower.includes('doctor') || idLower.includes('郎中') || idLower.includes('医')) {
+        return 'scholar'; // 医生走学子路线
+    }
+    
+    return 'common';
+}
+
+// 检查身份是否与上一卷匹配（世代传承）
+function isIdentityInherited(identity, previousIdentityType) {
+    if (!previousIdentityType) return true; // 第一卷无需检查
+    
+    const currentType = getIdentityType(identity.id);
+    
+    // 同一类型身份可以传承
+    if (currentType === previousIdentityType) return true;
+    
+    // 如果剧本定义了继承关系，则允许
+    if (appState.selectedVolume?.identityInheritance) {
+        return appState.selectedVolume.identityInheritance.includes(identity.id);
+    }
+    
+    return false;
+}
+
+// 获取继承的身份列表（过滤后的可用身份）
+function getInheritedIdentityList(volume) {
+    const previousType = appState.inheritance.previousIdentityType;
+    
+    if (!previousType) {
+        return volume.identityList; // 第一卷返回所有身份
+    }
+    
+    // 世代传承：返回与上一卷同类型的身份
+    return volume.identityList.filter(identity => isIdentityInherited(identity, previousType));
+}
+
+// 计算继承的学识积分
+function calculateInheritedPoints(previousVolumeId) {
+    if (!previousVolumeId) return 0;
+    
+    const saveKey = `${previousVolumeId}_completion`;
+    const completionData = localStorage.getItem(saveKey);
+    
+    if (!completionData) return 0;
+    
+    try {
+        const data = JSON.parse(completionData);
+        // 继承30%的学识积分
+        return Math.floor(data.totalKnowledge * appState.inheritance.inheritanceRate);
+    } catch (e) {
+        return 0;
+    }
+}
+
+// 保存通关数据用于传承
+function saveCompletionForInheritance(volumeId, totalKnowledge, completedIdentity) {
+    const saveKey = `${volumeId}_completion`;
+    const data = {
+        volumeId: volumeId,
+        totalKnowledge: totalKnowledge,
+        completedIdentity: completedIdentity,
+        completedAt: new Date().toISOString()
+    };
+    localStorage.setItem(saveKey, JSON.stringify(data));
+}
+
+// 应用传承效果
+function applyInheritance(volume) {
+    // 获取上一卷的信息
+    if (volume.inheritFrom) {
+        appState.inheritance.previousVolumeId = volume.inheritFrom;
+        
+        // 从存储中读取上一卷的通关数据
+        const saveKey = `${volume.inheritFrom}_completion`;
+        const completionData = localStorage.getItem(saveKey);
+        
+        if (completionData) {
+            try {
+                const data = JSON.parse(completionData);
+                appState.inheritance.previousIdentityId = data.completedIdentity;
+                appState.inheritance.previousIdentityType = getIdentityType(data.completedIdentity);
+                appState.inheritance.inheritedPoints = Math.floor(data.totalKnowledge * appState.inheritance.inheritanceRate);
+            } catch (e) {
+                console.warn('读取传承数据失败');
+            }
+        }
+    } else {
+        // 重置传承状态
+        appState.inheritance = {
+            previousVolumeId: null,
+            previousIdentityId: null,
+            previousIdentityType: null,
+            inheritedPoints: 0,
+            inheritanceRate: 0.3
+        };
+    }
+}
 
 // 初始化游戏状态
 function initGameState() {
@@ -1540,6 +1839,9 @@ function confirmPack() {
 }
 
 
+// ===================== 默认剧本加载（无内置剧情）=====================
+const PACK_LIST_KEY = 'customPackList'; // 自定义剧本列表
+
 async function loadDefaultPack() {
     try {
         const response = await fetch(DEFAULT_PACK_URL);
@@ -1553,21 +1855,35 @@ async function loadDefaultPack() {
         }
         throw new Error("网络加载失败");
     } catch (err) {
-        console.warn("内置剧本文件加载失败，使用备用剧本。请确保 data/song_pack.json 文件在同一目录下。");
-        appState.defaultPack = getFallbackDefaultPack();
-        updateDefaultPackCard(appState.defaultPack);
+        console.warn("内置剧本文件加载失败，请上传本地剧本或使用云端剧本。");
+        appState.defaultPack = null;
+        updateDefaultPackCard(null);
     }
 }
 
 function updateDefaultPackCard(pack) {
     const card = document.getElementById('default-pack-card');
+    
+    if (!pack) {
+        card.innerHTML = `
+            <div class="pack-title" style="color: var(--text-muted);">暂无内置剧情</div>
+            <div class="pack-meta">
+                <span style="color: var(--warning);">请上传本地剧本或使用云端剧本</span>
+            </div>
+            <div class="pack-desc">本版本已移除内置剧情，所有剧情以JSON剧本包形式提供。请在下方上传本地剧本文件。</div>
+        `;
+        card.style.opacity = '0.7';
+        return;
+    }
+    
+    card.style.opacity = '1';
     const volumeCount = pack.volumeList?.length || 1;
     card.innerHTML = `
-        <div class="pack-title">${pack.packInfo.packName}（内置完整版）</div>
+        <div class="pack-title">${pack.packInfo.packName}</div>
         <div class="pack-meta">
             <span>朝代：${pack.packInfo.dynasty}</span>
             <span>篇章数量：${volumeCount}卷</span>
-            <span>作者：${pack.packInfo.author || '官方内置'}</span>
+            <span>作者：${pack.packInfo.author || '官方'}</span>
             <span>版本：${pack.packInfo.version || '1.0'}</span>
         </div>
         <div class="pack-desc">${pack.packInfo.description}</div>
@@ -1831,7 +2147,7 @@ function showUploadError(msg, isError = true) {
     errorBox.innerText = msg;
 }
 
-// ===================== 卷选择逻辑（带解锁机制） =====================
+// ===================== 卷选择逻辑（带解锁机制和世代传承） =====================
 function renderVolumeList() {
     const volumeGrid = document.getElementById('volume-grid');
     const packId = appState.selectedPackType === 'default' ? 'default_pack' : 'custom_pack';
@@ -1839,21 +2155,37 @@ function renderVolumeList() {
     
     appState.selectedPack.volumeList.forEach(volume => {
         const isUnlocked = isVolumeUnlocked(packId, volume.id, appState.selectedPack.volumeList);
+        
+        // 检查是否有传承信息
+        let inheritanceInfo = '';
+        if (volume.inheritFrom && isUnlocked) {
+            const previousVolume = appState.selectedPack.volumeList.find(v => v.id === volume.inheritFrom);
+            if (previousVolume) {
+                inheritanceInfo = `<div class="inheritance-hint">传承自：${previousVolume.name}</div>`;
+            }
+        }
+        
         const card = document.createElement('div');
         card.className = `volume-card ${isUnlocked ? '' : 'locked'}`;
         card.dataset.volumeId = volume.id;
         if (isUnlocked) {
             card.onclick = () => selectVolume(volume);
         }
+        
+        // 获取该卷的身份信息
+        const identityCount = volume.identityList.length;
+        const totalLevels = volume.identityList.reduce((sum, id) => sum + (id.levelList?.length || 0), 0);
+        
         card.innerHTML = `
             <div>
                 <div class="volume-name">${volume.name}</div>
                 <div class="volume-subtitle">${volume.subtitle || volume.dynasty}</div>
                 <div class="volume-desc">${volume.description}</div>
+                ${inheritanceInfo}
             </div>
             <div class="volume-meta">
-                <span>身份数量：${volume.identityList.length}个</span>
-                <span>关卡总数：${volume.identityList.reduce((sum, id) => sum + id.levelList.length, 0)}关</span>
+                <span>身份数量：${identityCount}个</span>
+                <span>关卡总数：${totalLevels}关</span>
             </div>
         `;
         volumeGrid.appendChild(card);
@@ -1866,35 +2198,75 @@ function selectVolume(volume) {
     if (targetCard) targetCard.classList.add('selected');
     appState.selectedVolume = volume;
     appState.gameState.currentVolume = volume;
+    
+    // 应用世代传承
+    applyInheritance(volume);
+    
     document.getElementById('confirm-volume-btn').disabled = false;
 }
 
 function confirmVolume() {
     if (!appState.selectedVolume) return;
     
-    // 【新增】如果只有一个身份，直接跳过身份选择
-    if (appState.selectedVolume.identityList.length === 1) {
-        appState.gameState.currentIdentity = appState.selectedVolume.identityList[0];
+    // 【世代传承】获取可用的身份列表
+    const availableIdentities = getInheritedIdentityList(appState.selectedVolume);
+    
+    // 如果只有一个身份，直接跳过身份选择
+    if (availableIdentities.length === 1) {
+        appState.gameState.currentIdentity = availableIdentities[0];
+        // 更新爵位身份类型
+        const identityType = getIdentityType(availableIdentities[0].id);
+        updateRankFromPoints(identityType);
         goToLevelSelectDirectly();
         return;
     }
     
-    renderIdentityList();
+    // 如果没有可用身份（世代传承限制），提示用户
+    if (availableIdentities.length === 0) {
+        alert('当前篇章的身份与上一卷不匹配，无法传承。请选择其他篇章。');
+        return;
+    }
+    
+    renderIdentityList(availableIdentities);
     document.getElementById('identity-subtitle').innerText = `当前篇章：${appState.selectedVolume.name} | 剧本：${appState.selectedPack.packInfo.packName}`;
+    
+    // 显示传承提示
+    if (appState.inheritance.inheritedPoints > 0) {
+        document.getElementById('identity-subtitle').innerHTML += `<br><span style="color: var(--primary);">传承学识：+${appState.inheritance.inheritedPoints}点</span>`;
+    }
+    
     switchPage('identity-page');
 }
 
 
-// ===================== 身份选择逻辑 =====================
-function renderIdentityList() {
+// ===================== 身份选择逻辑（支持世代传承） =====================
+function renderIdentityList(identityList = null) {
     const identityGrid = document.getElementById('identity-grid');
+    const listToRender = identityList || appState.selectedVolume.identityList;
+    
     identityGrid.innerHTML = '';
-    appState.selectedVolume.identityList.forEach(identity => {
+    
+    // 世代传承：显示身份类型标签
+    const previousType = appState.inheritance.previousIdentityType;
+    if (previousType) {
+        const typeHint = document.createElement('div');
+        typeHint.className = 'inheritance-type-hint';
+        typeHint.innerHTML = `<span>请选择与上一卷【${getIdentityTypeName(previousType)}】传承的身份</span>`;
+        identityGrid.appendChild(typeHint);
+    }
+    
+    listToRender.forEach(identity => {
         const card = document.createElement('div');
         card.className = 'identity-card';
         card.dataset.identityId = identity.id;
         card.onclick = () => selectIdentity(identity);
+        
+        // 显示身份类型标签
+        const identityType = getIdentityType(identity.id);
+        const typeTag = getIdentityTypeName(identityType);
+        
         card.innerHTML = `
+            <div class="identity-type-tag">${typeTag}</div>
             <div class="identity-name">${identity.name}</div>
             <div class="identity-desc">${identity.description}</div>
         `;
@@ -1902,11 +2274,34 @@ function renderIdentityList() {
     });
 }
 
+// 获取身份类型的中文名称
+function getIdentityTypeName(type) {
+    const typeNames = {
+        farmer: '农户',
+        merchant: '商户',
+        scholar: '学子',
+        common: '通用'
+    };
+    return typeNames[type] || '通用';
+}
+
 function selectIdentity(identity) {
     document.querySelectorAll('.identity-card').forEach(card => card.classList.remove('selected'));
     const targetCard = document.querySelector(`[data-identity-id="${identity.id}"]`);
     if (targetCard) targetCard.classList.add('selected');
     appState.gameState.currentIdentity = identity;
+    appState.selectedIdentity = identity;
+    
+    // 更新爵位系统身份类型
+    const identityType = getIdentityType(identity.id);
+    updateRankFromPoints(identityType);
+    
+    // 应用传承学识积分
+    if (appState.inheritance.inheritedPoints > 0) {
+        knowledgeState.totalPoints += appState.inheritance.inheritedPoints;
+        saveKnowledgeState();
+    }
+    
     document.getElementById('confirm-identity-btn').disabled = false;
 }
 
@@ -1974,7 +2369,17 @@ function getRandomOptions(optionPool) {
     return shuffleArray(finalOptions);
 }
 
-// ===================== 倒计时系统 =====================
+// ===================== 倒计时系统（渐进式扣血） =====================
+// 渐进式扣血配置：超时后每段时间的扣血速度
+const PROGRESIVE_DAMAGE_CONFIG = {
+    phases: [
+        { duration: 5, damagePerSecond: 1 },    // 前5秒：每秒扣1点
+        { duration: 5, damagePerSecond: 2 },    // 接下来5秒：每秒扣2点
+        { duration: 5, damagePerSecond: 3 },    // 接下来5秒：每秒扣3点
+        { duration: Infinity, damagePerSecond: 5 } // 之后：每秒扣5点（逐渐加速到致命）
+    ]
+};
+
 function startCountdown() {
     clearCountdown();
     const timeConfig = getCurrentTimeConfig();
@@ -1982,6 +2387,8 @@ function startCountdown() {
     appState.countdown.remainingTime = timeConfig.baseTime;
     appState.countdown.isRunning = true;
     appState.countdown.isPaused = false;
+    appState.countdown.overTimeSeconds = 0; // 超时秒数
+    appState.countdown.totalDamage = 0;     // 累计超时扣血
 
     updateCountdownUI();
 
@@ -1992,12 +2399,23 @@ function startCountdown() {
         updateCountdownUI();
 
         if (appState.countdown.remainingTime < 0) {
-            const deductValue = timeConfig.healthDeductPerSecond;
-            updateAttribute('health', -deductValue);
+            // 渐进式扣血
+            appState.countdown.overTimeSeconds++;
+            const damage = calculateProgressiveDamage(appState.countdown.overTimeSeconds);
+            appState.countdown.totalDamage += damage;
+            
+            const result = updateAttribute('health', -damage);
             updateHealthUI();
 
+            // 显示扣血动画
+            showDamageAnimation(damage);
+
+            // 【修复Bug】生命值归零时立即结束游戏
             if (appState.gameState.health <= 0) {
                 clearCountdown();
+                // 强制设置health为0
+                appState.gameState.health = 0;
+                updateHealthUI();
                 gameEnd(false, "你答题超时，耗尽了所有生命值，在历史的长河中黯然落幕。");
                 return;
             }
@@ -2005,18 +2423,46 @@ function startCountdown() {
     }, 1000);
 }
 
+// 计算渐进式扣血值
+function calculateProgressiveDamage(overTimeSeconds) {
+    const phases = PROGRESIVE_DAMAGE_CONFIG.phases;
+    let accumulatedTime = 0;
+    
+    for (const phase of phases) {
+        if (overTimeSeconds < accumulatedTime + phase.duration) {
+            return phase.damagePerSecond;
+        }
+        accumulatedTime += phase.duration;
+    }
+    return phases[phases.length - 1].damagePerSecond;
+}
+
+// 显示扣血动画
+function showDamageAnimation(damage) {
+    const healthText = document.getElementById('health-text');
+    if (healthText) {
+        healthText.classList.add('damage-flash');
+        setTimeout(() => healthText.classList.remove('damage-flash'), 300);
+    }
+}
+
 function updateCountdownUI() {
     const countdownText = document.getElementById('countdown-text');
     const remainingTime = appState.countdown.remainingTime;
     const timeConfig = appState.countdown.currentConfig;
 
-    countdownText.innerText = remainingTime >= 0 ? `${remainingTime}s` : `超时 ${Math.abs(remainingTime)}s`;
-
     countdownText.classList.remove('warning', 'danger');
-    if (remainingTime < 0) {
+    
+    if (remainingTime >= 0) {
+        countdownText.innerText = `${remainingTime}s`;
+        if (remainingTime <= timeConfig.baseTime * 0.3) {
+            countdownText.classList.add('warning');
+        }
+    } else {
+        // 超时状态：显示超时秒数和当前扣血速度
+        const currentDamage = calculateProgressiveDamage(appState.countdown.overTimeSeconds || 1);
+        countdownText.innerText = `超时 ${Math.abs(remainingTime)}s [-${currentDamage}/s]`;
         countdownText.classList.add('danger');
-    } else if (remainingTime <= timeConfig.baseTime * 0.3) {
-        countdownText.classList.add('warning');
     }
 }
 
@@ -2037,6 +2483,8 @@ function clearCountdown() {
     appState.countdown.isPaused = false;
     appState.countdown.remainingTime = 0;
     appState.countdown.currentConfig = null;
+    appState.countdown.overTimeSeconds = 0;
+    appState.countdown.totalDamage = 0;
 }
 
 // ===================== 游戏核心逻辑 =====================
@@ -2281,15 +2729,16 @@ function processNormalOption(option) {
 
     updateGameUI();
 
-    // 死亡判定
+    // 【修复Bug】死亡判定：生命值归零时立即结束游戏
     if (appState.gameState.health <= 0) {
-        setTimeout(() => {
-            gameEnd(false, "你耗尽了所有生命值，在历史的长河中黯然落幕。");
-        }, 1000);
+        appState.gameState.health = 0;
+        updateHealthUI();
+        // 立即结束游戏，不等待
+        gameEnd(false, "你耗尽了所有生命值，在历史的长河中黯然落幕。");
         return;
     }
 
-    // 【修复】直接弹出知识点弹窗，不等待事件
+    // 直接弹出知识点弹窗，不等待事件
     setTimeout(() => {
         const title = option.isCorrect ? "选择正确！" : "选择错误";
         let content = option.isCorrect 
@@ -2598,6 +3047,11 @@ function gameEnd(isSuccess, desc) {
             const nextVolume = volumeList[currentIndex + 1];
             unlockVolume(packId, nextVolume.id);
         }
+        
+        // 【世代传承】保存通关数据
+        const totalKnowledge = knowledgeState.totalPoints;
+        const completedIdentity = appState.gameState.currentIdentity?.id;
+        saveCompletionForInheritance(currentVolumeId, totalKnowledge, completedIdentity);
     }
     
     // 计算学识积分
@@ -2938,219 +3392,6 @@ function updateSaveButtonStatus() {
     const hasSave = localStorage.getItem(SAVE_KEY) !== null;
     loadSaveBtn.disabled = !hasSave;
     loadSaveBtn.innerText = hasSave ? "读取存档" : "暂无存档";
-}
-
-// ===================== 备用内置剧本 =====================
-function getFallbackDefaultPack() {
-    return {
-        "packInfo": {
-            "packName": "唐朝历史生存剧本",
-            "dynasty": "唐朝",
-            "version": "3.0",
-            "author": "官方内置",
-            "description": "分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷，所有剧情均基于唐代正史、律令设计。"
-        },
-        "attributeConfig": {
-            "health": { "name": "生命值", "max": 100, "min": 0 },
-            "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
-            "debuff": { "name": "负面状态", "max": 5, "min": 0 },
-            "wealth": { "name": "财富值", "max": 1000, "min": 0 },
-            "officialRank": { "name": "官职品级", "max": 9, "min": 0 }
-        },
-        "timeLimitConfig": {
-            "baseTime": 10,
-            "healthDeductPerSecond": 1,
-            "freezeOnModal": true
-        },
-        "scoreConfig": getDefaultScoreConfig(),
-        "specialEvents": [
-            {
-                "id": "global_low_health_help",
-                "triggerTiming": "afterOptionSelect",
-                "triggerConditions": ["health < 20"],
-                "triggerOnce": true,
-                "eventType": "dialog",
-                "eventData": {
-                    "character": "云游郎中",
-                    "title": "偶遇贵人",
-                    "content": "你面色惨白，步履踉跄，街边一位云游郎中见你可怜，免费为你施了一剂汤药，你顿感身体恢复了不少。",
-                    "effects": {
-                        "health": 30,
-                        "debuff": -2
-                    }
-                }
-            }
-        ],
-        "volumeList": [
-            {
-                "id": "zhenguan",
-                "name": "贞观卷",
-                "subtitle": "贞观之治·父辈的起点",
-                "dynasty": "唐朝贞观年间",
-                "description": "贞观年间，唐太宗励精图治，天下初定，百废待兴。你将作为一名普通百姓，在这个盛世的起点，开启你的人生。",
-                "isFirst": true,
-                "unlockCondition": null,
-                "inheritFrom": null,
-                "timeLimitConfig": { "baseTime": 12 },
-                "identityList": [
-                    {
-                        "id": "farmer",
-                        "name": "农户",
-                        "description": "面朝黄土背朝天，靠耕种为生。你需要精通唐代农耕技术、农时历法、赋税徭役、灾荒应对，在田垄间谋求生路。",
-                        "levelList": [
-                            {
-                                "level": 1,
-                                "story": "贞观年间，关中平原风调雨顺，你是一名受均田制授田的农户，家中有口分田30亩、永业田20亩。春耕时节已至，想要今年有个好收成，首先要选对耕地的核心农具。",
-                                "knowledgeTag": ["唐代农耕技术", "唐代均田制", "唐代农具"],
-                                "timeLimitConfig": { "baseTime": 15, "healthDeductPerSecond": 2 },
-                                "specialEvents": [
-                                    {
-                                        "id": "level1_correct_meeting",
-                                        "triggerTiming": "afterOptionSelect",
-                                        "triggerConditions": ["isCorrect == true"],
-                                        "triggerOnce": true,
-                                        "eventType": "dialog",
-                                        "eventData": {
-                                            "character": "老农户",
-                                            "title": "老农的指点",
-                                            "content": "隔壁的老农户见你选对了农具，笑着点头：“后生不错，懂行！这曲辕犁啊，可是咱们庄户人的宝贝，用好了，今年收成翻番！”",
-                                            "effects": { "health": 5 }
-                                        }
-                                    }
-                                ],
-                                "optionPool": [
-                                    {
-                                        "id": "opt_correct",
-                                        "type": "correct",
-                                        "text": "曲辕犁（江东犁），搭配牛耕",
-                                        "isCorrect": true,
-                                        "result": "你选对了！曲辕犁是唐代最新改良的先进耕犁，相比传统直辕犁更灵活省力，一牛即可牵引，深耕效率提升一倍以上，为今年的丰收打下了坚实基础。",
-                                        "history": "曲辕犁又称江东犁，是唐代农耕技术的标志性发明，记载于唐代农书《四时纂要》。它将长直辕改为短曲辕，加装可转动的犁盘，适配江南与关中的不同田地，实现了中国传统耕犁的定型。",
-                                        "knowledgeTag": ["唐代农耕技术", "唐代农具"],
-                                        "healthChange": 5,
-                                        "debuffChange": -1,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_minor1",
-                                        "type": "minor_wrong",
-                                        "text": "直辕犁（长辕犁），搭配二牛抬杠",
-                                        "isCorrect": false,
-                                        "result": "你选择了直辕犁，这种犁是汉代流传下来的旧式农具，需要两头牛牵引，转弯费力，深耕深度不足，耕地效率远低于曲辕犁，今年的耕种进度大幅落后。",
-                                        "history": "直辕犁是唐代之前的主流耕犁，虽在唐代仍有使用，但已属于落后技术，需二牛三人操作，效率远低于曲辕犁。",
-                                        "knowledgeTag": ["唐代农耕技术", "唐代农具"],
-                                        "healthChange": -10,
-                                        "debuffChange": 1,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_minor2",
-                                        "type": "minor_wrong",
-                                        "text": "使用铁锸人工翻地，不使用耕牛",
-                                        "isCorrect": false,
-                                        "result": "你选择了人工翻地，虽然能完成耕种，但效率极低，耗费了大量体力，耕种进度落后于邻居，错过了最佳的播种窗口期。",
-                                        "history": "铁锸是战国至汉代的常用农具，至唐代已沦为辅助农具，纯人力翻地仅适用于极小面积的田地，无法满足均田制下50亩田地的耕种需求。",
-                                        "knowledgeTag": ["唐代农耕技术"],
-                                        "healthChange": -12,
-                                        "debuffChange": 1,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_major1",
-                                        "type": "major_wrong",
-                                        "text": "雇佣流民帮你耕种，承诺秋收后分一半粮食",
-                                        "isCorrect": false,
-                                        "result": "你雇佣了流民耕种，但唐代法律禁止流民私自受雇，被里正发现后，你被处以笞刑，还被罚了粮食，不仅耕种没做好，还损失了大量钱粮。",
-                                        "history": "唐代《唐律疏议》规定，流民必须附籍，私自雇佣浮浪人耕种属于违法行为，雇主和受雇者都会被处罚。",
-                                        "knowledgeTag": ["唐代法律制度", "唐代户籍制度"],
-                                        "healthChange": -20,
-                                        "debuffChange": 2,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_deadly",
-                                        "type": "deadly",
-                                        "text": "放弃耕种，去山里开荒占田",
-                                        "isCorrect": false,
-                                        "result": "你放弃了国家授予的田地，带着家人去山里开荒，没想到山里是官府封禁的山泽，被府兵抓获，以“盗耕官田”的罪名论处。",
-                                        "history": "唐代《唐律疏议·户婚律》规定，盗耕官田一亩以下笞三十，五亩加一等，超过二十亩就要流放，山里的山泽属于国家所有，严禁私自开垦。",
-                                        "knowledgeTag": ["唐代法律制度", "唐代土地制度"],
-                                        "healthChange": -100,
-                                        "debuffChange": 0,
-                                        "endGame": true,
-                                        "endDesc": "你违反了唐代均田制和唐律，盗耕官田被判处流放，家人离散，人生彻底终结，游戏结束。"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "id": "kaiyuan",
-                "name": "开元卷",
-                "subtitle": "开元盛世·子辈的传承",
-                "dynasty": "唐朝开元年间",
-                "description": "开元年间，唐朝达到鼎盛，四海升平，万邦来朝。你将继承父辈的家业，在这个全盛时代，续写家族的传奇。",
-                "isFirst": false,
-                "unlockCondition": "volume_zhenguan_pass",
-                "inheritFrom": "zhenguan",
-                "identityList": [
-                    {
-                        "id": "merchant",
-                        "name": "商人",
-                        "description": "继承家业，从事丝绸、茶叶、瓷器贸易。你需要精通唐代商业制度、市场行情、外贸规则，在繁华的商海中纵横捭阖。",
-                        "levelList": [
-                            {
-                                "level": 1,
-                                "story": "开元年间，你的父亲已在长安经营丝绸生意多年。如今父亲年迈，将家业交到你手中。你需要决定今年丝绸生意的经营策略。",
-                                "knowledgeTag": ["唐代商业", "丝绸贸易"],
-                                "optionPool": [
-                                    {
-                                        "id": "opt_correct",
-                                        "type": "correct",
-                                        "text": "长期客户优先，保证品质，稳定供货",
-                                        "isCorrect": true,
-                                        "result": "你选择了稳健经营策略，优先保证老客户的品质需求，虽然利润略低，但赢得了良好口碑。",
-                                        "history": "唐代商业重视信用，长安东西市都有自己的行会组织，守信用的商人会得到官府的褒奖和税收优惠。",
-                                        "knowledgeTag": ["唐代商业制度", "商业信用"],
-                                        "healthChange": 5,
-                                        "debuffChange": -1,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_minor1",
-                                        "type": "minor_wrong",
-                                        "text": "降低品质压缩成本，追求更高利润",
-                                        "isCorrect": false,
-                                        "result": "你选择了偷工减料，虽然短期利润增加，但客户发现品质问题后纷纷退货，还被官府以「欺行霸市」的名义处罚。",
-                                        "history": "唐代《唐律疏议·杂律》规定，商品质量不符标准的，杖六十；造成伤亡的，以故伤论罪。",
-                                        "knowledgeTag": ["唐代商业制度", "商品质量"],
-                                        "healthChange": -15,
-                                        "debuffChange": 2,
-                                        "endGame": false
-                                    },
-                                    {
-                                        "id": "opt_deadly",
-                                        "type": "deadly",
-                                        "text": "勾结胡商走私禁品",
-                                        "isCorrect": false,
-                                        "result": "你铤而走险，与胡商勾结走私禁品。不料被市舶司查获，以「通番」之罪论处，没收全部财产，身陷囹圄。",
-                                        "history": "唐代对走私管控严格，《唐律》规定私自出口军器、典籍、丝织物至境外者，流放二千里；通番者罪加一等。",
-                                        "knowledgeTag": ["唐代外贸制度", "走私处罚"],
-                                        "healthChange": -100,
-                                        "debuffChange": 0,
-                                        "endGame": true,
-                                        "endDesc": "你因走私禁品被官府查获，最终流放边疆，家业尽毁，游戏结束。"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    };
 }
 
 // ===================== 页面加载初始化 =====================

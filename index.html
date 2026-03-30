@@ -125,10 +125,10 @@
     <!-- 剧本选择页 -->
     <div id="pack-page" class="page">
         <h1 class="title">选择游戏剧本</h1>
-        <p class="subtitle">选择内置剧本，或上传自定义JSON剧本文件</p>
+        <p class="subtitle">上传本地JSON剧本文件，或使用云端剧本</p>
 
         <div class="upload-area" id="upload-area">
-            <h3>上传自定义剧本</h3>
+            <h3>上传本地剧本</h3>
             <p style="margin: 15px 0;">点击选择或拖拽JSON剧本文件到此处，即可导入</p>
             <input type="file" id="pack-upload" class="upload-input" accept=".json" />
             <button class="btn" onclick="document.getElementById('pack-upload').click()">选择JSON文件</button>
@@ -138,14 +138,11 @@
         <div id="upload-error" style="display: none;"></div>
 
         <div class="pack-card" id="default-pack-card" data-pack-type="default">
-            <div class="pack-title">唐朝历史生存剧本（内置完整版）</div>
+            <div class="pack-title" style="color: var(--text-muted);">暂无内置剧情</div>
             <div class="pack-meta">
-                <span>朝代：唐朝</span>
-                <span>篇章数量：2卷</span>
-                <span>作者：官方内置</span>
-                <span>版本：3.0</span>
+                <span style="color: var(--warning);">请上传本地剧本或等待云端剧本加载</span>
             </div>
-            <div class="pack-desc">分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷，所有剧情均基于唐代正史、律令设计。</div>
+            <div class="pack-desc">本版本已移除内置剧情，所有剧情以JSON剧本包形式提供。请在上方上传本地剧本文件。</div>
         </div>
 
         <!-- 【修改】自定义剧本列表容器 -->
