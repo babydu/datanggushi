@@ -54,6 +54,66 @@ body {
     width: 100%;
 }
 
+.rank-display-box {
+    width: 100%;
+    max-width: 500px;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+    border: 3px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.rank-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.rank-icon {
+    font-size: 2rem;
+}
+
+.rank-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.rank-title {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.rank-progress {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.rank-progress-bar {
+    flex: 1;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.rank-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.3s ease;
+}
+
+.rank-points {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--primary);
+    white-space: nowrap;
+}
+
 .subtitle {
     font-size: 1.2rem;
     text-align: center;
@@ -1192,6 +1252,314 @@ body {
     font-size: 1rem;
     color: var(--text-dark);
     margin-bottom: 20px;
+}
+
+/* ===================== 知识点详解页面样式 ===================== */
+.knowledge-toolbar {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    background-color: #fff;
+    color: var(--text-dark);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 8px rgba(139, 69, 19, 0.2);
+}
+
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background-color: var(--card-bg);
+    border: 2px solid var(--primary);
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--primary);
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #ffe0b2;
+}
+
+.tab-btn.active {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+.knowledge-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.knowledge-stats strong {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.knowledge-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.knowledge-card {
+    background-color: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.knowledge-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.knowledge-card.mastered {
+    border-color: var(--success);
+    background-color: #e8f5e9;
+}
+
+.knowledge-card.favorite {
+    border-color: var(--warning);
+    background-color: #fff3e0;
+}
+
+.knowledge-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.knowledge-category {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: var(--primary);
+    color: #fff;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.knowledge-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.knowledge-actions button {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border: 1px solid var(--text-muted);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.knowledge-actions button:hover {
+    background-color: var(--light-bg);
+}
+
+.knowledge-actions button.mastered-btn.active {
+    background-color: var(--success);
+    color: #fff;
+    border-color: var(--success);
+}
+
+.knowledge-actions button.favorite-btn.active {
+    background-color: var(--warning);
+    color: #fff;
+    border-color: var(--warning);
+}
+
+.knowledge-card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.knowledge-card-content {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.knowledge-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+/* ===================== 排行榜页面样式 ===================== */
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.leaderboard-tabs .tab-btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+}
+
+.leaderboard-content {
+    width: 100%;
+    background-color: #fff;
+    border: 3px solid var(--primary);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.leaderboard-section {
+    margin-bottom: 30px;
+}
+
+.leaderboard-section:last-child {
+    margin-bottom: 0;
+}
+
+.leaderboard-section-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--light-bg);
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: var(--light-bg);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.leaderboard-item:hover {
+    background-color: #ffe0b2;
+}
+
+.leaderboard-rank {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 15px;
+    border-radius: 50%;
+    background-color: var(--card-bg);
+    border: 2px solid var(--primary);
+}
+
+.leaderboard-rank.gold {
+    background: linear-gradient(135deg, #ffd700, #ffb347);
+    border-color: #ffd700;
+    color: #fff;
+}
+
+.leaderboard-rank.silver {
+    background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+    border-color: #c0c0c0;
+    color: #fff;
+}
+
+.leaderboard-rank.bronze {
+    background: linear-gradient(135deg, #cd7f32, #b8860b);
+    border-color: #cd7f32;
+    color: #fff;
+}
+
+.leaderboard-info {
+    flex: 1;
+}
+
+.leaderboard-pack {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.leaderboard-volume {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.leaderboard-score {
+    text-align: right;
+}
+
+.leaderboard-score-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.leaderboard-score-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.leaderboard-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+.leaderboard-summary {
+    background: linear-gradient(135deg, var(--card-bg) 0%, #ffe0b2 100%);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.leaderboard-summary-title {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.leaderboard-summary-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
 }
 
 

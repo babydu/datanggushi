@@ -25,6 +25,21 @@
     <div id="welcome-page" class="page active">
         <h1 class="title">历史生存模拟器</h1>
         <p class="subtitle">卷解锁版 | 以史为鉴，在历史长河中活下去</p>
+        
+        <div class="rank-display-box" id="rank-display-box">
+            <div class="rank-info">
+                <span class="rank-icon" id="welcome-rank-icon">👤</span>
+                <span class="rank-name" id="welcome-rank-name">庶人</span>
+                <span class="rank-title" id="welcome-rank-title">白丁</span>
+            </div>
+            <div class="rank-progress">
+                <div class="rank-progress-bar">
+                    <div class="rank-progress-fill" id="rank-progress-fill" style="width: 0%"></div>
+                </div>
+                <span class="rank-points" id="welcome-rank-points">0 学识</span>
+            </div>
+        </div>
+        
         <div class="intro-text">
             本游戏完全实现框架与剧情分离，采用多卷篇章解锁机制，强制从第一卷开始，通关上卷解锁下卷。<br>
             新增属性上限控制、随机选项池、限时答题、历史人物特殊事件、成绩评定、完整复盘功能。
@@ -33,6 +48,8 @@
             <button class="btn" id="start-game-btn" onclick="switchPage('pack-page')">选择剧本</button>
             <button class="btn btn-success" id="load-save-btn" disabled onclick="loadGameProgress()">读取存档</button>
             <button class="btn btn-info" onclick="switchPage('format-page')">剧本格式说明</button>
+            <button class="btn btn-secondary" onclick="switchPage('knowledge-page')">知识点详解</button>
+            <button class="btn btn-secondary" onclick="switchPage('leaderboard-page')">排行榜</button>
         </div>
     </div>
 
@@ -315,6 +332,61 @@
         <div class="control-box">
             <button class="btn" onclick="switchPage('end-page')">返回结局页</button>
             <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
+        </div>
+    </div>
+
+    <!-- 知识点详解页面 -->
+    <div id="knowledge-page" class="page">
+        <h1 class="title">知识点详解</h1>
+        <p class="subtitle">回顾游戏中的历史知识点，巩固所学</p>
+        
+        <div class="knowledge-toolbar">
+            <div class="search-box">
+                <input type="text" id="knowledge-search" placeholder="搜索知识点..." oninput="filterKnowledge()">
+            </div>
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-filter="all" onclick="filterKnowledgeByCategory('all')">全部</button>
+                <button class="tab-btn" data-filter="唐代农耕技术" onclick="filterKnowledgeByCategory('唐代农耕技术')">农耕</button>
+                <button class="tab-btn" data-filter="唐代法律制度" onclick="filterKnowledgeByCategory('唐代法律制度')">法律</button>
+                <button class="tab-btn" data-filter="唐代商业" onclick="filterKnowledgeByCategory('唐代商业')">商业</button>
+                <button class="tab-btn" data-filter="收藏" onclick="filterKnowledgeByCategory('收藏')">收藏</button>
+            </div>
+        </div>
+        
+        <div class="knowledge-stats">
+            <span>共 <strong id="knowledge-total-count">0</strong> 个知识点</span>
+            <span>已掌握 <strong id="knowledge-mastered-count">0</strong> 个</span>
+            <span>已收藏 <strong id="knowledge-favorite-count">0</strong> 个</span>
+        </div>
+        
+        <div id="knowledge-list" class="knowledge-grid">
+            <p style="text-align: center; color: var(--text-muted); padding: 40px;">暂无知识点记录，玩游戏后会自动积累</p>
+        </div>
+        
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('welcome-page')">返回首页</button>
+            <button class="btn" onclick="clearAllKnowledge()">清除所有记录</button>
+        </div>
+    </div>
+
+    <!-- 排行榜页面 -->
+    <div id="leaderboard-page" class="page">
+        <h1 class="title">排行榜</h1>
+        <p class="subtitle">展示个人最佳成绩，不断超越自我</p>
+        
+        <div class="leaderboard-tabs">
+            <button class="tab-btn active" data-leaderboard="score" onclick="switchLeaderboardTab('score')">最高分</button>
+            <button class="tab-btn" data-leaderboard="correctRate" onclick="switchLeaderboardTab('correctRate')">正确率</button>
+            <button class="tab-btn" data-leaderboard="streak" onclick="switchLeaderboardTab('streak')">最高连胜</button>
+        </div>
+        
+        <div id="leaderboard-content" class="leaderboard-content">
+            <!-- 排行榜内容由JS动态生成 -->
+        </div>
+        
+        <div class="control-box">
+            <button class="btn btn-secondary" onclick="switchPage('welcome-page')">返回首页</button>
+            <button class="btn btn-warning" onclick="resetLeaderboard()">重置记录</button>
         </div>
     </div>
 

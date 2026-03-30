@@ -673,6 +673,376 @@ function getAchievementStats() {
 // ===================== 每日任务系统 =====================
 const DAILY_TASK_KEY = 'history_survivor_daily_tasks';
 
+// ===================== 知识点详解系统 =====================
+const KNOWLEDGE_DB_KEY = 'history_survivor_knowledge_db';
+const KNOWLEDGE_FAVORITE_KEY = 'history_survivor_knowledge_favorites';
+const KNOWLEDGE_MASTERED_KEY = 'history_survivor_knowledge_mastered';
+
+let knowledgeDbState = {
+    knowledgeList: [],
+    favorites: [],
+    mastered: [],
+    currentFilter: 'all',
+    searchKeyword: ''
+};
+
+function loadKnowledgeDbState() {
+    try {
+        const dbSaved = localStorage.getItem(KNOWLEDGE_DB_KEY);
+        if (dbSaved) {
+            knowledgeDbState.knowledgeList = JSON.parse(dbSaved);
+        }
+        const favSaved = localStorage.getItem(KNOWLEDGE_FAVORITE_KEY);
+        if (favSaved) {
+            knowledgeDbState.favorites = JSON.parse(favSaved);
+        }
+        const masterSaved = localStorage.getItem(KNOWLEDGE_MASTERED_KEY);
+        if (masterSaved) {
+            knowledgeDbState.mastered = JSON.parse(masterSaved);
+        }
+    } catch (e) {
+        console.warn('加载知识点状态失败');
+    }
+}
+
+function saveKnowledgeDbState() {
+    try {
+        localStorage.setItem(KNOWLEDGE_DB_KEY, JSON.stringify(knowledgeDbState.knowledgeList));
+        localStorage.setItem(KNOWLEDGE_FAVORITE_KEY, JSON.stringify(knowledgeDbState.favorites));
+        localStorage.setItem(KNOWLEDGE_MASTERED_KEY, JSON.stringify(knowledgeDbState.mastered));
+    } catch (e) {
+        console.warn('保存知识点状态失败');
+    }
+}
+
+function extractKnowledgeFromGame(gameRecord) {
+    const newKnowledgeMap = new Map();
+    
+    gameRecord.forEach(record => {
+        const tags = record.knowledgeTag || [];
+        const allOptions = record.allOptions || [];
+        
+        tags.forEach(tag => {
+            if (!newKnowledgeMap.has(tag)) {
+                const correctOption = allOptions.find(o => o.isCorrect);
+                newKnowledgeMap.set(tag, {
+                    id: tag,
+                    category: tag,
+                    title: tag,
+                    content: correctOption?.history || '',
+                    source: record.volume,
+                    level: record.level,
+                    timesEncountered: 0,
+                    correctCount: 0,
+                    wrongCount: 0,
+                    lastEncountered: record.answerTime
+                });
+            }
+            const k = newKnowledgeMap.get(tag);
+            k.timesEncountered++;
+            if (record.isCorrect) {
+                k.correctCount++;
+            } else {
+                k.wrongCount++;
+            }
+        });
+        
+        const userOption = record.userOption;
+        if (userOption?.knowledgeTag) {
+            userOption.knowledgeTag.forEach(tag => {
+                if (newKnowledgeMap.has(tag)) {
+                    const k = newKnowledgeMap.get(tag);
+                    if (!record.isCorrect) {
+                        k.wrongCount++;
+                    }
+                }
+            });
+        }
+    });
+    
+    const newList = Array.from(newKnowledgeMap.values());
+    newList.forEach(newK => {
+        const existing = knowledgeDbState.knowledgeList.find(k => k.id === newK.id);
+        if (existing) {
+            existing.timesEncountered += newK.timesEncountered;
+            existing.correctCount += newK.correctCount;
+            existing.wrongCount += newK.wrongCount;
+        } else {
+            knowledgeDbState.knowledgeList.push(newK);
+        }
+    });
+    
+    saveKnowledgeDbState();
+}
+
+function toggleFavorite(knowledgeId) {
+    const index = knowledgeDbState.favorites.indexOf(knowledgeId);
+    if (index > -1) {
+        knowledgeDbState.favorites.splice(index, 1);
+    } else {
+        knowledgeDbState.favorites.push(knowledgeId);
+    }
+    saveKnowledgeDbState();
+    renderKnowledgeList();
+}
+
+function toggleMastered(knowledgeId) {
+    const index = knowledgeDbState.mastered.indexOf(knowledgeId);
+    if (index > -1) {
+        knowledgeDbState.mastered.splice(index, 1);
+    } else {
+        knowledgeDbState.mastered.push(knowledgeId);
+    }
+    saveKnowledgeDbState();
+    renderKnowledgeList();
+}
+
+function getKnowledgeCategories() {
+    const categories = new Set();
+    knowledgeDbState.knowledgeList.forEach(k => {
+        if (k.category) {
+            categories.add(k.category);
+        }
+    });
+    return Array.from(categories);
+}
+
+function filterKnowledge() {
+    knowledgeDbState.searchKeyword = document.getElementById('knowledge-search').value.toLowerCase();
+    renderKnowledgeList();
+}
+
+function filterKnowledgeByCategory(category) {
+    knowledgeDbState.currentFilter = category;
+    
+    document.querySelectorAll('.filter-tabs .tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === category);
+    });
+    
+    renderKnowledgeList();
+}
+
+function renderKnowledgeList() {
+    const container = document.getElementById('knowledge-list');
+    const totalCount = document.getElementById('knowledge-total-count');
+    const masteredCount = document.getElementById('knowledge-mastered-count');
+    const favoriteCount = document.getElementById('knowledge-favorite-count');
+    
+    let filtered = knowledgeDbState.knowledgeList;
+    
+    if (knowledgeDbState.currentFilter === '收藏') {
+        filtered = filtered.filter(k => knowledgeDbState.favorites.includes(k.id));
+    } else if (knowledgeDbState.currentFilter !== 'all') {
+        filtered = filtered.filter(k => k.category === knowledgeDbState.currentFilter);
+    }
+    
+    if (knowledgeDbState.searchKeyword) {
+        filtered = filtered.filter(k => 
+            k.title.toLowerCase().includes(knowledgeDbState.searchKeyword) ||
+            k.content.toLowerCase().includes(knowledgeDbState.searchKeyword)
+        );
+    }
+    
+    totalCount.textContent = knowledgeDbState.knowledgeList.length;
+    masteredCount.textContent = knowledgeDbState.mastered.length;
+    favoriteCount.textContent = knowledgeDbState.favorites.length;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `<p class="knowledge-empty">暂无知识点记录</p>`;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(k => {
+        const isFavorite = knowledgeDbState.favorites.includes(k.id);
+        const isMastered = knowledgeDbState.mastered.includes(k.id);
+        const correctRate = k.timesEncountered > 0 
+            ? ((k.correctCount / k.timesEncountered) * 100).toFixed(0) 
+            : 0;
+        
+        let cardClass = 'knowledge-card';
+        if (isMastered) cardClass += ' mastered';
+        if (isFavorite) cardClass += ' favorite';
+        
+        return `
+            <div class="${cardClass}">
+                <div class="knowledge-card-header">
+                    <span class="knowledge-category">${k.category}</span>
+                    <div class="knowledge-actions">
+                        <button class="mastered-btn ${isMastered ? 'active' : ''}" onclick="toggleMastered('${k.id}')">
+                            ${isMastered ? '✓ 已掌握' : '未掌握'}
+                        </button>
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${k.id}')">
+                            ${isFavorite ? '★ 已收藏' : '☆ 收藏'}
+                        </button>
+                    </div>
+                </div>
+                <div class="knowledge-card-title">${k.title}</div>
+                <div class="knowledge-card-content">${k.content}</div>
+                <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
+                    正确率: ${correctRate}% (${k.correctCount}/${k.timesEncountered}) | 来源: ${k.source}第${k.level}关
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function clearAllKnowledge() {
+    if (confirm('确定要清除所有知识点记录吗？此操作不可恢复。')) {
+        knowledgeDbState.knowledgeList = [];
+        knowledgeDbState.favorites = [];
+        knowledgeDbState.mastered = [];
+        saveKnowledgeDbState();
+        renderKnowledgeList();
+    }
+}
+
+// ===================== 本地排行榜系统 =====================
+const LEADERBOARD_KEY = 'history_survivor_leaderboard';
+
+let leaderboardState = {
+    scoreRecords: [],
+    correctRateRecords: [],
+    streakRecords: [],
+    currentTab: 'score'
+};
+
+function loadLeaderboardState() {
+    try {
+        const saved = localStorage.getItem(LEADERBOARD_KEY);
+        if (saved) {
+            leaderboardState = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.warn('加载排行榜状态失败');
+    }
+}
+
+function saveLeaderboardState() {
+    try {
+        localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboardState));
+    } catch (e) {
+        console.warn('保存排行榜状态失败');
+    }
+}
+
+function updateLeaderboard(gameState, isSuccess) {
+    if (!isSuccess) return;
+    
+    const packName = gameState.currentPack?.packInfo?.packName || '未知剧本';
+    const volumeName = gameState.currentVolume?.name || '未知篇章';
+    const identityName = gameState.currentIdentity?.name || '未知身份';
+    const totalScore = calculateScore(gameState, isSuccess).totalScore;
+    const correctRate = gameState.gameRecord.length > 0 
+        ? (gameState.levelPassed / gameState.gameRecord.length) 
+        : 0;
+    const maxStreak = gameState.consecutiveCorrect || 0;
+    
+    const recordTemplate = {
+        packName,
+        volumeName,
+        identityName,
+        score: totalScore,
+        correctRate: Math.round(correctRate * 100),
+        maxStreak,
+        date: new Date().toLocaleDateString()
+    };
+    
+    leaderboardState.scoreRecords.push(recordTemplate);
+    leaderboardState.correctRateRecords.push({...recordTemplate});
+    leaderboardState.streakRecords.push({...recordTemplate});
+    
+    leaderboardState.scoreRecords.sort((a, b) => b.score - a.score);
+    leaderboardState.correctRateRecords.sort((a, b) => b.correctRate - a.correctRate);
+    leaderboardState.streakRecords.sort((a, b) => b.maxStreak - a.maxStreak);
+    
+    const maxRecords = 20;
+    leaderboardState.scoreRecords = leaderboardState.scoreRecords.slice(0, maxRecords);
+    leaderboardState.correctRateRecords = leaderboardState.correctRateRecords.slice(0, maxRecords);
+    leaderboardState.streakRecords = leaderboardState.streakRecords.slice(0, maxRecords);
+    
+    saveLeaderboardState();
+}
+
+function switchLeaderboardTab(tab) {
+    leaderboardState.currentTab = tab;
+    
+    document.querySelectorAll('.leaderboard-tabs .tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.leaderboard === tab);
+    });
+    
+    renderLeaderboard();
+}
+
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboard-content');
+    
+    let records = [];
+    let valueLabel = '';
+    
+    switch (leaderboardState.currentTab) {
+        case 'score':
+            records = leaderboardState.scoreRecords;
+            valueLabel = '分';
+            break;
+        case 'correctRate':
+            records = leaderboardState.correctRateRecords;
+            valueLabel = '%';
+            break;
+        case 'streak':
+            records = leaderboardState.streakRecords;
+            valueLabel = '连';
+            break;
+    }
+    
+    if (records.length === 0) {
+        container.innerHTML = `
+            <div class="leaderboard-empty">
+                <p style="font-size: 1.2rem; margin-bottom: 10px;">暂无记录</p>
+                <p>完成游戏后将自动记录您的成绩</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const rankClass = ['gold', 'silver', 'bronze'];
+    
+    container.innerHTML = `
+        <div class="leaderboard-summary">
+            <div class="leaderboard-summary-title">最高分</div>
+            <div class="leaderboard-summary-value">${leaderboardState.scoreRecords[0]?.score || 0} 分</div>
+        </div>
+        <div class="leaderboard-section">
+            <div class="leaderboard-section-title">历史最佳</div>
+            ${records.slice(0, 10).map((record, index) => `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank ${rankClass[index] || ''}">${index + 1}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-pack">${record.packName} - ${record.volumeName}</div>
+                        <div class="leaderboard-volume">${record.identityName} | ${record.date}</div>
+                    </div>
+                    <div class="leaderboard-score">
+                        <div class="leaderboard-score-value">${leaderboardState.currentTab === 'correctRate' ? record.correctRate + '%' : record.score}</div>
+                        <div class="leaderboard-score-label">${valueLabel}</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function resetLeaderboard() {
+    if (confirm('确定要重置所有排行榜记录吗？此操作不可恢复。')) {
+        leaderboardState = {
+            scoreRecords: [],
+            correctRateRecords: [],
+            streakRecords: [],
+            currentTab: 'score'
+        };
+        saveLeaderboardState();
+        renderLeaderboard();
+    }
+}
+
 // 简化版每日任务定义
 const DAILY_TASKS = [
     {
@@ -803,6 +1173,16 @@ function getDailyTaskStats() {
         loginCount: dailyTaskState.loginCount,
         correctCount: dailyTaskState.correctCount
     };
+}
+
+function updateWelcomeRankDisplay() {
+    const rankInfo = getRankInfo(knowledgeState.currentRank);
+    
+    document.getElementById('welcome-rank-icon').textContent = rankInfo.icon;
+    document.getElementById('welcome-rank-name').textContent = rankInfo.name;
+    document.getElementById('welcome-rank-title').textContent = rankInfo.title;
+    document.getElementById('rank-progress-fill').style.width = `${knowledgeState.rankProgress}%`;
+    document.getElementById('welcome-rank-points').textContent = `${knowledgeState.totalPoints} 学识`;
 }
 
 // ===================== 全局状态管理 =====================
@@ -1041,6 +1421,16 @@ function switchPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     window.scrollTo(0, 0);
+    
+    // 知识点页面特殊处理
+    if (pageId === 'knowledge-page') {
+        renderKnowledgeList();
+    }
+    
+    // 排行榜页面特殊处理
+    if (pageId === 'leaderboard-page') {
+        renderLeaderboard();
+    }
     
     // 触发新手引导（仅首次）
     if (!appState.tutorial.isCompleted && !appState.tutorial.isActive) {
@@ -2177,6 +2567,14 @@ function gameEnd(isSuccess, desc) {
     clearCountdown();
     clearGameProgress();
     
+    // 提取知识点到数据库
+    if (appState.gameState.gameRecord && appState.gameState.gameRecord.length > 0) {
+        extractKnowledgeFromGame(appState.gameState.gameRecord);
+    }
+    
+    // 更新排行榜
+    updateLeaderboard(appState.gameState, isSuccess);
+    
     // 播放结局音效
     AudioSystem.init();
     if (isSuccess) {
@@ -2426,6 +2824,11 @@ function exitToHome() {
     document.getElementById('confirm-identity-btn').disabled = true;
     document.getElementById('confirm-volume-btn').disabled = true;
     document.getElementById('confirm-pack-btn').disabled = true;
+    
+    // 更新首页爵位显示
+    loadKnowledgeState();
+    updateWelcomeRankDisplay();
+    
     switchPage('welcome-page');
 }
 
@@ -2776,6 +3179,15 @@ window.onload = async () => {
     // 初始化每日任务
     loadDailyTaskState();
     checkAndCompleteDailyTasks();
+    
+    // 初始化知识点系统
+    loadKnowledgeDbState();
+    
+    // 初始化排行榜系统
+    loadLeaderboardState();
+    
+    // 更新首页爵位显示
+    updateWelcomeRankDisplay();
     
     // 添加全局按钮点击音效
     document.addEventListener('click', (e) => {
