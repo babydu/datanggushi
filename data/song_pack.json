@@ -1,0 +1,1491 @@
+{
+    "packInfo": {
+        "packName": "宋朝历史生存剧本",
+        "dynasty": "宋朝",
+        "version": "1.0",
+        "author": "官方内置",
+        "description": "分卷式还原宋朝开封府辖区内的人生历程。玩家将体验北宋仁宗年间的市井生活，感受大宋盛世的繁华与危机。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 },
+        "wealth": { "name": "财富值", "max": 1000, "min": 0 },
+        "officialRank": { "name": "官职品级", "max": 9, "min": 0 }
+    },
+    "timeLimitConfig": {
+        "baseTime": 12,
+        "healthDeductPerSecond": 1,
+        "freezeOnModal": true
+    },
+    "scoreConfig": {
+        "dimensions": [
+            {"name": "最终生命值", "field": "finalHealth", "weight": 0.3, "max": 100},
+            {"name": "答题正确率", "field": "correctRate", "weight": 0.4, "max": 1},
+            {"name": "关卡完成度", "field": "levelCompleteRate", "weight": 0.2, "max": 1},
+            {"name": "剩余求救次数", "field": "remainingHelpTimes", "weight": 0.1, "max": 3}
+        ],
+        "levels": [
+            {"id": "excellent", "name": "状元及第", "desc": "你对本朝代的历史知识了如指掌，堪称当世鸿儒！", "minTotalScore": 90, "mustPass": true},
+            {"id": "good", "name": "榜眼及第", "desc": "你对本朝代的历史知识掌握扎实，是难得的人才！", "minTotalScore": 80, "mustPass": true},
+            {"id": "pass", "name": "进士及第", "desc": "你顺利通过了本次考验，对本朝代的历史有基本的掌握。", "minTotalScore": 60, "mustPass": true},
+            {"id": "fail", "name": "名落孙山", "desc": "你没能通过本次考验，对本朝代的历史知识掌握不足，还需继续努力。", "minTotalScore": 0, "mustPass": false}
+        ]
+    },
+    "specialEvents": [
+        {
+            "id": "song_renzong_health_help",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["health < 20"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "慈悲郎中",
+                "title": "仁心仁术",
+                "content": "你身体欠佳，步履蹒跚。街角一位游方郎中见你可怜，施以援手，给你一剂良药，你顿感神清气爽。",
+                "effects": {
+                    "health": 25,
+                    "debuff": -1
+                }
+            }
+        },
+        {
+            "id": "song_merchant_luck",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["correct == true && currentLevel > 3"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "钱庄掌柜",
+                "title": "意外之财",
+                "content": "你答题出众，名声在外。钱庄掌柜对你印象深刻，决定给你一笔低息贷款，助你生意做大。",
+                "effects": {
+                    "wealth": 100
+                }
+            }
+        }
+    ],
+    "volumeList": [
+        {
+            "id": "kaifeng_riji",
+            "name": "东京日迹",
+            "subtitle": "仁宗盛世·市井百态",
+            "dynasty": "北宋仁宗年间",
+            "description": "北宋仁宗年间，开封府作为东京，繁华似锦，人口逾百万。你将在这座当时世界上最大的城市中，从一名普通市民起步，体验大宋的市井生活。",
+            "isFirst": true,
+            "unlockCondition": null,
+            "inheritFrom": null,
+            "timeLimitConfig": { "baseTime": 12 },
+            "identityList": [
+                {
+                    "id": "merchant",
+                    "name": "商铺掌柜",
+                    "description": "开封府商铺林立，商贾云集。你需要精通宋代商业制度、市场行情、货物贸易，在繁华的东京商海中纵横捭阖。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "仁宗年间，开封府人口百万，商业繁荣。你在州桥附近开了一间杂货铺，主要经营油盐酱醋。今日有批外地客商来采购，你如何定价？",
+                            "knowledgeTag": ["宋代商业", "宋代物价", "东京开封"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m1_correct",
+                                    "type": "correct",
+                                    "text": "参考市价，薄利多销，建立长期合作关系",
+                                    "isCorrect": true,
+                                    "result": "你定价公道，客商满意而归，还与你约定下次再来采买。你的店铺口碑渐起，生意越来越好。",
+                                    "history": "宋代商业注重信用和长远合作，《东京梦华录》记载州桥一带商铺林立，商贾往来频繁，公平定价是立足之本。",
+                                    "knowledgeTag": ["宋代商业道德", "宋代贸易"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "趁机抬价，赚取更多利润",
+                                    "isCorrect": false,
+                                    "result": "你抬价出售，客商摇头而去。更糟的是，你的名声在客商间传开，大家都绕道去别家采买。",
+                                    "history": "宋代商人讲究'义利兼顾'，坑客欺商者很快会被的行会排斥，失去客源。",
+                                    "knowledgeTag": ["宋代商业道德"],
+                                    "healthChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "低价倾销，挤垮周边同行",
+                                    "isCorrect": false,
+                                    "result": "你低价倾销，虽然吸引了一些顾客，但引发了同行的公愤。行会决定联合抵制你，你的货源被掐断了。",
+                                    "history": "宋代商铺有行会组织，保护同行利益是行会的基本规则。恶意压价竞争会遭到同行集体制裁。",
+                                    "knowledgeTag": ["宋代商业", "宋代行会"],
+                                    "healthChange": -8,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m1_deadly",
+                                    "type": "deadly",
+                                    "text": "掺假售假，以次充好",
+                                    "isCorrect": false,
+                                    "result": "你掺假售假，不料被开封府的街正发现，告到官府。你被杖责一百，店铺被查封，毕生积蓄付之东流。",
+                                    "history": "宋代《宋律》规定，商品掺假以次充好者，杖八十至一百，店铺查封。宋代市场管理严格，商德是立商之本。",
+                                    "knowledgeTag": ["宋代法律", "宋代商业制度"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因售假被官府查办，杖责入狱，店铺尽毁，在历史长河中黯然退场。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "冬日临近，开封府需要大量煤炭取暖。你听说汴河上游有煤矿，但运输路线被水匪骚扰。你如何确保煤炭供应？",
+                            "knowledgeTag": ["宋代运输", "宋代治安", "汴河"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m2_correct",
+                                    "type": "correct",
+                                    "text": "加入官方商队，缴纳过路费，走正规渠道",
+                                    "isCorrect": true,
+                                    "result": "你加入了官方的商队，虽然多交了费用，但一路平安顺利。煤炭按时到货，店铺名声更上一层楼。",
+                                    "history": "宋代汴河运输发达，官方设有检查站和护航。缴纳正常税费是合法经商的基本要求。",
+                                    "knowledgeTag": ["宋代商队", "宋代运输"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "雇佣私人镖局护送",
+                                    "isCorrect": false,
+                                    "result": "你雇佣了私人镖局，但镖师与水匪有勾结，半路劫走了你的货款。镖局追讨无果，你损失惨重。",
+                                    "history": "宋代镖局行业良莠不齐，选择镖局需要谨慎。官方商队虽有收费，但安全有保障。",
+                                    "knowledgeTag": ["宋代镖局", "宋代治安"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "贿赂水匪换取平安",
+                                    "isCorrect": false,
+                                    "result": "你贿赂了水匪，但水匪胃口越来越大，最终你入不敷出，还被官府以通匪罪逮捕。",
+                                    "history": "宋代对通匪者处罚严厉，一旦定罪将抄没家产。合法商人应当寻求官方保护。",
+                                    "knowledgeTag": ["宋代法律", "宋代治安"],
+                                    "healthChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m2_deadly",
+                                    "type": "deadly",
+                                    "text": "勾结水匪，坐地分赃",
+                                    "isCorrect": false,
+                                    "result": "你与水匪勾结，但水匪为了灭口，在分赃时将你推入汴河。你溺水而亡，毕生经营化为乌有。",
+                                    "history": "与水匪勾结风险极高，水匪为防止事情败露，往往杀人灭口。宋代水路治安由官府水军维护。",
+                                    "knowledgeTag": ["宋代治安", "宋代水匪"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你与水匪同流合污，最终被水匪灭口，葬身汴河，结束罪恶的一生。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "春日来临，你店铺的染坊需要采购大量蓝草用于染色。蓝草价格波动很大，你听说朝廷可能要调控染料价格。如何应对？",
+                            "knowledgeTag": ["宋代手工业", "宋代染料", "宋代商业"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m3_correct",
+                                    "type": "correct",
+                                    "text": "少量多次采购，分散风险，同时开发替代染料",
+                                    "isCorrect": true,
+                                    "result": "你采取谨慎策略，虽然单次采购量小，但避免了价格波动风险。同时你研究出用槐花替代蓝草的配方，获得了意外收益。",
+                                    "history": "宋代染坊已掌握多种植物染料，槐花、苏木等都是蓝草的替代品。多元化经营是商家的生存之道。",
+                                    "knowledgeTag": ["宋代染坊", "宋代手工业"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "囤积蓝草，等待价格上涨后出售",
+                                    "isCorrect": false,
+                                    "result": "你囤积了大量蓝草，但朝廷突然投放储备染料，市场价格暴跌。你血本无归，仓库里的蓝草腐烂变质。",
+                                    "history": "宋代朝廷会干预重要商品价格，染料作为军需物资受到管控。囤积居奇风险极大。",
+                                    "knowledgeTag": ["宋代经济政策", "宋代染料"],
+                                    "healthChange": -12,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "联合其他染坊控制蓝草货源，垄断市场",
+                                    "isCorrect": false,
+                                    "result": "你们试图垄断货源，但被官府以'扰市'罪名查处，领头者被杖责，你作为从犯也受牵连。",
+                                    "history": "宋代严禁商人垄断市场，《宋律》规定哄抬物价、垄断货源者杖六十至一百。",
+                                    "knowledgeTag": ["宋代商业法律", "宋代市场管理"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m3_deadly",
+                                    "type": "deadly",
+                                    "text": "用有毒劣质材料染色，坑害消费者",
+                                    "isCorrect": false,
+                                    "result": "你用劣质染料导致顾客皮肤过敏，引发群体诉讼。官府介入调查，你被判处赔偿并杖责，最终店铺关门。",
+                                    "history": "宋代对商品质量有严格规定，导致消费者受害的以故伤论罪，最高可判流放。",
+                                    "knowledgeTag": ["宋代消费者保护", "宋代商业法律"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因劣质商品害人死亡，被判流放三千里，客死他乡。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "夏季开封多雨，你的仓库进水，部分货物受损。有官员暗示你可以行贿避免检查。你如何处理？",
+                            "knowledgeTag": ["宋代廉政", "宋代官场", "宋代商业"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m4_correct",
+                                    "type": "correct",
+                                    "text": "如实申报损失，配合官府检查，寻求正常理赔",
+                                    "isCorrect": true,
+                                    "result": "你如实申报，官府核实后按规减免了你部分税赋。你的诚信经营获得官府嘉奖，在州桥一带传为美谈。",
+                                    "history": "宋代税务制度相对完善，正当的灾情减免是合法权利。诚信经营还能获得官府表彰。",
+                                    "knowledgeTag": ["宋代税务", "宋代诚信"],
+                                    "healthChange": 5,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "行贿官员，换取免检",
+                                    "isCorrect": false,
+                                    "result": "你行贿了官员，但此人是御史台暗查的对象。你被作为行贿证据，店铺被查封审查。",
+                                    "history": "宋代御史台专职纠察官员腐败，与官员勾结风险极高。仁宗年间反腐力度较大。",
+                                    "knowledgeTag": ["宋代反腐", "宋代官场"],
+                                    "healthChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "贿赂不成后行凶报复",
+                                    "isCorrect": false,
+                                    "result": "你派人报复官员，但宋代对伤害官员者处罚极重。你被判处刺配三千里，店铺充公。",
+                                    "history": "宋代对伤害官员者罪加一等，《宋律》规定殴伤官员者流放三千至四千里。",
+                                    "knowledgeTag": ["宋代法律", "宋代量刑"],
+                                    "healthChange": -25,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m4_deadly",
+                                    "type": "deadly",
+                                    "text": "销毁证据，嫁祸于人",
+                                    "isCorrect": false,
+                                    "result": "你销毁受损货物并嫁祸于邻居，但邻居报官，开封府介入调查。你被定罪为诬告陷害，秋后问斩。",
+                                    "history": "宋代《宋律·断狱律》规定，诬告他人者反坐，即以所诬之罪处罚。杀人害命者斩立决。",
+                                    "knowledgeTag": ["宋代诉讼法", "宋代死刑"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因诬告杀人被问斩，店铺充公，家人流散，结局悲惨。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "金秋时节，你生意兴隆，但一名旧日好友突然来访，说有笔稳赚不赔的大买卖邀请你入伙，邀你去州桥旁酒楼详谈。",
+                            "knowledgeTag": ["宋代交友", "宋代商业风险", "州桥"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m5_correct",
+                                    "type": "correct",
+                                    "text": "谨慎调查后再决定，先打听对方底细和生意详情",
+                                    "isCorrect": true,
+                                    "result": "你没有急于入伙，而是先打听对方底细。发现此人曾有商败前科，你婉拒了邀请。后来听说那笔生意果然是骗局。",
+                                    "history": "宋代商场上尔虞我诈，谨慎行事是生存之道。《夷坚志》等笔记小说记载了大量商业骗局。",
+                                    "knowledgeTag": ["宋代商业智慧", "宋代防骗"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "碍于情面，先入伙少量资金试试水",
+                                    "isCorrect": false,
+                                    "result": "你入了小股，但对方收了钱后失联。你损失了一笔积蓄，虽不至于伤筋动骨，但教训深刻。",
+                                    "history": "宋代商业中，碍于情面的投资风险极大。陌生人尚可防备，旧友反而难以拒绝。",
+                                    "knowledgeTag": ["宋代商业风险"],
+                                    "healthChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "全情投入，押上全部身家",
+                                    "isCorrect": false,
+                                    "result": "你押上全部身家，但对方是骗子，钱到手后消失无踪。你倾家荡产，只能沿街乞讨。",
+                                    "history": "宋代对商业诈骗处罚虽严，但破案率不高。押上全部身家是商家大忌。",
+                                    "knowledgeTag": ["宋代商业风险", "宋代防骗"],
+                                    "healthChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m5_deadly",
+                                    "type": "deadly",
+                                    "text": "入伙后发现是走私禁品，决定举报官府",
+                                    "isCorrect": false,
+                                    "result": "你入伙后发现是走私禁品，惊恐之下决定举报。但举报时机不当，被同伙先下手为强，你被杀人灭口。",
+                                    "history": "宋代走私禁品如盐、铁等属重罪。发现走私应立即举报，犹豫不决反遭其害。",
+                                    "knowledgeTag": ["宋代走私", "宋代盐铁官营"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你卷入走私案，被同伙灭口，葬身汴河。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "年关将至，你打算扩大经营，在州桥旁开设分店。但店铺选址成为难题，你需要在几个地段中做出选择。",
+                            "knowledgeTag": ["宋代店铺经营", "宋代选址", "宋代商业"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_m6_correct",
+                                    "type": "correct",
+                                    "text": "选择人流大的闹市区，虽然租金高但客源稳定",
+                                    "isCorrect": true,
+                                    "result": "你选择了闹市区，租金虽高但客流如织。分店开业后生意兴隆，很快收回成本。",
+                                    "history": "宋代州桥、相国寺一带是开封最繁华的商业区，人流量极大，是开设店铺的黄金地段。",
+                                    "knowledgeTag": ["宋代商业地理", "宋代州桥"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "选择偏僻低价地段，薄利多销",
+                                    "isCorrect": false,
+                                    "result": "你选择了偏僻地段，租金便宜但几乎没有客流。苦苦支撑三个月后，分店不得不关门。",
+                                    "history": "宋代店铺选址极为重要，偏僻地段虽租金低但无客流，难以维持。",
+                                    "knowledgeTag": ["宋代店铺经营"],
+                                    "healthChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "抢占相国寺外广场摆摊，省去租金",
+                                    "isCorrect": false,
+                                    "result": "相国寺外禁止摆摊，你被城管驱赶并罚款。分店计划泡汤，还赔了罚款。",
+                                    "history": "宋代开封街道有严格管理规定，相国寺周围禁止随意摆摊，需在指定区域经营。",
+                                    "knowledgeTag": ["宋代城市管理", "宋代法规"],
+                                    "healthChange": -8,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_m6_deadly",
+                                    "type": "deadly",
+                                    "text": "强占他人店铺，引发诉讼",
+                                    "isCorrect": false,
+                                    "result": "你强占他人店铺被告上官府，开封府查明真相后，你被杖责并赔偿，店铺被没收。",
+                                    "history": "宋代法律保护私产，强占他人店铺者杖一百，店铺归还原主。",
+                                    "knowledgeTag": ["宋代财产法", "宋代诉讼"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因侵占他人财产被杖责入狱，店铺充公，晚年凄凉。"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "scholar",
+                    "name": "寒门学子",
+                    "description": "万般皆下品，惟有读书高。你是一名寒门学子，梦想通过科举进入仕途。需要精通儒家经典、诗词歌赋、朝廷礼仪。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "仁宗年间，科举取士。你寒窗苦读十年，终于等到开封府发解试。考试当日，你携带笔墨入场，监考官突然要检查你的卷袋。你如何应对？",
+                            "knowledgeTag": ["宋代科举", "宋代考试制度", "宋代教育"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s1_correct",
+                                    "type": "correct",
+                                    "text": "主动打开卷袋接受检查，遵守考场纪律",
+                                    "isCorrect": true,
+                                    "result": "你主动配合检查，监考官对你的规矩印象良好。在后面的阅卷中，你的卷子被评为优等。",
+                                    "history": "宋代科举考试制度完善，搜身检查是正常程序。配合检查是考生的基本素养。",
+                                    "knowledgeTag": ["宋代科举礼仪"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "拒绝检查，声称侵犯隐私",
+                                    "isCorrect": false,
+                                    "result": "你拒绝检查，监考官认为你有作弊嫌疑，取消了你的考试资格。十年寒窗付诸东流。",
+                                    "history": "宋代科举对作弊者处罚严厉，抗拒检查者视同作弊，取消考试资格。",
+                                    "knowledgeTag": ["宋代科举法规"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "贿赂监考官通融",
+                                    "isCorrect": false,
+                                    "result": "监考官刚正不阿，拒绝贿赂并上报。你被取消考试资格，还被记入黑名单。",
+                                    "history": "宋代科举考官多由名臣担任，公正廉洁是基本原则。行贿考官是重罪。",
+                                    "knowledgeTag": ["宋代科举反腐"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s1_deadly",
+                                    "type": "deadly",
+                                    "text": "携带夹带作弊被发现",
+                                    "isCorrect": false,
+                                    "result": "你携带的夹带被发现，按宋律科场作弊者杖一百，革去功名，终身不得应试。",
+                                    "history": "宋代科场作弊处罚极重，《宋律》规定挟带入场者杖一百，革去白衣身份。",
+                                    "knowledgeTag": ["宋代科举法律"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因科场作弊被革去功名，杖责入狱，终身不得应试，读书人的前程毁于一旦。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "发解试放榜，你顺利通过！接下来是礼部省试。考试内容包括帖经、墨义和诗赋。你决定如何备考？",
+                            "knowledgeTag": ["宋代科举", "宋代考试内容", "宋代教育"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s2_correct",
+                                    "type": "correct",
+                                    "text": "全面复习，均衡准备各项内容",
+                                    "isCorrect": true,
+                                    "result": "你均衡准备，帖经、墨义、诗赋都有涉及。省试中虽然诗赋不是最佳，但其他题目答得极为扎实，终于榜上有名。",
+                                    "history": "宋代省试内容全面，要求考生具备扎实的基本功。均衡发展是科举成功之道。",
+                                    "knowledgeTag": ["宋代科举备考"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "专攻诗赋，忽视帖经墨义",
+                                    "isCorrect": false,
+                                    "result": "你专攻诗赋，但省试评分权重更看重帖经墨义。你的诗赋虽佳，但总分不够，落榜而归。",
+                                    "history": "宋代省试评分中，帖经墨义占比重较大，诗赋只是其中一部分。偏科风险大。",
+                                    "knowledgeTag": ["宋代科举评分"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "专攻帖经墨义，放弃诗赋",
+                                    "isCorrect": false,
+                                    "result": "你专攻帖经墨义，但诗赋是宋代科举的门面，放弃诗赋意味着放弃了最重要的展示机会。",
+                                    "history": "宋代文风鼎盛，诗赋是士人才华的集中体现，完全放弃诗赋难以脱颖而出。",
+                                    "knowledgeTag": ["宋代文风"],
+                                    "healthChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s2_deadly",
+                                    "type": "deadly",
+                                    "text": "购买考官泄题，认真复习反成陪衬",
+                                    "isCorrect": false,
+                                    "result": "你购买所谓泄题，结果是骗局，钱财尽失。更糟的是，你因试图行贿被举报，取消考试资格。",
+                                    "history": "宋代科举防弊极严，泄题多为诈骗。试图行贿考官是重罪，一经发现终身禁考。",
+                                    "knowledgeTag": ["宋代科举腐败防治"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因试图行贿考官被终身禁考，读书人的前途彻底断绝。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "省试过关，你获得殿试资格！仁宗皇帝亲自主持殿试，你既兴奋又紧张。殿试当日，试题是《刑赏忠厚之至论》。你如何破题？",
+                            "knowledgeTag": ["宋代殿试", "宋代科举", "宋代文学"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s3_correct",
+                                    "type": "correct",
+                                    "text": "以儒家仁政思想立意，阐述赏罚适中的治国之道",
+                                    "isCorrect": true,
+                                    "result": "你的文章以仁为核心，阐述赏罚适中的治国理念，正合仁宗心意。龙颜大悦，御笔点为进士。",
+                                    "history": "仁宗朝以仁孝治天下，殿试文章多以儒家思想为宗。契合时政者往往高中。",
+                                    "knowledgeTag": ["宋代殿试作文", "宋代仁政"],
+                                    "healthChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "批评时政，指责朝廷赏罚不明",
+                                    "isCorrect": false,
+                                    "result": "你借古讽今批评时政，虽然文章写得好，但触怒了权贵，被降名次录用。",
+                                    "history": "殿试虽可议论，但批评时政风险极高。仁宗朝党争激烈，言辞不当会影响前途。",
+                                    "knowledgeTag": ["宋代党争", "宋代言论"],
+                                    "healthChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "歌功颂德，空洞无物",
+                                    "isCorrect": false,
+                                    "result": "你通篇歌功颂德，毫无新意。仁宗皇帝虽不怪罪，但你的文章被评为下等，列于末甲。",
+                                    "history": "宋代殿试讲究真才实学，过度歌功颂德被认为缺乏见识，难以获得高分。",
+                                    "knowledgeTag": ["宋代殿试评分标准"],
+                                    "healthChange": -3,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s3_deadly",
+                                    "type": "deadly",
+                                    "text": "在文章中暗讽皇帝，被定为大不敬",
+                                    "isCorrect": false,
+                                    "result": "你的文章被解读为暗讽皇帝，大不敬。仁宗震怒，将你革去功名，发配边疆。",
+                                    "history": "宋代对大不敬罪处罚极重，《宋律》规定大不敬者流放三千里。殿试中更需谨慎。",
+                                    "knowledgeTag": ["宋代文字狱", "宋代大不敬"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因文字触怒皇帝，被发配边疆，客死他乡，家族受牵连。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "殿试高中，你被授予官职，任命为开封府某县县尉。从学生到官员的转变让你有些不适应。上任第一天，就有胥吏来请示案件。你如何处理？",
+                            "knowledgeTag": ["宋代官场", "宋代县尉", "宋代基层治理"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s4_correct",
+                                    "type": "correct",
+                                    "text": "亲自阅卷，了解案情，不急于下结论",
+                                    "isCorrect": true,
+                                    "result": "你亲自审阅卷宗，发现案件有疑点。深入调查后，真相大白，你公正廉明的名声传遍全县。",
+                                    "history": "宋代县尉主治安和司法，亲阅卷宗是基本职责。宋代司法制度强调慎刑，避免冤狱。",
+                                    "knowledgeTag": ["宋代司法", "宋代县尉职责"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "全听胥吏建议，省心省力",
+                                    "isCorrect": false,
+                                    "result": "你全听胥吏建议，但胥吏与本地豪强勾结，冤枉了好人。事情败露后，你被连坐降职。",
+                                    "history": "宋代胥吏往往与地方势力勾结，新任官员若全听胥吏建议，容易被蒙蔽和利用。",
+                                    "knowledgeTag": ["宋代吏治", "宋代基层腐败"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "不问青红皂白，严刑拷打逼供",
+                                    "isCorrect": false,
+                                    "result": "你严刑逼供，屈打成招。但案件复查时发现是冤案，你被降职处分。",
+                                    "history": "宋代司法禁止酷刑，《宋律》规定严禁严刑拷打逼供，违者降职或革职。",
+                                    "knowledgeTag": ["宋代司法改革", "宋代酷刑禁止"],
+                                    "healthChange": -12,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s4_deadly",
+                                    "type": "deadly",
+                                    "text": "收受贿赂，徇私枉法",
+                                    "isCorrect": false,
+                                    "result": "你收受贿赂枉法，但很快被人告发。仁宗朝反腐严厉，你被革职查办，发配边疆。",
+                                    "history": "仁宗朝对贪腐官员处罚严厉，《宋律》规定枉法赃者绞刑，贪腐是死罪。",
+                                    "knowledgeTag": ["宋代反腐", "宋代贪腐处罚"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因贪赃枉法被问斩，家族受牵连，遗臭万年。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "为官数载，你政绩卓著，被调入京城任京官。京城官场复杂，各派势力林立。一次权贵宴会邀请你，你如何应对？",
+                            "knowledgeTag": ["宋代官场", "宋代京官", "宋代党争"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s5_correct",
+                                    "type": "correct",
+                                    "text": "婉言谢绝，找借口推辞，保持中立",
+                                    "isCorrect": true,
+                                    "result": "你婉言谢绝，保持中立。后来权贵一派失势，你因未涉足而安然无恙。太后对你印象深刻，提拔你进入台谏。",
+                                    "history": "宋代京官党争激烈，保持中立是生存之道。台谏官负责监督官员，往往因刚正获得升迁。",
+                                    "knowledgeTag": ["宋代党争", "宋代台谏"],
+                                    "healthChange": 8,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "赴宴结交，主动靠近权贵",
+                                    "isCorrect": false,
+                                    "result": "你赴宴结交权贵，但不久权贵失势，你被划为同党，遭到贬谪。",
+                                    "history": "宋代党争中，站队风险极大。一旦所依傍的派系失势，牵连者往往难以自保。",
+                                    "knowledgeTag": ["宋代党争", "宋代贬谪"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "向另一派告密，换取功劳",
+                                    "isCorrect": false,
+                                    "result": "你告密后确实获得短暂提拔，但事情败露，两派都视你为叛徒，你两面不是人，最终被排挤出京。",
+                                    "history": "宋代官场鄙视告密者，背叛者往往被两方共同排斥。忠诚正直是立身之本。",
+                                    "knowledgeTag": ["宋代官场伦理"],
+                                    "healthChange": -8,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s5_deadly",
+                                    "type": "deadly",
+                                    "text": "卷入宫廷政变，站队错误",
+                                    "isCorrect": false,
+                                    "result": "你卷入宫廷政变，站队错误。政变失败后，你被作为从犯问斩，家族受牵连。",
+                                    "history": "宋代宫廷政变极为凶险，失败方往往被族诛。仁宗朝虽相对太平，但宫廷斗争从未停止。",
+                                    "knowledgeTag": ["宋代宫廷", "宋代政变"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因参与宫廷政变被问斩，家族流放，结局悲惨。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "晚年，你历官数任，终于升任知州。一日朝廷下来清点户口，你发现本地大户有隐匿人口之嫌。你如何处理？",
+                            "knowledgeTag": ["宋代知州", "宋代户籍", "宋代治理"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_s6_correct",
+                                    "type": "correct",
+                                    "text": "公正清查，依法办事，同时给大户留有申诉余地",
+                                    "isCorrect": true,
+                                    "result": "你公正清查，但注意方式方法，给予大户申诉机会。事情处理得当，朝廷嘉奖，百姓称颂。",
+                                    "history": "宋代户籍清查是重要政务，处理不当易引发民怨。清查与安抚并重是良法。",
+                                    "knowledgeTag": ["宋代户籍制度", "宋代治理智慧"],
+                                    "healthChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "趁机敲诈大户，索取财物",
+                                    "isCorrect": false,
+                                    "result": "你敲诈大户，被人告到朝廷。仁宗朝对贪腐零容忍，你被革职查办。",
+                                    "history": "宋代对官员贪污受贿处罚极重，《宋律》规定贪赃者绞刑。清廉是官员立身之本。",
+                                    "knowledgeTag": ["宋代廉政", "宋代反腐"],
+                                    "healthChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "畏惧权贵，放任隐匿",
+                                    "isCorrect": false,
+                                    "result": "你畏惧权贵，选择放任。但钦差复查时发现隐匿人口，你因失职被降职。",
+                                    "history": "宋代官员失职处罚虽轻于贪腐，但会影响考绩。失察之责也是官员责任。",
+                                    "knowledgeTag": ["宋代考绩", "宋代官员责任"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_s6_deadly",
+                                    "type": "deadly",
+                                    "text": "强行清查，得罪权贵，被人参劾",
+                                    "isCorrect": false,
+                                    "result": "你强行清查，得罪了后台极硬的权贵。权贵动用关系，反过来参劾你。你被革职查办，客死异乡。",
+                                    "history": "宋代官场关系复杂，得罪权贵风险极高。即便正直官员，也可能因触犯权贵而遭祸。",
+                                    "knowledgeTag": ["宋代官场险恶", "宋代权贵"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因触犯权贵被陷害，革职查办，客死异乡，正义未能伸张。"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "kaifeng_gongming",
+            "name": "盛世危言",
+            "subtitle": "仁宗末年·暗流涌动",
+            "dynasty": "北宋仁宗晚期",
+            "description": "仁宗末年，朝政渐暗，党争激烈，西夏威胁日益逼近。你将在这个风云变幻的时代，在历史的转折点上做出抉择。",
+            "isFirst": false,
+            "unlockCondition": "volume_kaifeng_riji_pass",
+            "inheritFrom": "kaifeng_riji",
+            "timeLimitConfig": { "baseTime": 10 },
+            "identityList": [
+                {
+                    "id": "military_official",
+                    "name": "边疆将领",
+                    "description": "西夏崛起，边疆告急。你是大宋边疆的一名将领，镇守西北重镇。需要精通军事制度、战略战术、外交周旋。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "仁宗晚期，西夏王元昊率军进犯宋境。你作为边将，率五千兵马驻守渭州。斥候来报，敌军万人来犯。你如何布防？",
+                            "knowledgeTag": ["宋代军事", "宋代边防", "西夏"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil1_correct",
+                                    "type": "correct",
+                                    "text": "凭城固守，以逸待劳，同时速报朝廷请求援军",
+                                    "isCorrect": true,
+                                    "result": "你凭城固守，敌军攻城不下，损失惨重。朝廷援军及时赶到，你内外夹击，大败敌军。",
+                                    "history": "宋代军事以守城为主，城墙和防御工事是重要依托。以逸待劳是常用战术。",
+                                    "knowledgeTag": ["宋代防守战术", "宋代城防"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "主动出击，突袭敌军大营",
+                                    "isCorrect": false,
+                                    "result": "你主动出击，但敌军早有防备。你中了埋伏，损失两千人马，被迫退守城中。",
+                                    "history": "宋代将领多谨慎出击，敌众我寡时主动出击风险极大。知己知彼方能百战不殆。",
+                                    "knowledgeTag": ["宋代军事思想"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "丢弃城池，率军撤退保存实力",
+                                    "isCorrect": false,
+                                    "result": "你丢弃城池撤退，但被朝廷以失守罪免职查办。你的军事生涯因此蒙上污点。",
+                                    "history": "宋代对失守城池处罚严厉，将领守土有责，不战而退是重罪。",
+                                    "knowledgeTag": ["宋代军法", "宋代失守处罚"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil1_deadly",
+                                    "type": "deadly",
+                                    "text": "投降敌军，里应外合",
+                                    "isCorrect": false,
+                                    "result": "你投降敌军，但敌军为防止你反叛，在宴会上将你杀害。",
+                                    "history": "古代战争中，投降者往往不被信任，常被杀害以除后患。叛国投敌者没有好下场。",
+                                    "knowledgeTag": ["宋代投降", "古代战争伦理"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛国投敌被敌军所杀，遗臭万年。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "战后，朝廷派监军来视察。监军是皇帝亲信，权力极大，常干预军事指挥。你与监军在作战方略上产生分歧。你如何应对？",
+                            "knowledgeTag": ["宋代监军制度", "宋代军政", "宋代边防"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil2_correct",
+                                    "type": "correct",
+                                    "text": "耐心向监军解释，以战例和地形说服",
+                                    "isCorrect": true,
+                                    "result": "你用详细的战例和地形分析说服了监军。作战时，监军不再胡乱干预，你大获全胜。",
+                                    "history": "宋代监军制度是双刃剑，好监军能协调军政，坏监军则祸害军队。善于沟通是生存之道。",
+                                    "knowledgeTag": ["宋代监军", "宋代军事协调"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "无视监军，坚持己见",
+                                    "isCorrect": false,
+                                    "result": "你无视监军，但监军向朝廷参了你一本。你被召回京城审查，军事计划也被搁置。",
+                                    "history": "宋代监军代表皇权，无视监军等于抗旨。虽有风险，但沟通不当后果严重。",
+                                    "knowledgeTag": ["宋代监军", "宋代军纪"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "贿赂监军，换取支持",
+                                    "isCorrect": false,
+                                    "result": "你贿赂监军，但监军是被派来查贪腐的。你被当场拿下，以行贿罪论处。",
+                                    "history": "宋代监军常由清廉官员担任，对贪腐恨之入骨。向监军行贿是自寻死路。",
+                                    "knowledgeTag": ["宋代反腐", "宋代监军"],
+                                    "healthChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil2_deadly",
+                                    "type": "deadly",
+                                    "text": "软禁监军，独揽军权",
+                                    "isCorrect": false,
+                                    "result": "你软禁监军，独揽军权。但此事很快被告发，你被定性为谋反，凌迟处死。",
+                                    "history": "软禁监军形同谋反，宋代对谋反者处以极刑，凌迟或斩立决。家产充公，家族连坐。",
+                                    "knowledgeTag": ["宋代谋反", "宋代极刑"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因软禁监军被定为谋反罪，凌迟处死，家族受牵连。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "边疆战事稍缓，但粮草补给困难。朝廷运来的军粮被克扣严重，你查明是后方转运官所为。你如何处理？",
+                            "knowledgeTag": ["宋代军需", "宋代后勤", "宋代军事腐败"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil3_correct",
+                                    "type": "correct",
+                                    "text": "上报朝廷，请求朝廷派员查处",
+                                    "isCorrect": true,
+                                    "result": "你上报朝廷，朝廷派人查处了转运官。军粮补给恢复畅通，你的刚正不阿获得朝廷嘉奖。",
+                                    "history": "宋代军需腐败是顽疾，上报朝廷是正途。宋代对克扣军需者处罚极重。",
+                                    "knowledgeTag": ["宋代军需制度", "宋代反腐"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "截留过路商队，就地补给",
+                                    "isCorrect": false,
+                                    "result": "你截留商队补给，虽然暂时缓解了困难，但商队告状，你被以扰民罪降职。",
+                                    "history": "宋代保护商旅安全，截留商队是违法行为。即便是军用，也需按程序申请。",
+                                    "knowledgeTag": ["宋代商业保护", "宋代军纪"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "同样克扣军粮，收买监军，沆瀣一气",
+                                    "isCorrect": false,
+                                    "result": "你与转运官同流合污，但监军暗中调查掌握了证据。你被一并拿下，从重处罚。",
+                                    "history": "宋代监察制度完善，监军常负暗中调查之责。贪腐者往往难逃法网。",
+                                    "knowledgeTag": ["宋代监察", "宋代监军"],
+                                    "healthChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil3_deadly",
+                                    "type": "deadly",
+                                    "text": "带兵抢了官仓，就地用粮",
+                                    "isCorrect": false,
+                                    "result": "你带兵抢了官仓，就地用粮。但官仓属于朝廷，你被定性为哗变，领头者斩立决。",
+                                    "history": "哗变是军中大罪，即便出于好心，抢官仓也是死罪。宋代对哗变者杀无赦。",
+                                    "knowledgeTag": ["宋代军法", "宋代哗变"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因哗变被斩立决，军事生涯以悲剧收场。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "边境稳定后，你被调回京城。京城正值变法前夕，革新派与保守派斗争激烈。你被卷入党争，如何站队？",
+                            "knowledgeTag": ["宋代党争", "宋代变法", "宋代政治"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil4_correct",
+                                    "type": "correct",
+                                    "text": "称病不出，避免站队，静观其变",
+                                    "isCorrect": true,
+                                    "result": "你称病不出，避免了站队。后来变法派和保守派轮番上台，你因未涉足而安然无恙。",
+                                    "history": "宋代党争激烈，站队风险极大。称病观望是明哲保身的常用策略。",
+                                    "knowledgeTag": ["宋代政治智慧", "宋代党争"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "加入革新派，支持变法",
+                                    "isCorrect": false,
+                                    "result": "你加入革新派，但变法很快失败，革新派被清洗。你被贬谪到岭南。",
+                                    "history": "宋代党争中，失败一方往往被流放岭南。岭南在当时是瘴疠之地，九死一生。",
+                                    "knowledgeTag": ["宋代贬谪", "宋代岭南"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "加入保守派，反对变法",
+                                    "isCorrect": false,
+                                    "result": "你加入保守派，但保守派后来也被清算。你再次被贬，颠沛流离。",
+                                    "history": "宋代党争没有永远的赢家，两边站队都可能遭殃。",
+                                    "knowledgeTag": ["宋代党争"],
+                                    "healthChange": -8,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil4_deadly",
+                                    "type": "deadly",
+                                    "text": "公开批评变法，得罪皇帝",
+                                    "isCorrect": false,
+                                    "result": "你公开批评变法，触怒了皇帝。皇帝下令将你下狱，问以大不敬之罪。",
+                                    "history": "宋代皇权至上，公开批评皇帝是大不敬罪，可判流放或死刑。",
+                                    "knowledgeTag": ["宋代大不敬", "宋代皇权"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因大不敬被下狱问罪，政治生命彻底终结。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "晚年，仁宗驾崩，英宗即位。新帝登基大赦天下，但你的政敌也在此时卷土重来，要清算你当年的旧账。你如何应对？",
+                            "knowledgeTag": ["宋代宫廷", "宋代帝位更迭", "宋代政治清算"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil5_correct",
+                                    "type": "correct",
+                                    "text": "主动面见新帝请罪，同时陈述当年功劳",
+                                    "isCorrect": true,
+                                    "result": "你主动请罪，态度诚恳，同时陈述边疆功劳。新帝感念你的功勋，从轻发落，贬为平民而非下狱。",
+                                    "history": "新帝登基时常清算旧账，但主动请罪可获从轻。宋代对功臣往往网开一面。",
+                                    "knowledgeTag": ["宋代政治智慧", "宋代君臣关系"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "托病不出，消极抵抗",
+                                    "isCorrect": false,
+                                    "result": "你托病不出，但新帝认为你傲慢无礼，加重处罚。你被下狱问罪。",
+                                    "history": "新帝登基时，臣子应当第一时间觐见请安。托病不出被视为不敬。",
+                                    "knowledgeTag": ["宋代朝仪", "宋代君臣礼仪"],
+                                    "healthChange": -12,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "行贿近臣，换取庇护",
+                                    "isCorrect": false,
+                                    "result": "你行贿近臣，但近臣收钱后翻脸不认，还以此要挟你。你人财两空。",
+                                    "history": "宋代宫中贿赂成风，但收钱不办事者大有人在。依赖贿赂风险极高。",
+                                    "knowledgeTag": ["宋代宫中", "宋代贿赂"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil5_deadly",
+                                    "type": "deadly",
+                                    "text": "起兵反抗，自立为王",
+                                    "isCorrect": false,
+                                    "result": "你起兵反抗，但兵力悬殊，很快被镇压。你被以谋反罪凌迟处死，夷三族。",
+                                    "history": "谋反是十恶不赦之大罪，凌迟处死，夷三族。宋代对谋反者绝不留情。",
+                                    "knowledgeTag": ["宋代谋反", "宋代极刑"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因谋反被凌迟处死，夷三族，军事生涯以悲剧告终。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "你告老还乡，回到开封养老。但开封府突然爆发瘟疫，朝廷需要人手协助抗疫。你已经退休，如何抉择？",
+                            "knowledgeTag": ["宋代疫情", "宋代社会责任", "宋代士人精神"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_mil6_correct",
+                                    "type": "correct",
+                                    "text": "捐资抗疫，出钱出力，展现士人担当",
+                                    "isCorrect": true,
+                                    "result": "你捐资抗疫，协助官府控制疫情。你的义举获得朝廷嘉奖，百姓立碑纪念。",
+                                    "history": "宋代士人强调社会责任，退隐后仍心系家国。抗疫捐资是士人担当的体现。",
+                                    "knowledgeTag": ["宋代士人精神", "宋代社会责任"],
+                                    "healthChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "闭门不出，自保平安",
+                                    "isCorrect": false,
+                                    "result": "你闭门不出，但瘟疫蔓延到你家附近，家人感染。你后悔莫及。",
+                                    "history": "宋代开封曾爆发多次瘟疫，疫情面前无人能独善其身。积极参与抗疫是自救救他。",
+                                    "knowledgeTag": ["宋代疫情"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "囤积居奇，发国难财",
+                                    "isCorrect": false,
+                                    "result": "你囤积药材，高价出售。但被人告发，官府介入，你被查封家产。",
+                                    "history": "宋代对囤积居奇者处罚严厉，尤其是疫情期间发国难财，更是罪加一等。",
+                                    "knowledgeTag": ["宋代经济法规", "宋代囤积居奇"],
+                                    "healthChange": -12,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_mil6_deadly",
+                                    "type": "deadly",
+                                    "text": "散布谣言，引起恐慌",
+                                    "isCorrect": false,
+                                    "result": "你散布谣言引起恐慌，导致民乱。朝廷派兵镇压，你被作为民乱首领处死。",
+                                    "history": "宋代对造谣引起社会动荡者严惩不贷，民乱首领往往被斩立决。",
+                                    "knowledgeTag": ["宋代造谣", "宋代民乱"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因造谣引起民变被斩立决，一生功名毁于一旦。"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "folk_doctor",
+                    "name": "市井郎中",
+                    "description": "开封府名医辈出，你是一名游方郎中，在东京街头行医。需要精通中医理论、药物知识、医德规范。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "仁宗年间，你在开封州桥旁摆摊行医。一日，一富商模样的中年人来看病，说自己头晕目眩。你如何诊断？",
+                            "knowledgeTag": ["宋代医学", "宋代中医诊断", "宋代市井"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d1_correct",
+                                    "type": "correct",
+                                    "text": "望闻问切四诊合参，详细问诊后开方",
+                                    "isCorrect": true,
+                                    "result": "你详细问诊，得知他嗜酒熬夜，诊断为肝阳上亢。你施以针灸并开方调理，一月后他痊愈，登门道谢。",
+                                    "history": "宋代中医四诊合参是基本功，《本草纲目》和《太平惠民和剂局方》是郎中的必备参考。",
+                                    "knowledgeTag": ["宋代中医", "宋代四诊"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "根据症状直接开药，不详细问诊",
+                                    "isCorrect": false,
+                                    "result": "你根据症状开药，但他服用后无效。后来详细问诊才发现他有其他隐疾，先前的药反而伤了正气。",
+                                    "history": "宋代郎中良莠不齐，草率诊断可能伤人。宋代已有官办惠民局规范行医。",
+                                    "knowledgeTag": ["宋代医疗规范"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "故意夸大病情，多开贵药",
+                                    "isCorrect": false,
+                                    "result": "你夸大病情多开贵药，但富商请了其他郎中核实，发现你欺骗。他告到官府，你被杖责并示众。",
+                                    "history": "宋代对坑蒙拐骗的郎中处罚严厉，欺诈病人者杖八十，执照吊销。",
+                                    "knowledgeTag": ["宋代医德", "宋代医疗法规"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d1_deadly",
+                                    "type": "deadly",
+                                    "text": "用剧毒药材冒充名贵药材",
+                                    "isCorrect": false,
+                                    "result": "你用剧毒药材冒充名贵药材，患者服用后中毒身亡。患者家属告官，你被判处绞刑。",
+                                    "history": "宋代对庸医杀人处罚极重，《宋律》规定庸医杀人者绞刑。害人害己，终遭报应。",
+                                    "knowledgeTag": ["宋代医德", "宋代庸医杀人"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因庸医杀人被绞刑处死，遗臭万年。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "你的医术渐有名气，被邀请到开封府官办惠民局任职。但惠民局与权贵有勾结，他们要求你开贵药回扣。你如何应对？",
+                            "knowledgeTag": ["宋代医疗制度", "宋代官场", "宋代医德"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d2_correct",
+                                    "type": "correct",
+                                    "text": "拒绝回扣，坚持医者本心，只开对的不开贵的",
+                                    "isCorrect": true,
+                                    "result": "你拒绝回扣，坚持只开对的药。惠民局无奈之下只好同意，你的医德在百姓中传开。",
+                                    "history": "宋代惠民局本为便民而设，但后期腐败丛生。坚持医德的郎中往往能获得百姓口碑。",
+                                    "knowledgeTag": ["宋代医德", "宋代惠民局"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "同流合污，收受回扣",
+                                    "isCorrect": false,
+                                    "result": "你收受回扣，但被御史台暗查。你被革职查办，医名尽毁。",
+                                    "history": "宋代御史台监察百官，官署腐败是重点监察对象。收受回扣难逃法网。",
+                                    "knowledgeTag": ["宋代反腐", "宋代御史台"],
+                                    "healthChange": -12,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "表面答应，实际仍开良心药",
+                                    "isCorrect": false,
+                                    "result": "你表面答应，但被监视，发现你阳奉阴违。你被惠民局开除，并被威胁不许声张。",
+                                    "knowledgeTag": ["宋代官场", "宋代诚信"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d2_deadly",
+                                    "type": "deadly",
+                                    "text": "举报惠民局腐败，得罪权贵",
+                                    "isCorrect": false,
+                                    "result": "你向官府举报惠民局腐败，但权贵势力庞大，反过来告你诬陷。你被下狱问罪。",
+                                    "history": "宋代官场错综复杂，举报权贵风险极高。没有足够证据的举报往往反被其害。",
+                                    "knowledgeTag": ["宋代官场险恶", "宋代举报"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因举报权贵被陷害入狱，医途尽毁。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "离开惠民局后，你回乡开了一间医馆。一日，邻县爆发疫情，求助朝廷无果，邻县县令来请你支援。你如何决定？",
+                            "knowledgeTag": ["宋代疫情", "宋代医德", "宋代社会责任"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d3_correct",
+                                    "type": "correct",
+                                    "text": "义不容辞，带上药材前往疫区救治",
+                                    "isCorrect": true,
+                                    "result": "你义不容辞前往疫区，深入基层救治患者。你的医术和医德感动百姓，疫情得到控制。朝廷嘉奖，封你为医官。",
+                                    "history": "宋代郎中重视医德，济世救人是医者本分。抗疫有功者常被授予官职。",
+                                    "knowledgeTag": ["宋代医德", "宋代抗疫"],
+                                    "healthChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "索取高价才去",
+                                    "isCorrect": false,
+                                    "result": "你索取高价，但邻县疫情紧急，百姓无力支付。你错失了抗疫良机，医名受损。",
+                                    "history": "宋代抗疫讲求医者仁心，索取高价者往往被时人唾弃。医德受损影响深远。",
+                                    "knowledgeTag": ["宋代医德"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "拒绝前往，自保平安",
+                                    "isCorrect": false,
+                                    "result": "你拒绝前往，但疫情蔓延到你的家乡。你的家人也感染了，你后悔莫及。",
+                                    "history": "宋代医疗条件有限，疫情传播迅速。自保并不能真正安全。",
+                                    "knowledgeTag": ["宋代疫情"],
+                                    "healthChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d3_deadly",
+                                    "type": "deadly",
+                                    "text": "趁机贩卖假药牟利",
+                                    "isCorrect": false,
+                                    "result": "你趁机贩卖假药，但疫情凶猛，假药无效，患者死亡众多。你被告发后处死。",
+                                    "history": "宋代对制售假药者处罚极重，特殊时期更是严惩不贷。发国难财者没有好下场。",
+                                    "knowledgeTag": ["宋代假药", "宋代医疗法规"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因贩卖假药害死人命被问斩，医者仁心尽丧。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "抗疫成功后，你被授予医官身份，入宫为皇家看病。一日，皇后患病，太医束手无策。你如何应对？",
+                            "knowledgeTag": ["宋代宫廷医学", "宋代太医", "宋代皇家"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d4_correct",
+                                    "type": "correct",
+                                    "text": "谦虚谨慎，四诊合参，请教太医共同商议",
+                                    "isCorrect": true,
+                                    "result": "你谦虚谨慎，与太医共同商议，制定了治疗方案。皇后病情好转，你获得皇帝嘉奖。",
+                                    "history": "宋代宫廷医学讲究谨慎谦逊，擅自做主是大忌。与太医合作是稳妥之道。",
+                                    "knowledgeTag": ["宋代宫廷礼仪", "宋代医学协作"],
+                                    "healthChange": 8,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "逞能夸口，承诺必能治好",
+                                    "isCorrect": false,
+                                    "result": "你逞能夸口，但病情复杂，久治不愈。皇帝认为你虚有其表，将你革职。",
+                                    "history": "宫廷看病最忌逞能，医学有太多不确定性。承诺过满容易身败名裂。",
+                                    "knowledgeTag": ["宋代宫廷礼仪"],
+                                    "healthChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "推脱责任，说这不是我的专业范围",
+                                    "isCorrect": false,
+                                    "result": "你推脱责任，皇帝认为你无能怯懦，将你革职永不复用。",
+                                    "history": "宋代医官被召就是为皇帝分忧，推脱者被视为不忠。",
+                                    "knowledgeTag": ["宋代君臣关系"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d4_deadly",
+                                    "type": "deadly",
+                                    "text": "用猛药冒险一搏",
+                                    "isCorrect": false,
+                                    "result": "你用猛药冒险，但皇后体质虚弱，药物反应剧烈，当夜崩逝。你被定性为谋害皇后，凌迟处死。",
+                                    "history": "宋代对皇室成员医疗事故处理极严，用药不当致死者往往以谋害论处。",
+                                    "knowledgeTag": ["宋代医疗法规", "宋代谋害"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因医疗事故被凌迟处死，家族受牵连。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "在宫中任职多年，你告老还乡。但你的徒弟中有人要用你的名号行医害人。你如何提前防范？",
+                            "knowledgeTag": ["宋代医德传承", "宋代医患关系", "宋代医馆"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d5_correct",
+                                    "type": "correct",
+                                    "text": "立下医训，明确医德规范，公示于医馆",
+                                    "isCorrect": true,
+                                    "result": "你立下医训规范，并公示于医馆。徒弟们遵循医训，你的医名得以传承。",
+                                    "history": "宋代已有医德规范，如孙思邈《大医精诚》是中医医德典范。立训传承是良法。",
+                                    "knowledgeTag": ["宋代医德", "宋代医德传承"],
+                                    "healthChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "不闻不问，任由徒弟自流",
+                                    "isCorrect": false,
+                                    "result": "你不闻不问，徒弟中有人果然出问题，败坏了你的医名。你晚节不保。",
+                                    "history": "师徒关系需要维护放任自流风险极大。徒弟行恶，师父难辞其咎。",
+                                    "knowledgeTag": ["宋代师徒关系"],
+                                    "healthChange": -8,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "将徒弟逐出师门，断绝关系",
+                                    "isCorrect": false,
+                                    "result": "你将可能出问题的徒弟逐出师门，但他怀恨在心，四处造谣中伤你。",
+                                    "history": "宋代医界竞争激烈，师徒反目常见。处理不当影响医名。",
+                                    "knowledgeTag": ["宋代医界"],
+                                    "healthChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d5_deadly",
+                                    "type": "deadly",
+                                    "text": "徒弟用你的名号行医出事，你被连坐下狱",
+                                    "isCorrect": false,
+                                    "result": "徒弟用你的名号行医出了人命，你被连坐下狱。虽然不知情，但师父责任难逃。",
+                                    "history": "宋代对假冒医者处罚严厉，对师父连带也严。不知情不能作为免罪理由。",
+                                    "knowledgeTag": ["宋代医疗法规", "宋代假冒医者"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因徒弟假冒医者被连坐下狱，晚年蒙冤。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "晚年，你决定将毕生所学整理成书。但书商找到你，说可以帮你出版，但要在书中添加虚假夸大内容以促销。你如何抉择？",
+                            "knowledgeTag": ["宋代医学著作", "宋代医德", "宋代出版"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "song_d6_correct",
+                                    "type": "correct",
+                                    "text": "拒绝虚假内容，坚持实事求是，宁可不出版也不篡改",
+                                    "isCorrect": true,
+                                    "result": "你坚持实事求是，拒绝了虚假内容。虽然出版推迟，但你的医书最终以真实可靠传世，造福后世。",
+                                    "history": "宋代医学著作丰富，《太平惠民和剂局方》等真实可靠的作品流传至今。医德与文德并重。",
+                                    "knowledgeTag": ["宋代医德", "宋代医学著作"],
+                                    "healthChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "答应书商，添加一些夸大和虚假内容",
+                                    "isCorrect": false,
+                                    "result": "你添加了虚假内容，但读者使用后无效甚至受害。你的医名被毁，书被查禁。",
+                                    "history": "宋代对医书虚假内容有处罚，害人医书会被查禁销毁。虚名终将不保。",
+                                    "knowledgeTag": ["宋代出版法规", "宋代医德"],
+                                    "healthChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "不出版，将书稿束之高阁",
+                                    "isCorrect": false,
+                                    "result": "你将书稿束之高阁，毕生所学未能传世。你去世后，这些珍贵的医学经验失传了。",
+                                    "history": "宋代医家重视经验传承，束之高阁是对医学的不负责任。传承是医者的使命。",
+                                    "knowledgeTag": ["宋代医学传承"],
+                                    "healthChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "song_d6_deadly",
+                                    "type": "deadly",
+                                    "text": "为了高额版税，在书中加入害人药方",
+                                    "isCorrect": false,
+                                    "result": "你加入害人药方，书出版后害死了人命。读者告发，你被开棺戮尸，医书被焚毁。",
+                                    "history": "宋代对害人医书处罚极重，不仅人受罚，书也要焚毁。医德尽失，祸延后世。",
+                                    "knowledgeTag": ["宋代医德", "宋代医疗法规"],
+                                    "healthChange": -100,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因著害人之书被开棺戮尸，医名尽毁，遗臭万年。"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

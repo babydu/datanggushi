@@ -2,7 +2,7 @@
 const SAVE_KEY = "history_survivor_save_data";
 const CUSTOM_PACK_LIST_KEY = "customPackList"; // 存储剧本列表（多剧本管理）
 const CUSTOM_PACK_KEY = "customPackData"; // 存储当前自定义剧本（用于存档兼容）
-const DEFAULT_PACK_URL = "tang-dynasty-pack.json";
+const DEFAULT_PACK_URL = "data/song_pack.json";
 const OPTION_DRAW_COUNT = 3;
 const DEADLY_OPTION_CHANCE = 0.25;
 const WEAKNESS_THRESHOLD = 0.5;
@@ -1553,7 +1553,7 @@ async function loadDefaultPack() {
         }
         throw new Error("网络加载失败");
     } catch (err) {
-        console.warn("内置剧本文件加载失败，使用备用剧本。请确保 tang-dynasty-pack.json 文件在同一目录下。");
+        console.warn("内置剧本文件加载失败，使用备用剧本。请确保 data/song_pack.json 文件在同一目录下。");
         appState.defaultPack = getFallbackDefaultPack();
         updateDefaultPackCard(appState.defaultPack);
     }
