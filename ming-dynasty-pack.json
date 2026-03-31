@@ -1,0 +1,723 @@
+{
+    "packInfo": {
+        "packName": "明朝那些事儿",
+        "dynasty": "明朝洪武至万历年间",
+        "version": "1.0",
+        "author": "官方内置",
+        "description": "穿越到大明王朝，从贫苦农民到朝中重臣，体验276年的风云变幻。所有剧情均基于《明史》、《明实录》及各类野史笔记设计，需要真正的历史知识才能通关。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 },
+        "wisdom": { "name": "学识值", "max": 100, "min": 0 },
+        "merit": { "name": "功勋值", "max": 100, "min": 0 }
+    },
+    "timeLimitConfig": {
+        "baseTime": 10,
+        "healthDeductPerSecond": 1,
+        "freezeOnModal": true
+    },
+    "scoreConfig": {
+        "dimensions": [
+            {"name": "最终生命值", "field": "finalHealth", "weight": 0.25, "max": 100},
+            {"name": "答题正确率", "field": "correctRate", "weight": 0.35, "max": 1},
+            {"name": "关卡完成度", "field": "levelCompleteRate", "weight": 0.2, "max": 1},
+            {"name": "最终学识值", "field": "finalWisdom", "weight": 0.1, "max": 100},
+            {"name": "最终功勋值", "field": "finalMerit", "weight": 0.1, "max": 100}
+        ],
+        "levels": [
+            {"id": "legendary", "name": "一代名臣", "desc": "你对明朝历史了如指掌，堪称当世大儒！", "minTotalScore": 92, "mustPass": true},
+            {"id": "excellent", "name": "朝廷栋梁", "desc": "你对明朝历史掌握扎实，是难得的人才！", "minTotalScore": 85, "mustPass": true},
+            {"id": "good", "name": "初入仕途", "desc": "你顺利通过了考验，对明朝历史有了基本了解。", "minTotalScore": 70, "mustPass": true},
+            {"id": "fail", "name": "名落孙山", "desc": "你没能通过考验，对明朝历史了解不足。", "minTotalScore": 0, "mustPass": false}
+        ]
+    },
+    "specialEvents": [
+        {
+            "id": "ming_sanshan_meeting",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["wisdom > 50", "currentLevel > 3"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "方孝孺",
+                "title": "读书人的种子",
+                "content": "久仰将军学问渊博，正所谓'十年树木，百年树人'，我大明正需要你这样的人才！",
+                "effects": {
+                    "wisdom": 15,
+                    "merit": 5
+                }
+            }
+        }
+    ],
+    "volumeList": [
+        {
+            "id": "hongwu_era",
+            "name": "第一卷·洪武开国",
+            "subtitle": "大明开篇·布衣天子",
+            "dynasty": "明朝洪武年间·1368-1398年",
+            "description": "朱元璋建立大明，定都南京。你作为淮西布衣，亲历开国风云。从军功晋升到封侯拜将，见证明初风云。",
+            "isFirst": true,
+            "unlockCondition": null,
+            "inheritFrom": null,
+            "timeLimitConfig": { "baseTime": 10 },
+            "identityList": [
+                {
+                    "id": "soldier",
+                    "name": "开国士兵",
+                    "description": "你是一名淮西军人，跟随朱元璋从军起义。从普通士兵做起，需要凭借战功和智慧，一步步晋升为将领。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "至正十二年，你家乡遭遇旱灾，父母饿死。你听闻濠州红巾军招兵，便想去投军。但红巾军鱼龙混杂，你需要先弄清楚这支军队的来历和背景。下列关于红巾军的说法，正确的是？",
+                            "knowledgeTag": ["红巾军", "元末农民起义", "白莲教"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_h1_correct",
+                                    "type": "correct",
+                                    "text": "红巾军又称红军，以白莲教为纽带，主要活动于中原地区",
+                                    "isCorrect": true,
+                                    "result": "你选对了！红巾军确实以白莲教为纽带，相信'明王出世'的教义，主要活动于河南、河北、山东等地。你的正确判断让你避免了加入不靠谱的队伍。",
+                                    "history": "红巾军是元末农民起义的主流力量，以白莲教'明王出世'为号召，建立了大宋等政权。韩山童、刘福通等人是早期领袖。",
+                                    "knowledgeTag": ["白莲教", "韩山童", "农民起义"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "红巾军是蒙古贵族建立的军队，以铁木真后裔为旗帜",
+                                    "isCorrect": false,
+                                    "result": "你答错了！红巾军是农民起义军，与蒙古贵族毫无关系。你的误判让你对局势产生了严重错误判断。",
+                                    "history": "红巾军明确是反元起义军，以汉族农民为主力，与蒙古统治者是死敌。",
+                                    "knowledgeTag": ["元末政治"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -5,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "红巾军是沿海倭寇伪装，以劫掠为生",
+                                    "isCorrect": false,
+                                    "result": "你答错了！红巾军是内陆农民起义，与倭寇完全无关。你的误判暴露了你对元末局势的无知。",
+                                    "history": "倭寇问题在明代中期才真正严重，与元末红巾军无关。",
+                                    "knowledgeTag": ["元末社会"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -5,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h1_deadly",
+                                    "type": "deadly",
+                                    "text": "红巾军是张士诚建立的水军，以运粮为名割据一方",
+                                    "isCorrect": false,
+                                    "result": "你将红巾军与张士诚完全搞混了！张士诚是另一支起义军，与红巾军系统完全不同。你对局势的混乱认知让你成为军中的笑柄。",
+                                    "history": "张士诚确实在江南建立了政权，但他不是红巾军系统，而是盐贩出身，自立为'诚王'。",
+                                    "knowledgeTag": ["张士诚", "元末诸侯"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -10,
+                                    "meritChange": -5,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "你加入郭子兴的红巾军后，表现出色，郭子兴很赏识你，想把养女马氏许配给你。但马氏并不愿意，你想说服马氏。以下哪句诗是朱元璋（彼时还叫朱重八）写给马氏的？",
+                            "knowledgeTag": ["朱元璋", "马皇后", "明朝开国"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_h2_correct",
+                                    "type": "correct",
+                                    "text": "朱元璋早年并无写诗记载，这很可能是后人附会",
+                                    "isCorrect": true,
+                                    "result": "你选对了！朱元璋出身贫寒，早年忙于生存，并没有写诗的闲情逸致。那些所谓朱元璋写给马皇后的诗，大多是后世文人杜撰。",
+                                    "history": "朱元璋文化水平不高，起义前主要身份是农民和僧人。他的诗作主要集中在建国后，且多以大白话为主，不同于文人墨客的雅致风格。",
+                                    "knowledgeTag": ["朱元璋文学水平", "历史考证"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "《咏燕子矶》：'燕子矶头独立斜，阳春有脚到天涯'",
+                                    "isCorrect": false,
+                                    "result": "你答错了！这首诗实际是清代薛雪所作，与朱元璋无关。朱元璋的诗作风格与此完全不同。",
+                                    "history": "清代薛雪是著名温病学家，《咏燕子矶》是其代表作之一，风格清丽，与朱元璋朴实直白的诗风截然不同。",
+                                    "knowledgeTag": ["诗词考证", "清代文学"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "《思亲歌》：'欲效飞天鹰，徘徊思故园'",
+                                    "isCorrect": false,
+                                    "result": "你答错了！这首诗是元末张士诚的弟弟张士德所作，与朱元璋无关。",
+                                    "history": "张士德是张士诚的弟弟，擅长文学，这首诗表达了对故土的思念，但作者不是朱元璋。",
+                                    "knowledgeTag": ["元末文学", "张士诚集团"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h2_deadly",
+                                    "type": "deadly",
+                                    "text": "《劝马氏书》：'孤灯破壁照双影，愿与卿卿共白头'",
+                                    "isCorrect": false,
+                                    "result": "你答错了！朱元璋从未写过这种风格的书信。这很可能是后世戏曲小说的杜撰。你的误判暴露了历史知识的严重不足。",
+                                    "history": "朱元璋与马氏的结合主要是政治婚姻，马氏是郭子兴的养女，朱元璋需要这门婚事来稳固地位。",
+                                    "knowledgeTag": ["朱元璋马氏婚姻", "明初政治"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -15,
+                                    "meritChange": -5,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "鄱阳湖之战爆发，你作为水军将领参与了这场决定性的战役。面对陈友谅的巨大战船，你建议朱元璋采用火攻。但火攻需要借助东北风，以下关于鄱阳湖地区气候的说法，正确的是？",
+                            "knowledgeTag": ["鄱阳湖之战", "朱元璋", "陈友谅", "火攻"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_h3_correct",
+                                    "type": "correct",
+                                    "text": "鄱阳湖地区冬季确实多刮东北风，这是湖区特殊地形造成的",
+                                    "isCorrect": true,
+                                    "result": "你选对了！鄱阳湖地区冬季受西伯利亚寒流影响，加上湖泊与长江的地形效应，确实容易刮东北风。朱元璋正是利用了这一点实施了火攻。",
+                                    "history": "鄱阳湖之战发生在至正二十三年（1363年）七月至八月，正值夏季。但气候变化复杂，据史料记载，战中确实出现了有利于火攻的风向。",
+                                    "knowledgeTag": ["鄱阳湖地理", "气象知识"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "鄱阳湖全年都刮西南风，因为湖泊比热容大",
+                                    "isCorrect": false,
+                                    "result": "你答错了！鄱阳湖的风向随季节变化，冬季以东北风为主。你的错误地理知识可能导致火攻失败。",
+                                    "history": "湖泊确实能调节局部气候，但鄱阳湖位于亚热带，冬季受季风影响明显，并非全年西南风。",
+                                    "knowledgeTag": ["鄱阳湖气候"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -10,
+                                    "meritChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "鄱阳湖在元末正值丰水期，水面比现在大得多",
+                                    "isCorrect": false,
+                                    "result": "你答错了！元末时期鄱阳湖水面确实较大，但这与风向无关。你的回答暴露了知识的混乱。",
+                                    "history": "元末明初鄱阳湖水面确实比现在大，但水面大小与风向没有直接关系，而是与降水和长江水位有关。",
+                                    "knowledgeTag": ["鄱阳湖变迁"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -5,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h3_deadly",
+                                    "type": "deadly",
+                                    "text": "鄱阳湖在元末已经完全干涸，成为了一片沼泽",
+                                    "isCorrect": false,
+                                    "result": "你答错了！鄱阳湖在元末依然是中国第一大淡水湖，水面广阔。你的荒谬判断让你成为军中的笑柄。",
+                                    "history": "鄱阳湖在历史时期水面有盈缩变化，但元末明初依然是烟波浩渺的大湖，否则也不会成为朱元璋与陈友谅决战的主战场。",
+                                    "knowledgeTag": ["鄱阳湖历史"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -15,
+                                    "meritChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "明朝建立后，朱元璋大封功臣。你因功被封为百户，但你对爵位制度有些疑问。明朝的封爵制度与秦汉不同，以下关于明朝封爵制度的说法，正确的是？",
+                            "knowledgeTag": ["明朝封爵", "功臣封赏", "明朝制度"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_h4_correct",
+                                    "type": "correct",
+                                    "text": "明朝封爵分为宗室爵位和功臣爵位两套系统，功臣爵位只有公、侯、伯三级",
+                                    "isCorrect": true,
+                                    "result": "你选对了！明朝封爵制度确实分为两套：宗室使用五等爵位（公、侯、伯、子、男），而功臣只有公、侯、伯三级，且不世袭，需要有功才能维持。",
+                                    "history": "朱元璋建立明朝后，大封功臣，但同时担心功臣威胁皇权，所以功臣爵位不似汉朝那样完整，且后来多次大规模清洗功臣。洪武二十七年（1394年），大部分功臣被削除爵位。",
+                                    "knowledgeTag": ["明朝爵位制度", "朱元璋集权"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "明朝功臣爵位分公、侯、伯、子、男五等，与宗室相同",
+                                    "isCorrect": false,
+                                    "result": "你答错了！功臣爵位与宗室爵位不同，功臣只有三级。",
+                                    "history": "明朝功臣爵位确实只有公、侯、伯三级，这是朱元璋有意为之，以降低功臣的法定地位。",
+                                    "knowledgeTag": ["明朝封爵"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "明朝功臣爵位都是世袭的，与宗室享受同等待遇",
+                                    "isCorrect": false,
+                                    "result": "你答错了！功臣爵位不世袭，需要有功才能维持，这是明朝爵位制度的重要特点。",
+                                    "history": "明朝功臣爵位'铁券'上明确记载，爵位传袭需要不断建立新功，否则子孙无法继承。这也是为何后来大量功臣被削除爵位。",
+                                    "knowledgeTag": ["铁券制度"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h4_deadly",
+                                    "type": "deadly",
+                                    "text": "明朝功臣可以封王，与宗室王一样拥有封地和军队",
+                                    "isCorrect": false,
+                                    "result": "你答错了！功臣封王是朱元璋的大忌，他正是因此才大规模清洗功臣。你的无知让你成为被清洗的对象。",
+                                    "history": "朱元璋明确禁止功臣封王异性封王是祖训，违者必死。李善长、刘基等功臣都曾被暗示或明示不得封王。蓝玉案的起因之一就是蓝玉自恃功高，有封王的野心。",
+                                    "knowledgeTag": ["功臣封王禁忌", "蓝玉案"],
+                                    "healthChange": -50,
+                                    "wisdomChange": -15,
+                                    "meritChange": -10,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "洪武二十五年，太子朱标病逝，朱允炆被立为皇太孙。你作为老臣，需要表态支持。以下关于明朝储君制度的说法，正确的是？",
+                            "knowledgeTag": ["朱标", "朱允炆", "明朝储君", "嫡长继承"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_h5_correct",
+                                    "type": "correct",
+                                    "text": "明朝坚持嫡长继承制，但朱标是嫡长却早逝，朱允炆以嫡孙身份继立",
+                                    "isCorrect": true,
+                                    "result": "你选对了！朱标虽是嫡长子，但早逝后，皇位继承按照'有嫡立嫡，无嫡立长'的原则，由朱标嫡子朱允炆继立，这符合明朝继承制度。",
+                                    "history": "朱标是朱元璋嫡长子，洪武二十五年病逝后，朱元璋选择立朱标嫡子朱允炆为皇太孙，这一安排后来引发了靖难之役。",
+                                    "knowledgeTag": ["嫡长继承", "朱标之死"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "朱允炆是朱标次子，因长兄朱雄英早夭而继立",
+                                    "isCorrect": false,
+                                    "result": "你答错了！朱允炆是朱标次子，但其生母是吕氏而非嫡妻常氏，所以朱允炆本身并非嫡子。",
+                                    "history": "朱标的嫡妻是常氏（常遇春之女），所生嫡长子是朱雄英，早夭。朱允炆是朱标次子，生母是吕氏，朱雄英死后，朱允炆才被认为有资格继立。",
+                                    "knowledgeTag": ["明朝皇室继承"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "朱允炆是朱标三子，因二子朱允熥年幼而被立",
+                                    "isCorrect": false,
+                                    "result": "你答错了！朱允炆确实是朱标次子，但朱允熥是第三子。",
+                                    "history": "朱标有多个儿子：朱雄英（嫡长，早夭）、朱允炆（次子）、朱允熥（三子）、朱允熙（四子）等。",
+                                    "knowledgeTag": ["明朝皇子"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_h5_deadly",
+                                    "type": "deadly",
+                                    "text": "朱允炆是朱棣之子，因朱标无子而被立",
+                                    "isCorrect": false,
+                                    "result": "你答错了！朱允炆是朱标之子，不是朱棣之子。朱棣是朱元璋第四子，后来发动靖难之役夺取了侄子朱允炆的皇位。",
+                                    "history": "朱棣是朱元璋第四子，封地为北平。靖难之役后，朱棣夺取皇位，是为永乐帝。朱允炆是朱标次子，是朱棣的侄子。",
+                                    "knowledgeTag": ["朱棣", "靖难之役"],
+                                    "healthChange": -30,
+                                    "wisdomChange": -20,
+                                    "meritChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "scholar_official",
+                    "name": "科举士子",
+                    "description": "你是一名科举士子，寒窗苦读，志在金榜题名。从秀才到进士，从翰林到入阁，需要凭借真才实学和官场智慧。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "你参加乡试，中了举人。考官对你的文章赞不绝口，并提到你的房师（阅卷考官）是某位著名学者。以下关于明朝科举'房师'制度的说法，正确的是？",
+                            "knowledgeTag": ["明朝科举", "房师", "乡试"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_s1_correct",
+                                    "type": "correct",
+                                    "text": "房师是阅卷官员，正式名称叫'同考官'，负责推荐优秀试卷给主考官",
+                                    "isCorrect": true,
+                                    "result": "你选对了！房师是科举中的重要角色，也叫同考官，负责阅卷并推荐优秀卷子给主考官。推荐的文章如果最终录取，推荐的房师也会受到褒奖。",
+                                    "history": "明朝科举考试采用糊名、誊录等防作弊制度，同考官（房师）负责推荐优秀试卷给主考官，最终由主考官决定录取名单。被录取的试卷，其房师被称为'荐元'。",
+                                    "knowledgeTag": ["科举制度", "同考官"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "房师是主考官的副手，负责实际阅卷工作",
+                                    "isCorrect": false,
+                                    "result": "你答错了！主考官是科举考试的主要负责人，副手是'同考官'或'副主考'，不是'房师'。",
+                                    "history": "明朝科举中，主考官是科举考试的主持者，同考官是辅助阅卷的官员。房师是考生对自己荐卷考官的称呼，并非正式官职。",
+                                    "knowledgeTag": ["科举官职"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "房师是考生在乡试前的辅导老师，类似私塾先生",
+                                    "isCorrect": false,
+                                    "result": "你答错了！房师是科举考试中的阅卷官员，与考生的私塾老师完全不同。",
+                                    "history": "考生的辅导老师一般称为'西席'、'幕友'或'业师'，与科举中的房师是不同的概念。",
+                                    "knowledgeTag": ["明代教育"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s1_deadly",
+                                    "type": "deadly",
+                                    "text": "房师是考生花钱雇佣的枪手，专门负责帮考生作弊",
+                                    "isCorrect": false,
+                                    "result": "你答错了！科举作弊是重罪，房师是正式官员，绝非枪手。你的误解暴露了科举知识的严重缺乏。",
+                                    "history": "科举作弊确实存在，但房师是正式官员，负责阅卷推荐，与枪手完全不同。明代对科举作弊处罚极严，一旦发现，师生皆斩。",
+                                    "knowledgeTag": ["科举防弊"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -15,
+                                    "meritChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "你进京赶考，在客栈遇到一位考生，他自称熟读《永乐大典》，声称这本书收录了世间所有书籍。下列关于《永乐大典》的说法，正确的是？",
+                            "knowledgeTag": ["永乐大典", "明朝图书", "类书"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_s2_correct",
+                                    "type": "correct",
+                                    "text": "《永乐大典》是一部类书而非百科全书，它按韵目编排，摘录原文，不改变古籍原貌",
+                                    "isCorrect": true,
+                                    "result": "你选对了！《永乐大典》是类书，按韵编排，摘录古籍原文，并不进行注释或改编。它保存了大量古籍原文，但并非'收录所有书籍'。",
+                                    "history": "《永乐大典》编纂于永乐年间，由解缙、姚广孝等人主持，共22877卷。它是世界上最大的百科全书性质的类书，但不是百科全书，因为它不解释、不改编，只是摘录原文。可惜正本毁于明末战火，副本在清末也散佚大半。",
+                                    "knowledgeTag": ["《永乐大典》性质", "类书与百科全书"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "《永乐大典》是百科全书，对所收书籍进行了全面注释和讲解",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《永乐大典》是类书，只摘录原文，不进行注释。",
+                                    "history": "类书与百科全书的区别在于：类书摘录原文，百科全书进行解释和改编。《永乐大典》是典型的类书。",
+                                    "knowledgeTag": ["类书与百科全书区别"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "《永乐大典》完整保存至今，是研究明朝以前历史的最重要史料",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《永乐大典》正本毁于明末，副本在清末也大部分散佚，现存仅约400余卷。",
+                                    "history": "《永乐大典》正本在明末下落不明（可能是殉葬或焚毁），副本在清代只有少量保存下来。现今能看到的《永乐大典》原件约400余卷，分藏于世界各地图书馆和博物馆。",
+                                    "knowledgeTag": ["《永乐大典》流传"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s2_deadly",
+                                    "type": "deadly",
+                                    "text": "《永乐大典》由唐伯虎主持编纂，共用了十年时间完成",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《永乐大典》由解缙、姚广孝等人主持，与唐伯虎完全无关。唐伯虎是弘治年间的江南四大才子之一，与永乐年间相差近百年。",
+                                    "history": "《永乐大典》主编是解缙（第一任）和姚广孝（第二任），唐伯虎是明中期人物，与永乐年间相差近百年，且唐伯虎一生并不得志，未曾参与任何官方图书编纂。",
+                                    "knowledgeTag": ["解缙", "姚广孝", "唐伯虎"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -20,
+                                    "meritChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "殿试当日，你被皇帝亲自点名。你需要回答关于明朝律法的题目。以下关于《大明律》的说法，正确的是？",
+                            "knowledgeTag": ["大明律", "明朝法律", "唐律疏议"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_s3_correct",
+                                    "type": "correct",
+                                    "text": "《大明律》的体例继承自《唐律疏议》，采用七刑名体例",
+                                    "isCorrect": true,
+                                    "result": "你选对了！《大明律》确实继承了《唐律疏议》的体例，采用笞、杖、徒、流、死五刑以及杂刑等七种刑名。",
+                                    "history": "《大明律》是朱元璋亲自参与编纂的重要法典，历时三十年完成。它以《唐律疏议》为蓝本，体例为名例、吏律、户律、礼律、兵律、刑律、工律七律。《大明律》的编纂过程体现了朱元璋'治乱世用重典'的思想。",
+                                    "knowledgeTag": ["《大明律》体例", "刑法制度"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "《大明律》完全由朱元璋原创，体现农民起义的平均思想",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《大明律》大量借鉴了《唐律疏议》和《宋律》，并非完全原创。",
+                                    "history": "朱元璋虽然亲自参与编纂，但《大明律》主要继承和沿用了唐宋法律体系。朱元璋的'原创'主要体现在一些具体条款上，如针对官员腐败的严厉处罚等。",
+                                    "knowledgeTag": ["法律传承"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "《大明律》在洪武年间完成后就一直未修改，是明朝的根本大法",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《大明律》虽然在洪武年间完成，但明代历代都有修订和补充。",
+                                    "history": "《大明律》完成后，确实是明朝的基本法典，但后代皇帝也会根据需要进行补充和解释。《问刑条例》就是对《大明律》的重要补充。",
+                                    "knowledgeTag": ["明代法律修订"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s3_deadly",
+                                    "type": "deadly",
+                                    "text": "《大明律》规定可以'以钱代刑'，犯了死罪也可以交钱赎命",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《大明律》对贪腐和谋反等重罪一律严惩，不允许以钱代刑。恰恰相反，朱元璋时期对贪腐的处罚是中国历史上最严厉的。",
+                                    "history": "朱元璋对贪腐的处罚极其严厉，'赃满六十两以上者，枭首示众、剥皮实草'。明朝允许赎刑，但仅限于轻微罪行，死罪不能赎。",
+                                    "knowledgeTag": ["明代刑罚", "朱元璋反腐"],
+                                    "healthChange": -25,
+                                    "wisdomChange": -20,
+                                    "meritChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "你入仕后，被派往地方担任知县。上任前，你需要了解明朝的赋税制度。以下关于'一条鞭法'的说法，正确的是？",
+                            "knowledgeTag": ["一条鞭法", "明朝赋税", "张居正改革"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_s4_correct",
+                                    "type": "correct",
+                                    "text": "一条鞭法将各种赋税折算成银两，统一征收，简化了赋税程序",
+                                    "isCorrect": true,
+                                    "result": "你选对了！一条鞭法是张居正改革的的重要内容，将各种复杂的赋税项目折算成银两，统一征收，大大简化了赋税程序。",
+                                    "history": "一条鞭法，又名'一条编'，是万历九年（1581年）张居正在全国推行的赋税制度改革。将原来的里甲、均徭、杂泛等各款项，以及秋粮米麦等，统一折算成银两，合并征收。这一改革简化了赋税程序，增加了财政收入，但也给农民带来了新的负担。",
+                                    "knowledgeTag": ["张居正改革", "赋税折银"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "meritChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "一条鞭法是按人口平均摊派赋税，贫富一律平等",
+                                    "isCorrect": false,
+                                    "result": "你答错了！一条鞭法不是按人口摊派，而是将赋税折银合并征收，与人口均摊无关。",
+                                    "history": "一条鞭法主要是简化赋税征收方式，不是改变赋税的分摊原则。明代赋税仍按田亩和人丁为主要依据。",
+                                    "knowledgeTag": ["赋税原则"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "一条鞭法是永乐年间郑和下西洋时提出的财政改革方案",
+                                    "isCorrect": false,
+                                    "result": "你答错了！一条鞭法是万历年张居正的改革措施，与郑和下西洋无关。",
+                                    "history": "一条鞭法是张居正于万历九年（1581年）推行，与郑和下西洋（永乐年间）相差近两百年。",
+                                    "knowledgeTag": ["张居正", "郑和"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -10,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s4_deadly",
+                                    "type": "deadly",
+                                    "text": "一条鞭法规定所有赋税必须以粮食实物的形式缴纳，不得用银两代替",
+                                    "isCorrect": false,
+                                    "result": "你答错了！一条鞭法的核心就是将赋税折银征收，与实物缴纳完全相反。",
+                                    "history": "明代中后期，白银成为主要流通货币，赋税折银成为趋势。一条鞭法正是将各种赋税折算成银两的改革，这与'以粮食实物缴纳'恰恰相反。",
+                                    "knowledgeTag": ["白银货币化"],
+                                    "healthChange": -25,
+                                    "wisdomChange": -20,
+                                    "meritChange": -15,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "你政绩卓著，被调入京城任职。在翰林院，你遇到了著名学者徐光启。交谈中，徐光启提到他正在翻译一本西方著作。以下关于徐光启与西方科学的说法，正确的是？",
+                            "knowledgeTag": ["徐光启", "西方科学", "利玛窦", "几何原本"],
+                            "timeLimitConfig": { "baseTime": 12 },
+                            "optionPool": [
+                                {
+                                    "id": "ming_s5_correct",
+                                    "type": "correct",
+                                    "text": "徐光启与利玛窦合作翻译了《几何原本》，将欧几里得几何学引入中国",
+                                    "isCorrect": true,
+                                    "result": "你选对了！徐光启与利玛窦合作翻译了《几何原本》前六卷，这是西方数学名著首次系统引入中国。",
+                                    "history": "徐光启（1562-1633）是明末著名科学家，与意大利传教士利玛窦合作，翻译了《几何原本》、《测量法义》等西方科学著作。他还是《农政全书》的主编，被誉为'睁眼看世界'的第一人。",
+                                    "knowledgeTag": ["《几何原本》", "徐光启利玛窦"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 20,
+                                    "meritChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "徐光启翻译的是《天工开物》，这是中国第一部西方科学著作的中文译本",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《天工开物》是宋应星所著的中国技术百科全书，与徐光启和西方科学无关。",
+                                    "history": "《天工开物》是宋应星（1587-约1666年）所著，是总结中国传统生产技术的百科全书，并非西方著作译本。",
+                                    "knowledgeTag": ["《天工开物》", "宋应星"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -15,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "徐光启在万历年间主持编写《永乐大典》，系统引进西方学术",
+                                    "isCorrect": false,
+                                    "result": "你答错了！《永乐大典》编纂于永乐年间，主编是解缙、姚广孝，与万历年间和徐光启都无关。",
+                                    "history": "《永乐大典》编纂于永乐年间（1403-1408），远早于徐光启时代。徐光启是万历、天启、崇祯年间的人物。",
+                                    "knowledgeTag": ["《永乐大典》编纂时间"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -15,
+                                    "meritChange": 0,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ming_s5_deadly",
+                                    "type": "deadly",
+                                    "text": "徐光启是清朝康熙年间的官员，主编《四库全书》中关于西方科学的部分",
+                                    "isCorrect": false,
+                                    "result": "你答错了！徐光启是明朝人，《四库全书》是清朝乾隆年间编纂的，两者在时间上相差近百年。",
+                                    "history": "徐光启是明末官员，崇祯年间官至礼部尚书兼东阁大学士。《四库全书》是清代乾隆年间纪晓岚等人编纂的大型丛书，与徐光启无关。",
+                                    "knowledgeTag": ["徐光启时代", "四库全书"],
+                                    "healthChange": -30,
+                                    "wisdomChange": -25,
+                                    "meritChange": -20,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

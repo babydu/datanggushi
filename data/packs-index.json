@@ -110,6 +110,34 @@
                 "普通将士、初出谋士、曹魏/蜀汉/东吴将领5条身份线",
                 "涉及官渡之战、赤壁之战、夷陵之战等经典战役"
             ]
+        },
+        {
+            "id": "ming-dynasty-pack",
+            "packName": "明朝那些事儿",
+            "dynasty": "明朝洪武至万历年间",
+            "version": "1.0",
+            "author": "官方内置",
+            "authorUrl": "",
+            "description": "穿越到大明王朝，从贫苦农民到朝中重臣，体验276年的风云变幻。所有剧情均基于《明史》、《明实录》及各类野史笔记设计，需要真正的历史知识才能通关。",
+            "coverImage": "",
+            "tags": ["明朝", "洪武", "科举", "张居正改革", "徐光启"],
+            "difficulty": "hard",
+            "filePath": "ming-dynasty-pack.json",
+            "levelCount": 10,
+            "identityCount": 2,
+            "volumeCount": 1,
+            "downloadCount": 0,
+            "rating": 4.9,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-03-31",
+            "updatedAt": "2026-03-31",
+            "highlights": [
+                "洪武开国到万历年间的波澜壮阔",
+                "开国士兵、科举士子两条专业身份线",
+                "涉及《永乐大典》、《大明律》、一条鞭法等专业知识",
+                "需要真正的历史知识才能答对，常识推断无效"
+            ]
         }
     ],
     "categories": [
