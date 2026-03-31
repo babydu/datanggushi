@@ -347,37 +347,30 @@ const KNOWLEDGE_CONFIG = {
     levelComplete: 50      // 完成关卡额外 +50
 };
 
-// 爵位等级配置
+// 学识等级配置（科举功名体系）
 const RANK_CONFIG = {
     ranks: [
-        { id: 'commoner', name: '庶人', minPoints: 0, title: '白丁', icon: '👤' },
-        { id: 'tenant', name: '佃农', minPoints: 100, title: '田舍郎', icon: '🌾' },
-        { id: 'owner', name: '自耕农', minPoints: 300, title: '田主', icon: '🏠' },
-        { id: 'rich', name: '富农', minPoints: 600, title: '殷实户', icon: '💰' },
-        { id: 'landlord', name: '地主', minPoints: 1000, title: '地主', icon: '🏘️' },
-        { id: 'gentry', name: '乡绅', minPoints: 1500, title: '乡贤', icon: '📜' },
-        { id: 'official', name: '县尉', minPoints: 2500, title: '父母官', icon: '🏛️' },
-        { id: 'magistrate', name: '县令', minPoints: 4000, title: '县令', icon: '🎖️' },
-        { id: 'sima', name: '司马', minPoints: 6000, title: '司马', icon: '⚔️' },
-        { id: 'cishi', name: '刺史', minPoints: 9000, title: '刺史', icon: '🦅' },
-        { id: 'taishou', name: '太守', minPoints: 13000, title: '太守', icon: '🏯' },
-        { id: 'shangshu', name: '尚书', minPoints: 18000, title: '尚书', icon: '📚' },
-        { id: 'jiangjun', name: '将军', minPoints: 25000, title: '将军', icon: '🛡️' },
-        { id: 'wanghou', name: '王侯', minPoints: 35000, title: '王侯', icon: '👑' }
+        { id: 'baiting', name: '白丁', minPoints: 0, title: '尚未入学', icon: '👤', desc: '历史知识尚需积累' },
+        { id: 'tongsheng', name: '童生', minPoints: 50, title: '初识文墨', icon: '📖', desc: '已启蒙历史典籍' },
+        { id: 'xiucai', name: '秀才', minPoints: 150, title: '饱读诗书', icon: '📚', desc: '历史知识初具根基' },
+        { id: 'juren', name: '举人', minPoints: 400, title: '学富五车', icon: '🎓', desc: '对历史有相当研究' },
+        { id: 'gongsheng', name: '贡生', minPoints: 800, title: '博古通今', icon: '📜', desc: '历史学问日益精进' },
+        { id: 'jinshi', name: '进士', minPoints: 1500, title: '学贯中西', icon: '🏆', desc: '历史知识渊博' },
+        { id: 'zhuanglu', name: '传胪', minPoints: 2500, title: '独占鳌头', icon: '🥇', desc: '历史学识出类拔萃' },
+        { id: 'bianxiu', name: '编修', minPoints: 4000, title: '博学多才', icon: '📝', desc: '可著书立说' },
+        { id: 'shendu', name: '侍读', minPoints: 6000, title: '学富五车', icon: '📕', desc: '堪称当世大儒' },
+        { id: 'dashixueshi', name: '大学士', minPoints: 10000, title: '学究天人', icon: '👑', desc: '历史学识登峰造极' }
     ],
-    // 爵位特权
+    // 学识特权（根据等级获得不同加成）
     privileges: {
-        'rich': { healthBonus: 10 },
-        'landlord': { wealthBonus: 50 },
-        'gentry': { debuffImmunity: 1 },
-        'official': { helpTimesBonus: 2 },
-        'magistrate': { streakBonus: 1.5 },
-        'sima': { correctBonus: 1.1 },
-        'cishi': { figureUnlock: true },
-        'taishou': { talentUnlock: true },
-        'shangshu': { allEndingsUnlock: true },
-        'jiangjun': { prestigeBonus: 1.2 },
-        'wanghou': { title: '千古一帝' }
+        'tongsheng': { correctBonus: 1.05 },
+        'xiucai': { correctBonus: 1.1 },
+        'gongsheng': { healthBonus: 5 },
+        'jinshi': { healthBonus: 10, correctBonus: 1.1 },
+        'zhuanglu': { helpTimesBonus: 1 },
+        'bianxiu': { healthBonus: 15, correctBonus: 1.15, helpTimesBonus: 1 },
+        'shendu': { healthBonus: 20, correctBonus: 1.2, helpTimesBonus: 2 },
+        'dashixueshi': { healthBonus: 30, correctBonus: 1.25, helpTimesBonus: 3 }
     }
 };
 
@@ -385,9 +378,9 @@ const RANK_CONFIG = {
 let knowledgeState = {
     totalPoints: 0,       // 累计学识
     currentPoints: 0,      // 当前学识（可用于本局）
-    currentRank: 'commoner',
-    highestRank: 'commoner',
-    rankProgress: 0         // 距离下一爵位的进度百分比
+    currentRank: 'baiting',
+    highestRank: 'baiting',
+    rankProgress: 0         // 距离下一等级的进度百分比
 };
 
 function loadKnowledgeState() {
@@ -396,7 +389,7 @@ function loadKnowledgeState() {
         if (saved) {
             const parsed = JSON.parse(saved);
             knowledgeState.totalPoints = parsed.totalPoints || 0;
-            knowledgeState.highestRank = parsed.highestRank || 'commoner';
+            knowledgeState.highestRank = parsed.highestRank || 'baiting';
         }
     } catch (e) {
         console.warn('加载学识状态失败');
@@ -2870,12 +2863,13 @@ function gameEnd(isSuccess, desc) {
     `;
     document.getElementById('end-desc').innerHTML = endingHtml + `<p style="margin-top: 15px;">${desc}</p>`;
     
-    // 显示爵位信息
+    // 显示学识等级信息
     const rankHtml = `
         <div class="rank-display" style="text-align: center; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%); border-radius: 12px;">
             <div style="font-size: 2.5rem; margin-bottom: 5px;">${rankInfo.icon}</div>
-            <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;">当前爵位：${rankInfo.name}</div>
+            <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;">当前学识等级：${rankInfo.name}</div>
             <div style="font-size: 0.9rem; color: var(--text-muted);">${rankInfo.title}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">${rankInfo.desc}</div>
             <div style="margin-top: 10px;">
                 <span style="color: var(--success);">+${knowledgeGained}</span> 学识
                 <span style="color: var(--text-muted); margin-left: 15px;">累计：${knowledgeState.totalPoints}</span>
