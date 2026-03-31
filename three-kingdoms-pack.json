@@ -1,0 +1,2099 @@
+{
+    "packInfo": {
+        "packName": "三国志·英雄的诞生",
+        "dynasty": "东汉末年~三国时期",
+        "version": "1.0",
+        "author": "官方内置",
+        "description": "完整还原东汉末年到三国鼎立的历史进程。你将穿越到群雄并起的乱世，体验一名普通将士或谋士的崛起之路。从平定黄巾之乱到三国鼎立，在刀光剑影与运筹帷幄中，做出决定命运的选择。"
+    },
+    "attributeConfig": {
+        "health": { "name": "生命值", "max": 100, "min": 0 },
+        "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+        "debuff": { "name": "负面状态", "max": 5, "min": 0 },
+        "loyalty": { "name": "忠诚度", "max": 100, "min": 0 },
+        "wisdom": { "name": "智谋值", "max": 100, "min": 0 }
+    },
+    "timeLimitConfig": {
+        "baseTime": 12,
+        "healthDeductPerSecond": 1,
+        "freezeOnModal": true
+    },
+    "scoreConfig": {
+        "dimensions": [
+            {"name": "最终生命值", "field": "finalHealth", "weight": 0.25, "max": 100},
+            {"name": "答题正确率", "field": "correctRate", "weight": 0.35, "max": 1},
+            {"name": "关卡完成度", "field": "levelCompleteRate", "weight": 0.2, "max": 1},
+            {"name": "最终智谋值", "field": "finalWisdom", "weight": 0.1, "max": 100},
+            {"name": "最终忠诚度", "field": "finalLoyalty", "weight": 0.1, "max": 100}
+        ],
+        "levels": [
+            {"id": "legendary", "name": "千古一帝", "desc": "你对三国历史了如指掌，堪称当世卧龙！", "minTotalScore": 92, "mustPass": true},
+            {"id": "excellent", "name": "名将风范", "desc": "你对这段历史掌握扎实，是难得的人才！", "minTotalScore": 85, "mustPass": true},
+            {"id": "good", "name": "小有所成", "desc": "你顺利通过了本次考验，对三国历史有基本的掌握。", "minTotalScore": 70, "mustPass": true},
+            {"id": "fail", "name": "默默无闻", "desc": "你没能通过本次考验，对三国历史了解不足。", "minTotalScore": 0, "mustPass": false}
+        ]
+    },
+    "specialEvents": [
+        {
+            "id": "three_kingdoms_zhouyu_friend",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["wisdom > 60", "currentLevel > 3"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "周瑜",
+                "title": "江东美周郎",
+                "content": "久仰大名！将军既有卧龙之智，又兼英雄之气，实乃我东吴之福也！",
+                "effects": {
+                    "wisdom": 15,
+                    "loyalty": 10
+                }
+            }
+        },
+        {
+            "id": "three_kingdoms_zhuge blessing",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["correct == true", "currentLevel > 5"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "诸葛亮",
+                "title": "卧龙先生",
+                "content": "将军答题出众，足见对历史典故了然于胸。望将军继续研习，他日必为栋梁之才！",
+                "effects": {
+                    "wisdom": 20,
+                    "health": 10
+                }
+            }
+        },
+        {
+            "id": "three_kingdoms_cao_death",
+            "triggerTiming": "afterOptionSelect",
+            "triggerConditions": ["health < 20"],
+            "triggerOnce": true,
+            "eventType": "dialog",
+            "eventData": {
+                "character": "曹操",
+                "title": "乱世奸雄",
+                "content": "胜败乃兵家常事！将军莫要气馁，且饮下这杯酒，重整旗鼓！",
+                "effects": {
+                    "health": 30,
+                    "loyalty": 5
+                }
+            }
+        }
+    ],
+    "volumeList": [
+        {
+            "id": "huangjin_rebellion",
+            "name": "第一卷·黄巾之乱",
+            "subtitle": "东汉末年·乱世序幕",
+            "dynasty": "东汉灵帝年间·184年",
+            "description": "东汉末年，朝纲败坏，民生凋敝。张角以太平道为号，率三十六方信徒起义，天下大乱。你将作为一名普通将士，参与平定黄巾之乱，在战火中初露锋芒。",
+            "isFirst": true,
+            "unlockCondition": null,
+            "inheritFrom": null,
+            "timeLimitConfig": { "baseTime": 12 },
+            "identityList": [
+                {
+                    "id": "military_general",
+                    "name": "普通将士",
+                    "description": "你是一名东汉军营中的普通将士，怀揣着建功立业的梦想。在平定黄巾之乱的战役中，你需要做出正确的战场决策，一步步从普通士兵成长为将领。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "中平元年，张角以\"苍天已死，黄天当立\"为号，率三十六方信徒起义。你所在的部队接到命令，前往颍川镇压叛军。行军途中，发现前方有大量难民涌来，其中混有可疑人物。你如何应对？",
+                            "knowledgeTag": ["黄巾起义", "东汉政治", "颍川之战"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h1_correct",
+                                    "type": "correct",
+                                    "text": "安抚难民，派人暗中搜查可疑人员，确保主力部队安全通过",
+                                    "isCorrect": true,
+                                    "result": "你沉着应对，先派人安抚难民情绪，同时安排精干士兵暗中盘查。果然发现几名黄巾军细作潜伏在难民中，及时避免了主力部队被突袭的风险。",
+                                    "history": "黄巾起义初期，起义军常以难民身份渗透各地官军。颍川之战中，曹操、孙坚等将领都曾遭遇类似情况。",
+                                    "knowledgeTag": ["黄巾起义", "军事谋略"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "驱赶所有难民，不分良莠一律驱逐",
+                                    "isCorrect": false,
+                                    "result": "你下令驱赶所有难民，但其中混杂着许多无辜百姓。此事传开后，百姓对官军多有怨言，你的部队名誉受损，招募新兵变得困难。",
+                                    "history": "东汉末年，百姓对官军印象不佳。颍川太守阴德过人，善待百姓，获得民众支持。",
+                                    "knowledgeTag": ["东汉社会", "民心向背"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "不闻不问，直接率军继续前进",
+                                    "isCorrect": false,
+                                    "result": "你对难民漠不关心，继续行军。结果难民中的黄巾细作通风报信，导致你的部队在前方山谷遭遇伏击，损失惨重。",
+                                    "history": "黄巾军善用情报战，常以难民身份刺探军情或引诱官军中伏。",
+                                    "knowledgeTag": ["黄巾起义战术", "情报战"],
+                                    "healthChange": -15,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h1_deadly",
+                                    "type": "deadly",
+                                    "text": "下令屠杀所有难民，防止细作混入",
+                                    "isCorrect": false,
+                                    "result": "你下令屠杀难民以防万一，此事骇人听闻。上级得知后，以\"滥杀无辜\"罪将你革职查办，军法处置。",
+                                    "history": "东汉军法森严，滥杀无辜是重罪，会被立即处决。",
+                                    "knowledgeTag": ["东汉军法"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因滥杀无辜被军法处置，在历史长河中留下千古骂名。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "颍川之战爆发，你随部与黄巾军主力对峙。敌军以波才为首，领兵十万，士气高涨。波才命部下在阵前叫骂，挑衅官军出战。你作为先登小校的谋士，建议主将如何布阵？",
+                            "knowledgeTag": ["颍川之战", "阵法", "波才"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h2_correct",
+                                    "type": "correct",
+                                    "text": "建议主将据守不动，待敌军疲惫时再出击",
+                                    "isCorrect": true,
+                                    "result": "你建议主将按兵不动，避开敌军锋芒。果然，黄巾军连日叫骂，士气逐渐懈怠。时机成熟时，主将率军突然出击，大破波才于阳翟。",
+                                    "history": "颍川之战中，曹操采用类似的战术，以逸待劳，大破黄巾军。",
+                                    "knowledgeTag": ["曹操军事", "以逸待劳"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议立即全军出击，正面硬撼敌军",
+                                    "isCorrect": false,
+                                    "result": "你建议立即出击，但黄巾军人数众多，正面硬撼损失惨重。主将采纳后，部队伤亡过半，不得不撤退。",
+                                    "history": "黄巾军虽训练不足，但人数众多。正面冲击往往两败俱伤。",
+                                    "knowledgeTag": ["黄巾军特点"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议绕道偷袭敌军后方",
+                                    "isCorrect": false,
+                                    "result": "你建议绕道偷袭，但地形不熟，部队在山林中迷路，错过了战机。等赶回战场时，友军已经与敌军陷入苦战。",
+                                    "history": "颍川地形复杂，不熟悉地形贸然绕道风险极大。",
+                                    "knowledgeTag": ["地理因素", "战术选择"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h2_deadly",
+                                    "type": "deadly",
+                                    "text": "建议主将投降黄巾军，共谋大事",
+                                    "isCorrect": false,
+                                    "result": "你建议主将投降，但此言一出，即被身边亲兵举报。主将大怒，当场将你斩首示众，以儆效尤。",
+                                    "history": "东汉军法，叛降者斩。",
+                                    "knowledgeTag": ["东汉军法"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因建议投降被主将斩首，身首异处，结局凄惨。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "颍川大捷后，你随部乘胜追击残敌。在一处山谷中，发现数十名受伤的敌军士兵，其中似有黄巾军首领张曼成的部下。他们请求投降，并愿意交出张曼成的位置。作为带队什长，你如何处置？",
+                            "knowledgeTag": ["张曼成", "黄巾军", "俘虏处置"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h3_correct",
+                                    "type": "correct",
+                                    "text": "接受投降，将俘虏押送回大营审讯",
+                                    "isCorrect": true,
+                                    "result": "你接受了俘虏的投降，并将他们押送回大营。审讯后得知张曼成的藏身之处，立下大功，被破格提拔为屯长。",
+                                    "history": "黄巾起义中，许多俘虏经审讯后能为官军提供重要情报。",
+                                    "knowledgeTag": ["俘虏审讯", "军功制度"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "全部斩杀，以绝后患",
+                                    "isCorrect": false,
+                                    "result": "你将俘虏全部斩杀，但消息传开后，许多本欲投降的黄巾军士兵拼死抵抗，你的部队伤亡增加。",
+                                    "history": "滥杀俘虏会导致敌军死战到底，对官军不利。",
+                                    "knowledgeTag": ["军事策略"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "释放俘虏，展现宽宏大量",
+                                    "isCorrect": false,
+                                    "result": "你释放了俘虏，但他们回去后立即向张曼成报告了你的位置。你遭到伏击，身负重伤。",
+                                    "history": "对黄巾军俘虏需谨慎处置，轻易释放可能带来严重后果。",
+                                    "knowledgeTag": ["黄巾军特点"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h3_deadly",
+                                    "type": "deadly",
+                                    "text": "私下放走俘虏，收受贿赂",
+                                    "isCorrect": false,
+                                    "result": "你私下放走了俘虏并收受了贿赂，但此事被同袍揭发。你被押送回营，以\"通敌受贿\"罪论处。",
+                                    "history": "东汉军法通敌受贿是死罪。",
+                                    "knowledgeTag": ["东汉军法"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因通敌受贿被押送法办，问斩于军前。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "黄巾之乱逐渐平定，你因功被提拔为百夫长。然而好景不长，灵帝宠信宦官，朝政日非大将军何进与十常侍争权，天下即将再次大乱。此时，你收到上级命令，要你参与一项机密任务。你会怎么做？",
+                            "knowledgeTag": ["东汉政治", "十常侍", "何进"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h4_correct",
+                                    "type": "correct",
+                                    "text": "服从命令，尽职尽责执行任务",
+                                    "isCorrect": true,
+                                    "result": "你服从命令，成功完成了任务。虽然任务危险，但你行事谨慎，得到了上级的赏识。",
+                                    "history": "东汉末年，服从命令是军人的天职，也是晋升的重要途径。",
+                                    "knowledgeTag": ["东汉军事", "军人职责"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "借口推脱，不愿参与这场宫廷斗争",
+                                    "isCorrect": false,
+                                    "result": "你借故推脱，惹怒了上级。此后你被调往边关冷衙门，仕途黯淡。",
+                                    "history": "拒绝上级命令在东汉军中是重罪，会严重影响仕途。",
+                                    "knowledgeTag": ["东汉官场"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "向十常侍告密，换取荣华富贵",
+                                    "isCorrect": false,
+                                    "result": "你向十常侍告密，但十常侍过河拆桥，将你灭口。",
+                                    "history": "十常侍以阴险狡诈著称，告密者往往没有好下场。",
+                                    "knowledgeTag": ["十常侍"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h4_deadly",
+                                    "type": "deadly",
+                                    "text": "趁机叛逃，投奔黄巾余党",
+                                    "isCorrect": false,
+                                    "result": "你叛逃投奔黄巾余党，但黄巾余党同样不信任你，将你处死。",
+                                    "history": "叛逃者两面不讨好，往往死无葬身之地。",
+                                    "knowledgeTag": ["黄巾余党"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你叛逃后被黄巾余党处死，身首异处。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "何进被十常侍设计杀害，袁绍、曹操等人率兵入宫诛杀宦官。混乱中，你作为一名宫廷侍卫亲历了这场政变。宫中大火，宦官挟持少帝出逃。你会怎么做？",
+                            "knowledgeTag": ["十常侍之乱", "董卓", "少帝"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h5_correct",
+                                    "type": "correct",
+                                    "text": "护送少帝，与宦官势力斗争",
+                                    "isCorrect": true,
+                                    "result": "你护送少帝出逃，在混乱中展现出忠诚与勇敢。少帝对你印象深刻，日后对你多加提拔。",
+                                    "history": "护卫少帝是东汉臣子的最高忠诚表现。",
+                                    "knowledgeTag": ["忠君护主"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "趁乱逃离皇宫，保全性命",
+                                    "isCorrect": false,
+                                    "result": "你趁乱逃离，但作为宫廷侍卫，失职是重罪。事后你被通缉，不得不流亡江湖。",
+                                    "history": "宫廷侍卫擅离职守是死罪。",
+                                    "knowledgeTag": ["宫廷侍卫"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "投靠宦官，为宦官效力",
+                                    "isCorrect": false,
+                                    "result": "你投靠了宦官，但很快董卓进京，宦官集团被清洗，你也受到牵连。",
+                                    "knowledgeTag": ["董卓进京"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h5_deadly",
+                                    "type": "deadly",
+                                    "text": "趁乱刺杀少帝，投靠董卓",
+                                    "isCorrect": false,
+                                    "result": "你试图刺杀少帝，但被侍卫拼死拦住，反被诛杀。",
+                                    "history": "刺杀皇帝是十恶不赦之罪，诛九族。",
+                                    "knowledgeTag": ["弑君之罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因弑君之罪被诛杀，夷三族。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "董卓入京，废少帝立献帝，专权乱政，天下诸侯纷纷起兵讨伐。你已升为校尉，收到讨董联军的檄文。作为一名将领，你会如何抉择？",
+                            "knowledgeTag": ["董卓", "十八路诸侯", "讨董联盟"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sg_h6_correct",
+                                    "type": "correct",
+                                    "text": "加入讨董联军，响应天下义举",
+                                    "isCorrect": true,
+                                    "result": "你加入讨董联军，在战斗中屡立战功。关东联军虽然最终未能消灭董卓，但你的名声传遍了各路诸侯。",
+                                    "history": "讨董联盟是东汉末年第一次大规模诸侯联合，虽然失败，但推动了天下大势的变化。",
+                                    "knowledgeTag": ["讨董战役"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "留在董卓阵营，静观其变",
+                                    "isCorrect": false,
+                                    "result": "你留在董卓阵营，但董卓残暴不仁，部下离心。最终董卓被吕布刺杀，你也受到牵连。",
+                                    "history": "董卓最终被吕布所杀，留在董卓阵营的人多没有好下场。",
+                                    "knowledgeTag": ["董卓之死"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "占山为王，趁乱自立",
+                                    "isCorrect": false,
+                                    "result": "你占山为王，但很快被讨董联军或董卓军剿灭，兵败身亡。",
+                                    "history": "乱世中独自起兵，没有根基很难存活。",
+                                    "knowledgeTag": ["群雄割据"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sg_h6_deadly",
+                                    "type": "deadly",
+                                    "text": "暗中勾结董卓，出卖讨董联军",
+                                    "isCorrect": false,
+                                    "result": "你暗中勾结董卓，但事情败露，被袁绍等人以叛徒罪名处死。",
+                                    "history": "背叛盟约者在乱世中死得最惨。",
+                                    "knowledgeTag": ["盟约背叛"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛徒罪被诸侯会盟处斩，遗臭万年。"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "strategist",
+                    "name": "初出谋士",
+                    "description": "你是一名怀才不遇的年轻谋士，游说于各路诸侯之间。在东汉末年的乱世中，你需要凭借智慧和谋略，为主公出谋划策，在群雄中脱颖而出。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "你是一名饱读诗书的年轻谋士，听闻曹操在陈留起兵讨董，于是前去投奔。曹操帐下谋士众多，你如何才能获得曹操的赏识？",
+                            "knowledgeTag": ["曹操", "陈留起兵", "谋士"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s1_correct",
+                                    "type": "correct",
+                                    "text": "先观察形势，然后献上一计打动曹操",
+                                    "isCorrect": true,
+                                    "result": "你先观察曹营形势，发现粮草运输的漏洞，然后献上计策解决了军粮运输问题。曹操大悦，对你印象极佳。",
+                                    "history": "曹操善于识人用人，对有真才实学的谋士极为重视。",
+                                    "knowledgeTag": ["曹操用人", "谋士之道"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "大吹大擂，声称自己才高八斗",
+                                    "isCorrect": false,
+                                    "result": "你大吹大擂，但曹操帐下谋士如荀彧、郭嘉等都是当世英才，你的夸口被认为是狂妄自大，被赶出营门。",
+                                    "history": "曹操最厌恶夸夸其谈之人。",
+                                    "knowledgeTag": ["曹操性格"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "贿赂曹操身边的人，寻求引荐",
+                                    "isCorrect": false,
+                                    "result": "你贿赂了曹操的门客，但曹操最恨这种人，将你逐出并永不叙用。",
+                                    "history": "曹操以廉洁著称，厌恶走后门之人。",
+                                    "knowledgeTag": ["曹操作风"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s1_deadly",
+                                    "type": "deadly",
+                                    "text": "假意投靠，暗中为董卓刺探情报",
+                                    "isCorrect": false,
+                                    "result": "你的细作身份被曹操的暗探查获，被当场抓获，以间谍罪处死。",
+                                    "history": "间谍罪在军中是最严重的罪行，必死无疑。",
+                                    "knowledgeTag": ["间谍罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因间谍罪被曹操处死，乱世中黯然退场。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "讨董联盟解散后，各路诸侯纷纷割据。你随曹操参与了一场攻城战，主将下令你献计破城。城中守军五千，粮草可支三月，你如何献策？",
+                            "knowledgeTag": ["攻城战", "战术谋略"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s2_correct",
+                                    "type": "correct",
+                                    "text": "建议围而不攻，断其粮道，待其自乱",
+                                    "isCorrect": true,
+                                    "result": "你建议围城断粮，三月后城中果然断粮，守军开城投降。你的计策不战而屈人之兵，曹操对你更加器重。",
+                                    "history": "不战而屈人之兵是兵家上策，断粮围城是常用战术。",
+                                    "knowledgeTag": ["兵法", "断粮计"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议立即强攻，速战速决",
+                                    "isCorrect": false,
+                                    "result": "你建议强攻，但守军拼死抵抗，攻城部队伤亡惨重，不得不撤退。你因此被降职。",
+                                    "history": "攻城战往往损失惨重，除非有绝对优势，否则不宜强攻。",
+                                    "knowledgeTag": ["攻城战"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议撤军，改日再战",
+                                    "isCorrect": false,
+                                    "result": "你建议撤军，但被主将认为是怯战，遭到斥责，你的建议被无视。",
+                                    "history": "谋士的建议需要有理有据，空谈撤退会被认为是无能。",
+                                    "knowledgeTag": ["谋士修养"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s2_deadly",
+                                    "type": "deadly",
+                                    "text": "建议献城投降，叛投敌军",
+                                    "isCorrect": false,
+                                    "result": "你建议投降，但立即被身边亲兵举报，以叛降罪被斩首。",
+                                    "history": "谋士叛降是死罪。",
+                                    "knowledgeTag": ["叛降罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛降罪被斩首，谋士之路就此终结。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "曹操与吕布在濮阳交战，两军对峙。你作为曹操的谋士，需要分析敌情。吕布有勇无谋，但麾下有高顺、张辽等将领。你如何为曹操分析局势？",
+                            "knowledgeTag": ["曹操", "吕布", "濮阳之战"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s3_correct",
+                                    "type": "correct",
+                                    "text": "建议用离间计分化吕布与部将的关系",
+                                    "isCorrect": true,
+                                    "result": "你建议曹操散布谣言，离间吕布与陈宫的关系。果然，吕布开始猜疑陈宫，军心浮动。曹操趁机进攻，大破吕布。",
+                                    "history": "吕布有勇无谋，不能信任他人，是其致命弱点。",
+                                    "knowledgeTag": ["离间计", "吕布弱点"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议正面硬撼，以硬碰硬",
+                                    "isCorrect": false,
+                                    "result": "你建议正面硬撼，但吕布麾下有精骑，正面交战曹操军损失不小。",
+                                    "history": "曹操军以步兵为主，与吕布精骑硬碰不智。",
+                                    "knowledgeTag": ["曹操战术"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议直接投降吕布",
+                                    "isCorrect": false,
+                                    "result": "你建议投降吕布，但此言一出，曹操大怒，将你逐出帐外，永不叙用。",
+                                    "history": "曹操志向远大，绝不会轻易投降。",
+                                    "knowledgeTag": ["曹操志向"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s3_deadly",
+                                    "type": "deadly",
+                                    "text": "暗中与吕布勾结，出卖曹操",
+                                    "isCorrect": false,
+                                    "result": "你暗中与吕布勾结，但被曹操的暗探截获密信，你被当众处斩。",
+                                    "history": "背叛主公者必死无疑。",
+                                    "knowledgeTag": ["背主之罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因背主勾敌被曹操处死，身败名裂。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "曹操在兖州站稳脚跟后，打算迎接汉献帝到许都，奉天子以令不臣。你作为谋士，如何看待这个计划？",
+                            "knowledgeTag": ["曹操", "汉献帝", "许都", "奉天子以令不臣"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s4_correct",
+                                    "type": "correct",
+                                    "text": "极力赞同，这是成就霸业的绝佳机会",
+                                    "isCorrect": true,
+                                    "result": "你极力赞同，并献上具体实施方案。曹操依计行事，果然顺利迎奉天子，获得了政治上的大义名分。",
+                                    "history": "奉天子以令不臣是曹操最重要的政治策略，为其统一北方奠定了基础。",
+                                    "knowledgeTag": ["曹操政治", "战略眼光"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "表示反对，认为此举会引来麻烦",
+                                    "isCorrect": false,
+                                    "result": "你表示反对，但曹操坚持己见。事后证明曹操决策正确，你失去了一次展示战略眼光的机会。",
+                                    "history": "迎奉天子虽有风险，但利大于弊。",
+                                    "knowledgeTag": ["战略判断"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议让献帝留在洛阳，不宜迁都",
+                                    "isCorrect": false,
+                                    "result": "你建议让献帝留在洛阳，但洛阳残破，不适合做都城。曹操没有采纳你的建议。",
+                                    "history": "洛阳在董卓之乱后已残破不堪，不宜建都。",
+                                    "knowledgeTag": ["洛阳状况"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s4_deadly",
+                                    "type": "deadly",
+                                    "text": "密谋将献帝劫走，献给袁绍",
+                                    "isCorrect": false,
+                                    "result": "你密谋劫持献帝献给袁绍，但计划败露，被曹操凌迟处死。",
+                                    "history": "劫持天子是谋反大罪。",
+                                    "knowledgeTag": ["谋反罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因谋反罪被曹操凌迟处死，夷三族。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "刘备在徐州被曹操击败后，不得不依附于曹操。你作为曹操的谋士，如何看待刘备这个人？",
+                            "knowledgeTag": ["刘备", "曹操", "徐州"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s5_correct",
+                                    "type": "correct",
+                                    "text": "提醒曹操刘备是英雄，不可小觑，但也不必急于除掉",
+                                    "isCorrect": true,
+                                    "result": "你建议对刘备以礼相待，既不过分亲近，也不轻易加害。曹操采纳，后来刘备果然成为曹操最头疼的对手。",
+                                    "history": "曹操曾言\"今天下英雄，唯使君与操耳\"，对刘备既忌又敬。",
+                                    "knowledgeTag": ["曹操刘备", "英雄相惜"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 5,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议立即除掉刘备，以绝后患",
+                                    "isCorrect": false,
+                                    "result": "你建议杀刘备，但曹操认为刘备是英雄，杀之会失天下人心，没有采纳。你的建议过于狠毒，曹操对你印象变差。",
+                                    "history": "曹操深谙收买人心之道，不会轻易杀害英雄。",
+                                    "knowledgeTag": ["曹操谋略"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议将刘备软禁，不让他离开许都",
+                                    "isCorrect": false,
+                                    "result": "你建议软禁刘备，但曹操认为软禁会显得自己气度狭小，没有采纳。刘备后来借机逃离许都。",
+                                    "history": "刘备借拦截袁术之机离开许都，重获自由。",
+                                    "knowledgeTag": ["刘备脱身"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s5_deadly",
+                                    "type": "deadly",
+                                    "text": "私下与刘备结交，密谋背叛曹操",
+                                    "isCorrect": false,
+                                    "result": "你私下与刘备结交，但被曹操的暗探发现，你被以叛主罪处死。",
+                                    "history": "私下勾结他人是谋士大忌。",
+                                    "knowledgeTag": ["谋士忠诚"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因背主罪被曹操处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "官渡之战前夕，袁绍率十万大军南下，与曹操在官渡对峙。你作为曹操的谋士，分析敌我态势，献上计策。",
+                            "knowledgeTag": ["官渡之战", "袁绍", "曹操", "以少胜多"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "ss_s6_correct",
+                                    "type": "correct",
+                                    "text": "建议先坚守消耗敌军，再寻机烧其粮草",
+                                    "isCorrect": true,
+                                    "result": "你建议先坚守待机，消耗袁绍军锐气。果然，袁绍久攻不下，士气低落。曹操采纳你的建议，适时出击，烧毁乌巢粮草，一举击溃袁绍。",
+                                    "history": "官渡之战的转折点就是曹操亲率精兵烧毁乌巢粮草，以少胜多击败袁绍。",
+                                    "knowledgeTag": ["官渡之战", "乌巢烧粮"],
+                                    "healthChange": 10,
+                                    "wisdomChange": 20,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议立即全军出击，与袁绍决战",
+                                    "isCorrect": false,
+                                    "result": "你建议立即决战，但袁绍兵多将广，正面交锋曹操军难以取胜。此建议过于冒进，曹操没有采纳。",
+                                    "history": "官渡之战曹操以少胜多，靠的不是正面决战，而是奇袭和坚持。",
+                                    "knowledgeTag": ["以少胜多"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议投降袁绍，以保全性命",
+                                    "isCorrect": false,
+                                    "result": "你建议投降袁绍，曹操大怒，将你逐出帐外。",
+                                    "history": "曹操宁死不降，不会接受投降建议。",
+                                    "knowledgeTag": ["曹操性格"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "ss_s6_deadly",
+                                    "type": "deadly",
+                                    "text": "暗中投降袁绍，为袁绍献计对付曹操",
+                                    "isCorrect": false,
+                                    "result": "你暗中投降袁绍，但袁绍多疑寡断，没有采纳你的建议。曹操得知后，将你追杀至死。",
+                                    "history": "两面三刀者往往没有好下场。",
+                                    "knowledgeTag": ["背主之报"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛主被曹操追杀，横死荒野。"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "three_kingdoms_warring",
+            "name": "第二卷·三国鼎立",
+            "subtitle": "群雄逐鹿·三分天下",
+            "dynasty": "东汉末年~三国时期·208-280年",
+            "description": "赤壁之战后，三国鼎立的格局逐渐形成。你将在这个英雄辈出的时代，选择效忠一位主公，辅佐他成就帝王之业。从赤壁之战到三国归晋，你将亲历这段波澜壮阔的历史。",
+            "isFirst": false,
+            "unlockCondition": "volume_huangjin_rebellion_pass",
+            "inheritFrom": "huangjin_rebellion",
+            "timeLimitConfig": { "baseTime": 12 },
+            "identityList": [
+                {
+                    "id": "wei_general",
+                    "name": "曹魏将领",
+                    "description": "你是一名曹魏阵营的将领，麾下有精兵万人。在曹操及其后人的麾下，你需要东征西讨，辅佐曹魏统一天下。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "赤壁之战后，曹操率残部北还，留下曹仁守南郡。孙权派周瑜进攻南郡，形势危急。你作为曹仁的部将，如何应对吴军的攻势？",
+                            "knowledgeTag": ["赤壁之战", "曹仁", "周瑜", "南郡之战"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t1_correct",
+                                    "type": "correct",
+                                    "text": "建议坚守不出，等待援军",
+                                    "isCorrect": true,
+                                    "result": "你建议曹仁坚守不出，消耗吴军锐气。果然，周瑜久攻不下，士气受挫。曹仁坚守一年，终于等来援军。",
+                                    "history": "南郡之战是周瑜的成名之战，但他也损失惨重，未能一举攻下。",
+                                    "knowledgeTag": ["坚守待援"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议主动出击，挫败吴军锐气",
+                                    "isCorrect": false,
+                                    "result": "你建议主动出击，但吴军士气正盛，出战不利。曹仁损失一员大将，形势更加危急。",
+                                    "history": "赤壁新败之后，曹军士气低落，不宜主动出击。",
+                                    "knowledgeTag": ["曹军状态"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议投降孙权，保全性命",
+                                    "isCorrect": false,
+                                    "result": "你建议投降，但曹仁誓死不降，将你以动摇军心罪斩首。",
+                                    "history": "曹仁是曹操族弟，忠心耿耿，绝不投降。",
+                                    "knowledgeTag": ["曹仁忠义"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t1_deadly",
+                                    "type": "deadly",
+                                    "text": "私下通敌，开城纳叛",
+                                    "isCorrect": false,
+                                    "result": "你私下通敌，试图开城纳降，但被曹仁察觉，将你擒获斩首。",
+                                    "history": "通敌叛国是死罪。",
+                                    "knowledgeTag": ["通敌罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因通敌叛国被曹仁斩首，遗臭万年。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "曹操病逝后，其子曹丕继位，逼迫汉献帝禅让，建立曹魏政权。你作为曹魏将领，对曹丕代汉自立有何看法？",
+                            "knowledgeTag": ["曹丕", "汉献帝", "禅让", "曹魏建立"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t2_correct",
+                                    "type": "correct",
+                                    "text": "支持禅让，认为天命已归曹氏",
+                                    "isCorrect": true,
+                                    "result": "你支持禅让，表示天命已归曹氏。曹丕对你十分欣赏，将你视为心腹。",
+                                    "history": "曹丕代汉是东汉末年的大事，许多汉臣表示支持。",
+                                    "knowledgeTag": ["禅让政治"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "表示不满，仍忠于汉室",
+                                    "isCorrect": false,
+                                    "result": "你表示不满忠于汉室，曹丕记恨在心，找借口将你贬谪。",
+                                    "history": "曹丕代汉后，对不服从者多有打压。",
+                                    "knowledgeTag": ["曹丕手段"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "保持中立，不发表意见",
+                                    "isCorrect": false,
+                                    "result": "你保持中立，但曹丕认为你态度暧昧，对你多有猜疑，你的仕途受到影响。",
+                                    "history": "政治表态很重要，中立往往两边不讨好。",
+                                    "knowledgeTag": ["政治表态"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t2_deadly",
+                                    "type": "deadly",
+                                    "text": "起兵反对曹丕，复兴汉室",
+                                    "isCorrect": false,
+                                    "result": "你起兵反对曹丕，但很快被镇压，你被俘后处死。",
+                                    "history": "反对曹魏代汉者大多失败。",
+                                    "knowledgeTag": ["忠汉反对"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因起兵反对曹魏被处死，汉室复兴梦碎。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "刘备在益州称帝，建立蜀汉。随后亲率大军进攻东吴，为关羽报仇。你作为曹魏将领，面临一个重要抉择。曹丕问你该如何看待蜀吴之战？",
+                            "knowledgeTag": ["刘备", "东吴", "夷陵之战", "曹丕"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t3_correct",
+                                    "type": "correct",
+                                    "text": "建议坐山观虎斗，待蜀吴两败俱伤再出击",
+                                    "isCorrect": true,
+                                    "result": "你建议坐山观虎斗，待蜀吴两败俱伤。曹丕采纳，后来果然蜀吴在夷陵对峙，曹魏坐收渔翁之利。",
+                                    "history": "曹丕采纳了谋士的建议，选择坐观蜀吴相争。",
+                                    "knowledgeTag": ["渔翁得利"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议趁机进攻东吴，夹击蜀军",
+                                    "isCorrect": false,
+                                    "result": "你建议夹击蜀军，但曹丕认为吴蜀并未离心，夹击可能适得其反，没有采纳。",
+                                    "history": "当时吴蜀虽有矛盾，但仍有联盟基础。",
+                                    "knowledgeTag": ["吴蜀联盟"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议联吴击蜀，先灭蜀国",
+                                    "isCorrect": false,
+                                    "result": "你建议联吴击蜀，但孙权本就与刘备为敌，你的建议显得多余。曹丕认为你没有看清形势。",
+                                    "history": "曹丕时期的魏吴关系并不稳固。",
+                                    "knowledgeTag": ["魏吴关系"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t3_deadly",
+                                    "type": "deadly",
+                                    "text": "建议联蜀击吴，背叛曹魏",
+                                    "isCorrect": false,
+                                    "result": "你建议联蜀击吴，这被视为背叛曹魏。你被以叛国罪处死。",
+                                    "history": "背叛主公必死无疑。",
+                                    "knowledgeTag": ["背主之罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛国罪被曹丕处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "蜀汉诸葛亮率军北伐曹魏，战事紧张。你作为曹魏将领镇守街亭，阻挡蜀军北上。马谡请求镇守街亭，你如何决断？",
+                            "knowledgeTag": ["诸葛亮", "北伐", "街亭", "马谡"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t4_correct",
+                                    "type": "correct",
+                                    "text": "亲自镇守街亭，不让马谡冒险",
+                                    "isCorrect": true,
+                                    "result": "你决定亲自镇守街亭，谨慎布防。蜀军久攻不下，诸葛亮只得退兵。此战之后，你威名远震。",
+                                    "history": "街亭之战是诸葛亮第一次北伐的关键战役，司马懿也认为此地不可丢。",
+                                    "knowledgeTag": ["街亭重要", "谨慎用兵"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "同意让马谡镇守，自己另守他处",
+                                    "isCorrect": false,
+                                    "result": "你同意马谡镇守街亭，但马谡违背部署，被蜀军大败。曹魏第一次北伐失败，你作为主将遭到贬谪。",
+                                    "history": "马谡失街亭是诸葛亮北伐的重大挫折。",
+                                    "knowledgeTag": ["马谡失街亭"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "放弃街亭，收缩防线",
+                                    "isCorrect": false,
+                                    "result": "你放弃街亭，收缩防线。虽然保全了兵力，但陇右三郡被蜀军占领，你被问罪。",
+                                    "history": "街亭是陇右门户，丢失此地等于放弃整个陇右。",
+                                    "knowledgeTag": ["战略要地"],
+                                    "healthChange": -5,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t4_deadly",
+                                    "type": "deadly",
+                                    "text": "投降蜀军，为诸葛亮效力",
+                                    "isCorrect": false,
+                                    "result": "你投降蜀军，但诸葛亮认为你不忠，将你闲置不用。你两头不讨好，最终郁郁而终。",
+                                    "history": "诸葛亮用人德才兼备，背主之人不受重用。",
+                                    "knowledgeTag": ["忠义观念"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因投降蜀汉被闲置不用，郁郁而终。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "曹丕去世后，其子曹睿继位。蜀汉诸葛亮再次北伐，魏明帝曹睿御驾亲征。你作为随军将领，面临与诸葛亮对峙的局面。你如何看待这位对手？",
+                            "knowledgeTag": ["曹睿", "诸葛亮", "魏明帝", "北伐"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t5_correct",
+                                    "type": "correct",
+                                    "text": "建议坚守不出，消耗蜀军粮草",
+                                    "isCorrect": true,
+                                    "result": "你建议坚守不出，蜀军粮草不济，必退无疑。曹睿采纳，果然蜀军因粮尽退兵。",
+                                    "history": "诸葛亮北伐多次因粮尽退兵，司马懿也曾用坚守策略。",
+                                    "knowledgeTag": ["坚守策略", "粮草关键"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议主动出击，与蜀军决战",
+                                    "isCorrect": false,
+                                    "result": "你建议主动出击，但诸葛亮治军有方，蜀军士气高昂。魏军出击不利，损失不小。",
+                                    "history": "诸葛亮治军严谨，蜀军战斗力不容小觑。",
+                                    "knowledgeTag": ["蜀军战斗力"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议求和休战，与蜀军谈判",
+                                    "isCorrect": false,
+                                    "result": "你建议求和，但诸葛亮志在北伐，不会接受求和。曹睿认为你长敌人志气，将你斥责。",
+                                    "history": "诸葛亮以复兴汉室为己任，不会轻易议和。",
+                                    "knowledgeTag": ["诸葛亮志向"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -10,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t5_deadly",
+                                    "type": "deadly",
+                                    "text": "私下通敌，暗中为诸葛亮传递情报",
+                                    "isCorrect": false,
+                                    "result": "你私下通敌，但被曹睿的暗探截获密信，你被以叛国罪处以极刑。",
+                                    "history": "通敌叛国罪无可恕。",
+                                    "knowledgeTag": ["叛国罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛国罪被曹睿下令处以极刑。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "诸葛亮病逝五丈原后，蜀汉势力渐衰。曹魏大权逐渐落入司马氏手中。司马懿发动高平陵之变，掌握了曹魏大权。你作为曹魏将领，面临站队选择。",
+                            "knowledgeTag": ["司马懿", "高平陵之变", "曹魏", "司马氏"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wg_t6_correct",
+                                    "type": "correct",
+                                    "text": "支持司马懿，认为他才能出众",
+                                    "isCorrect": true,
+                                    "result": "你支持司马懿，在高平陵之变中站在司马氏一方。司马懿对你十分信任，你的家族得以保全。",
+                                    "history": "高平陵之变是曹魏政权的转折点，站队正确者得以保全。",
+                                    "knowledgeTag": ["政治站队"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "忠于曹氏，反对司马懿",
+                                    "isCorrect": false,
+                                    "result": "你忠于曹氏，反对司马懿。但司马懿最终获胜，你被清洗。",
+                                    "history": "高平陵之变后，司马氏清除了一切反对势力。",
+                                    "knowledgeTag": ["曹马之争"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "保持中立，不参与政变",
+                                    "isCorrect": false,
+                                    "result": "你保持中立，但司马懿获胜后清洗异己，你虽未被杀，但被边缘化。",
+                                    "history": "政治斗争中，保持中立往往意味着失去信任。",
+                                    "knowledgeTag": ["中立代价"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wg_t6_deadly",
+                                    "type": "deadly",
+                                    "text": "起兵讨伐司马懿，复兴曹氏",
+                                    "isCorrect": false,
+                                    "result": "你起兵讨伐司马懿，但很快被镇压，你被夷三族。",
+                                    "history": "反对司马氏者下场凄惨。",
+                                    "knowledgeTag": ["司马氏清洗"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因起兵讨伐司马氏被夷三族。"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "shu_general",
+                    "name": "蜀汉将领",
+                    "description": "你是一名蜀汉阵营的将领，怀着兴复汉室的理想。在诸葛亮及其继承人的领导下，你将北伐中原，为兴复汉室而战。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "刘备在白帝城病逝，诸葛亮辅政，蜀汉大权尽归诸葛亮。你作为蜀汉将领，如何看待诸葛亮的执政？",
+                            "knowledgeTag": ["刘备", "白帝城托孤", "诸葛亮", "蜀汉"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t1_correct",
+                                    "type": "correct",
+                                    "text": "全力支持诸葛亮，服从其指挥",
+                                    "isCorrect": true,
+                                    "result": "你全力支持诸葛亮，服从其指挥。诸葛亮对你十分信任，将你委以重任。",
+                                    "history": "诸葛亮辅政期间，蜀汉内部团结，将领们多服从其指挥。",
+                                    "knowledgeTag": ["诸葛亮辅政"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "对诸葛亮专权不满，怀念刘备",
+                                    "isCorrect": false,
+                                    "result": "你对诸葛亮不满，但蜀汉正值用人之际，你的态度被视为动摇军心，被诸葛亮贬谪。",
+                                    "history": "诸葛亮执法严明，不服从者会被处理。",
+                                    "knowledgeTag": ["诸葛亮执法"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "保持观望态度，不表态",
+                                    "isCorrect": false,
+                                    "result": "你保持观望，但诸葛亮注意到了你的态度，对你多有猜疑，你的仕途受到影响。",
+                                    "history": "诸葛亮时期，蜀汉需要团结一心。",
+                                    "knowledgeTag": ["团结的重要性"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t1_deadly",
+                                    "type": "deadly",
+                                    "text": "勾结外敌，密谋背叛蜀汉",
+                                    "isCorrect": false,
+                                    "result": "你勾结外敌，但被诸葛亮察觉，以叛国罪处死。",
+                                    "history": "叛国者必死。",
+                                    "knowledgeTag": ["叛国罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛国罪被诸葛亮处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "诸葛亮准备北伐，需要选拔先锋将领。你作为蜀汉将领，希望担任先锋。但先锋一职关系重大，需要谨慎选择。你会如何表现？",
+                            "knowledgeTag": ["诸葛亮", "北伐", "先锋", "蜀汉"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t2_correct",
+                                    "type": "correct",
+                                    "text": "主动请缨，但表示需服从诸葛亮安排",
+                                    "isCorrect": true,
+                                    "result": "你主动请缨，但表示愿意服从诸葛亮安排。诸葛亮认为你既有进取心，又懂大局，对你印象极佳。",
+                                    "history": "诸葛亮喜欢既有能力又懂大局的将领。",
+                                    "knowledgeTag": ["诸葛亮用人"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "争抢先锋之位，与同僚争执不下",
+                                    "isCorrect": false,
+                                    "result": "你争抢先锋之位，与同僚发生争执，诸葛亮认为你不能顾全大局，没有让你担任先锋。",
+                                    "history": "诸葛亮注重将领的团结协作能力。",
+                                    "knowledgeTag": ["团结协作"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "谦虚退让，表示自己才能不足",
+                                    "isCorrect": false,
+                                    "result": "你谦虚退让，但诸葛亮认为你缺乏进取心，不适合担任先锋。",
+                                    "history": "谦虚虽好，但过度谦虚会被视为无能。",
+                                    "knowledgeTag": ["谦虚有度"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t2_deadly",
+                                    "type": "deadly",
+                                    "text": "贿赂诸葛亮身边的人谋取先锋之位",
+                                    "isCorrect": false,
+                                    "result": "你贿赂诸葛亮身边的人，企图谋取先锋之位。诸葛亮发现后，将你以行贿罪处死。",
+                                    "history": "诸葛亮执法严明，贿赂是重罪。",
+                                    "knowledgeTag": ["行贿罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因行贿罪被诸葛亮处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "北伐战争进行中，你担任先锋，连战连捷。但在一次战役中，你陷入了敌军的包围，粮草也将耗尽。你如何脱困？",
+                            "knowledgeTag": ["北伐", "包围", "脱困", "战术"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t3_correct",
+                                    "type": "correct",
+                                    "text": "组织突围，且战且退，等待援军",
+                                    "isCorrect": true,
+                                    "result": "你组织突围，且战且退，保持队形完整。果然，援军及时赶到，你成功脱困。",
+                                    "history": "败而不乱是精兵的表现。",
+                                    "knowledgeTag": ["败而不乱"],
+                                    "healthChange": -5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": 0,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "拼死突围，不惜一切代价",
+                                    "isCorrect": false,
+                                    "result": "你拼死突围，但损失惨重，最终虽然突围成功，但部队伤亡过半，你被撤职。",
+                                    "history": "不计后果的突围往往损失惨重。",
+                                    "knowledgeTag": ["量力而行"],
+                                    "healthChange": -20,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "投降敌军，保全性命",
+                                    "isCorrect": false,
+                                    "result": "你投降敌军，但蜀汉对投降者处罚极严，你的家人被连坐。",
+                                    "history": "蜀汉对投降者处罚严厉。",
+                                    "knowledgeTag": ["投降处罚"],
+                                    "healthChange": -30,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -20,
+                                    "debuffChange": 3,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t3_deadly",
+                                    "type": "deadly",
+                                    "text": "叛投敌军，反戈一击",
+                                    "isCorrect": false,
+                                    "result": "你叛投敌军，并协助敌军夹击蜀军。但叛徒的下场往往很惨，你被敌军设计除掉。",
+                                    "history": "叛徒往往两头不讨好。",
+                                    "knowledgeTag": ["叛徒下场"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因叛投敌军被设计除掉，死无葬身之地。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "诸葛亮病逝后，蜀汉面临危机。魏延与杨仪争权，蜀汉内乱。你作为蜀汉将领，如何应对这场危机？",
+                            "knowledgeTag": ["魏延", "杨仪", "蜀汉内乱", "诸葛亮"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t4_correct",
+                                    "type": "correct",
+                                    "text": "支持杨仪，维护诸葛亮遗志",
+                                    "isCorrect": true,
+                                    "result": "你支持杨仪，维护诸葛亮遗志。蜀汉虽然内乱，但很快平定，你被新主信任。",
+                                    "history": "魏延最终被杨仪击杀，蜀汉内乱平息。",
+                                    "knowledgeTag": ["平定内乱"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "支持魏延，认为他才能出众",
+                                    "isCorrect": false,
+                                    "result": "你支持魏延，但魏延最终兵败被杀，你受到牵连。",
+                                    "history": "魏延起兵反抗，最终兵败身亡。",
+                                    "knowledgeTag": ["魏延之乱"],
+                                    "healthChange": -15,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "两不相帮，坐观其变",
+                                    "isCorrect": false,
+                                    "result": "你两不相帮，但事后被怀疑立场不坚定，被新主疏远。",
+                                    "history": "政治斗争中站队很重要。",
+                                    "knowledgeTag": ["站队选择"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t4_deadly",
+                                    "type": "deadly",
+                                    "text": "趁机起兵，自立为王",
+                                    "isCorrect": false,
+                                    "result": "你趁蜀汉内乱起兵自立，但很快被姜维率军平定，你被俘杀。",
+                                    "history": "蜀汉虽然内乱，但凝聚力仍在。",
+                                    "knowledgeTag": ["自立为王"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因起兵自立被姜维平定，身首异处。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "蜀汉后期，姜维继承诸葛亮遗志，继续北伐。你作为老将，如何看待姜维的北伐？",
+                            "knowledgeTag": ["姜维", "北伐", "蜀汉后期"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t5_correct",
+                                    "type": "correct",
+                                    "text": "支持姜维北伐，虽败犹荣",
+                                    "isCorrect": true,
+                                    "result": "你支持姜维北伐，虽然多次无功而返，但你的忠诚打动了后主。",
+                                    "history": "姜维北伐虽然未能成功，但体现了蜀汉的坚持精神。",
+                                    "knowledgeTag": ["坚持北伐"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "反对北伐，认为应该休养生息",
+                                    "isCorrect": false,
+                                    "result": "你反对北伐，但姜维坚持北伐。你的意见被忽视，你心灰意冷。",
+                                    "history": "蜀汉内部对北伐一直有分歧。",
+                                    "knowledgeTag": ["北伐分歧"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "主张投降曹魏，保全百姓",
+                                    "isCorrect": false,
+                                    "result": "你主张投降，但蜀汉忠义之士众多，你的言论被视为背叛，被下狱。",
+                                    "history": "蜀汉以忠义立国，投降派没有市场。",
+                                    "knowledgeTag": ["忠义观念"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -20,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t5_deadly",
+                                    "type": "deadly",
+                                    "text": "勾结魏国，密谋献城",
+                                    "isCorrect": false,
+                                    "result": "你勾结魏国，密谋献城，但被黄皓察觉，你被处死。",
+                                    "history": "密谋献城是死罪。",
+                                    "knowledgeTag": ["献城罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因密谋献城被处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "魏国三路大军进攻蜀汉，蜀汉面临灭亡危机。后主刘禅投降，蜀汉灭亡。但你作为将领，仍有最后的抉择。你会怎么做？",
+                            "knowledgeTag": ["蜀汉灭亡", "刘禅投降", "魏军", "姜维"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "sug_t6_correct",
+                                    "type": "correct",
+                                    "text": "保护后主，前往洛阳保全性命",
+                                    "isCorrect": true,
+                                    "result": "你保护后主前往洛阳，后来被封为列侯，得以善终。",
+                                    "history": "刘禅投降后，许多蜀汉旧臣被魏国继续任用。",
+                                    "knowledgeTag": ["善终之道"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": 0,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "逃往东吴，等待复国机会",
+                                    "isCorrect": false,
+                                    "result": "你逃往东吴，但东吴不久也被晋国所灭，你流落异乡，郁郁而终。",
+                                    "history": "东吴最终也被晋国所灭。",
+                                    "knowledgeTag": ["东吴命运"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "战死沙场，以身殉国",
+                                    "isCorrect": false,
+                                    "result": "你战死沙场，以身殉国。你的忠义被后人传颂，但壮志未酬。",
+                                    "history": "蜀汉灭亡时，许多将领选择殉国。",
+                                    "knowledgeTag": ["以身殉国"],
+                                    "healthChange": -50,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 20,
+                                    "debuffChange": 0,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "sug_t6_deadly",
+                                    "type": "deadly",
+                                    "text": "投降魏军，为魏国效力",
+                                    "isCorrect": false,
+                                    "result": "你投降魏军，但魏国对你不信任，将你闲置不用，你郁郁而终。",
+                                    "history": "降将往往不被信任。",
+                                    "knowledgeTag": ["降将命运"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因投降魏国被闲置不用，郁郁而终。"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "wu_general",
+                    "name": "东吴将领",
+                    "description": "你是一名东吴阵营的将领，辅佐孙氏家族三代，在江东建立了强大的势力。在赤壁之战到三国归晋的历史进程中，你将经历东吴的兴衰。",
+                    "levelList": [
+                        {
+                            "level": 1,
+                            "story": "孙权继承父兄基业，在江东建立势力。你作为江东旧臣，如何看待年轻的孙权？",
+                            "knowledgeTag": ["孙权", "江东", "孙坚", "孙策"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t1_correct",
+                                    "type": "correct",
+                                    "text": "全力支持孙权，效忠孙氏家族",
+                                    "isCorrect": true,
+                                    "result": "你全力支持孙权，孙权对你十分信任，将你视为心腹。你的家族在江东世代荣华。",
+                                    "history": "孙权知人善任，江东老臣多受重用。",
+                                    "knowledgeTag": ["孙权用人"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t1_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "怀念孙策时期，对孙权能力存疑",
+                                    "isCorrect": false,
+                                    "result": "你对孙权能力存疑，但孙权很快展现出自己的才干，你被边缘化。",
+                                    "history": "孙权最终证明了自己是杰出的君主。",
+                                    "knowledgeTag": ["孙权能力"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t1_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "保持观望态度，看风使舵",
+                                    "isCorrect": false,
+                                    "result": "你保持观望，但孙权注意到了你的态度，对你多有猜疑。",
+                                    "history": "孙权重视忠诚的臣子。",
+                                    "knowledgeTag": ["忠诚重要"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t1_deadly",
+                                    "type": "deadly",
+                                    "text": "勾结外敌，密谋背叛江东",
+                                    "isCorrect": false,
+                                    "result": "你勾结外敌，但被孙权的暗探查获，你被处死。",
+                                    "history": "背叛孙氏家族者必死。",
+                                    "knowledgeTag": ["背叛下场"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因背叛江东被孙权处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 2,
+                            "story": "曹操率大军南下，意图一举灭吴。程普、周瑜等将领主张抵抗，但张昭等人主张投降。你作为江东将领，态度如何？",
+                            "knowledgeTag": ["赤壁之战", "曹操", "周瑜", "东吴"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t2_correct",
+                                    "type": "correct",
+                                    "text": "坚决支持周瑜，与曹军决战",
+                                    "isCorrect": true,
+                                    "result": "你坚决支持周瑜，主张与曹军决战。孙权下定决心，联合刘备，在赤壁大败曹操。",
+                                    "history": "赤壁之战是中国历史上著名的以少胜多战役，东吴坚决抵抗是关键。",
+                                    "knowledgeTag": ["赤壁决战"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t2_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "赞同张昭，认为应该投降保全",
+                                    "isCorrect": false,
+                                    "result": "你赞同投降，但孙权决心抵抗。你虽然免于被杀，但被视为怯战，仕途受损。",
+                                    "history": "张昭主张投降，但孙权没有采纳。",
+                                    "knowledgeTag": ["张昭主张"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t2_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "首鼠两端，看风使舵",
+                                    "isCorrect": false,
+                                    "result": "你首鼠两端，但孙权注意到了你的动摇。赤壁之战后，你被疏远。",
+                                    "history": "孙权对忠诚看得很重。",
+                                    "knowledgeTag": ["忠诚问题"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t2_deadly",
+                                    "type": "deadly",
+                                    "text": "暗中投降曹操，为曹军做内应",
+                                    "isCorrect": false,
+                                    "result": "你暗中投降曹操，但被周瑜察觉，你被当众处斩。",
+                                    "history": "内应背叛者死。",
+                                    "knowledgeTag": ["内应下场"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因做曹军内应被周瑜处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 3,
+                            "story": "赤壁之战后，刘备借荆州不还，成为东吴的心腹大患。吕蒙建议用武力夺回荆州，你如何看待这个问题？",
+                            "knowledgeTag": ["荆州", "刘备", "吕蒙", "东吴"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t3_correct",
+                                    "type": "correct",
+                                    "text": "支持吕蒙，认为应该用武力夺回荆州",
+                                    "isCorrect": true,
+                                    "result": "你支持吕蒙的计划，吕蒙白衣渡江，成功夺取荆州。",
+                                    "history": "吕蒙白衣渡江是三国时期的经典战术。",
+                                    "knowledgeTag": ["白衣渡江"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 10,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t3_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "反对夺回荆州，认为应该维护孙刘联盟",
+                                    "isCorrect": false,
+                                    "result": "你反对夺回荆州，但孙权采纳了吕蒙建议。你因为意见不被采纳而心灰意冷。",
+                                    "history": "孙权最终决定夺回荆州。",
+                                    "knowledgeTag": ["孙权决断"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t3_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "主张联合曹魏，共同对付刘备",
+                                    "isCorrect": false,
+                                    "result": "你主张联合曹魏，但孙权认为这会丧失主动权，没有采纳。",
+                                    "history": "孙权善于在魏蜀之间周旋。",
+                                    "knowledgeTag": ["孙权谋略"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t3_deadly",
+                                    "type": "deadly",
+                                    "text": "私通刘备，暗中为刘备效力",
+                                    "isCorrect": false,
+                                    "result": "你私通刘备，但被吕蒙察觉，你被以叛徒罪名处死。",
+                                    "history": "背叛东吴者必死。",
+                                    "knowledgeTag": ["背叛下场"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因私通刘备被吕蒙处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 4,
+                            "story": "吕蒙去世后，陆逊成为东吴大都督。夷陵之战爆发，刘备率军进攻东吴。你作为江东将领，如何看待这场战役？",
+                            "knowledgeTag": ["夷陵之战", "陆逊", "刘备", "火烧连营"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t4_correct",
+                                    "type": "correct",
+                                    "text": "支持陆逊，坚守不出，等待战机",
+                                    "isCorrect": true,
+                                    "result": "你支持陆逊的坚守策略。陆逊坚守数月，终于找到战机，一把火烧了刘备连营。",
+                                    "history": "夷陵之战是中国古代火攻战术的经典战例。",
+                                    "knowledgeTag": ["火烧连营"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 15,
+                                    "loyaltyChange": 10,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t4_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议主动出击，与刘备决战",
+                                    "isCorrect": false,
+                                    "result": "你建议主动出击，但刘备军营依山而建，易守难攻。你的建议过于冒进，陆逊没有采纳。",
+                                    "history": "陆逊认为刘备军营地形复杂，不宜强攻。",
+                                    "knowledgeTag": ["地形因素"],
+                                    "healthChange": -10,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t4_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "建议求和休战，避免两败俱伤",
+                                    "isCorrect": false,
+                                    "result": "你建议求和，但刘备志在复仇，不会接受求和。陆逊认为你长敌人志气，将你斥责。",
+                                    "history": "刘备伐吴决心坚定。",
+                                    "knowledgeTag": ["刘备决心"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t4_deadly",
+                                    "type": "deadly",
+                                    "text": "私下通蜀，暗中为刘备传递情报",
+                                    "isCorrect": false,
+                                    "result": "你私下通蜀，但被陆逊的暗探查获，你被以叛国罪处死。",
+                                    "history": "通敌叛国是死罪。",
+                                    "knowledgeTag": ["叛国罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因通敌叛国被陆逊处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 5,
+                            "story": "孙权称帝，建立东吴政权。三国鼎立的格局正式形成。你作为东吴老臣，如何看待这个局面？",
+                            "knowledgeTag": ["孙权称帝", "东吴建立", "三国鼎立"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t5_correct",
+                                    "type": "correct",
+                                    "text": "支持孙权称帝，认为这是水到渠成之事",
+                                    "isCorrect": true,
+                                    "result": "你支持孙权称帝，孙权对你这位开国老臣十分尊重，你的家族世代荣华。",
+                                    "history": "孙权称帝标志着三国鼎立格局的正式形成。",
+                                    "knowledgeTag": ["水到渠成"],
+                                    "healthChange": 5,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 15,
+                                    "debuffChange": -1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t5_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "认为东吴应该继续使用东汉年号",
+                                    "isCorrect": false,
+                                    "result": "你主张使用东汉年号，但孙权已经下定决心称帝，你被视为守旧派，被疏远。",
+                                    "history": "孙权称帝是政治上的需要。",
+                                    "knowledgeTag": ["政治需要"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -10,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t5_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "主张与蜀汉争夺正统",
+                                    "isCorrect": false,
+                                    "result": "你主张与蜀汉争夺正统，但孙权认为应该维护吴蜀联盟，你的意见被忽视。",
+                                    "history": "孙权重视吴蜀联盟。",
+                                    "knowledgeTag": ["吴蜀联盟"],
+                                    "healthChange": 0,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -5,
+                                    "debuffChange": 1,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t5_deadly",
+                                    "type": "deadly",
+                                    "text": "勾结蜀汉，密谋推翻孙权",
+                                    "isCorrect": false,
+                                    "result": "你勾结蜀汉，但被孙权察觉，你被处死。",
+                                    "history": "谋反者必死。",
+                                    "knowledgeTag": ["谋反罪"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因谋反罪被孙权处死。"
+                                }
+                            ]
+                        },
+                        {
+                            "level": 6,
+                            "story": "晋国三路大军进攻东吴，杜预、王濬率水陆大军直逼建业。东吴面临灭亡危机。你作为东吴老将，最后一战如何应对？",
+                            "knowledgeTag": ["晋灭吴", "杜预", "王濬", "东吴灭亡"],
+                            "timeLimitConfig": { "baseTime": 15 },
+                            "optionPool": [
+                                {
+                                    "id": "wug_t6_correct",
+                                    "type": "correct",
+                                    "text": "誓死抵抗，保卫建业",
+                                    "isCorrect": true,
+                                    "result": "你誓死抵抗，但晋军势大，建业最终城破。你以身殉国，留名青史。",
+                                    "history": "东吴灭亡时，许多将领选择殉国。",
+                                    "knowledgeTag": ["以身殉国"],
+                                    "healthChange": -50,
+                                    "wisdomChange": 5,
+                                    "loyaltyChange": 20,
+                                    "debuffChange": 0,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t6_wrong1",
+                                    "type": "minor_wrong",
+                                    "text": "建议投降，保全百姓性命",
+                                    "isCorrect": false,
+                                    "result": "你建议投降，但孙皓拒绝投降，坚持战斗到底。你被视为动摇军心，被迫自尽。",
+                                    "history": "孙皓是亡国之君，性格暴虐。",
+                                    "knowledgeTag": ["孙皓性格"],
+                                    "healthChange": -30,
+                                    "wisdomChange": -5,
+                                    "loyaltyChange": -15,
+                                    "debuffChange": 2,
+                                    "endGame": false
+                                },
+                                {
+                                    "id": "wug_t6_wrong2",
+                                    "type": "minor_wrong",
+                                    "text": "逃往海外，另寻出路",
+                                    "isCorrect": false,
+                                    "result": "你逃往海外，但海上风浪太大，你的船队覆没，你葬身大海。",
+                                    "history": "东吴灭亡时，有人试图逃往海外。",
+                                    "knowledgeTag": ["海外逃亡"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因逃亡海上遭遇风浪，葬身大海。"
+                                },
+                                {
+                                    "id": "wug_t6_deadly",
+                                    "type": "deadly",
+                                    "text": "投降晋军，为晋国效力",
+                                    "isCorrect": false,
+                                    "result": "你投降晋军，但晋国对你不信任，将你闲置不用，你郁郁而终。",
+                                    "history": "降将往往不被信任。",
+                                    "knowledgeTag": ["降将命运"],
+                                    "healthChange": -100,
+                                    "wisdomChange": 0,
+                                    "loyaltyChange": 0,
+                                    "debuffChange": 0,
+                                    "endGame": true,
+                                    "endDesc": "你因投降晋国被闲置不用，郁郁而终。"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

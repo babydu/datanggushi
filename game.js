@@ -18,6 +18,12 @@ const DEFAULT_ATTRIBUTE_CONFIG = {
 };
 const UNLOCK_KEY_PREFIX = "unlocked_volumes_"; // 【新增】卷解锁状态存储前缀
 
+// ===================== 云端剧本配置 =====================
+const CLOUD_PACK_INDEX_URL = "data/packs-index.json"; // 云端剧本索引文件路径
+let cloudPackIndex = null; // 云端剧本索引数据
+let cloudPacks = []; // 云端剧本列表
+let currentCloudPack = null; // 当前选中的云端剧本
+
 // ===================== 新手引导常量 =====================
 const TUTORIAL_KEY = "history_survivor_tutorial_completed";
 const TUTORIAL_STEPS = [
@@ -1432,6 +1438,11 @@ function switchPage(pageId) {
         renderLeaderboard();
     }
     
+    // 剧本选择页特殊处理 - 加载云端剧本索引
+    if (pageId === 'pack-page') {
+        loadCloudPackIndex();
+    }
+    
     // 触发新手引导（仅首次）
     if (!appState.tutorial.isCompleted && !appState.tutorial.isActive) {
         if (pageId === 'pack-page') {
@@ -1469,6 +1480,218 @@ function updateTutorialForPage(pageId) {
     }
 }
 
+// ===================== 云端剧本系统 =====================
+async function loadCloudPackIndex() {
+    const loadingEl = document.getElementById('cloud-pack-loading');
+    const errorEl = document.getElementById('cloud-pack-error');
+    const emptyEl = document.getElementById('cloud-pack-empty');
+    const listEl = document.getElementById('cloud-pack-list');
+    
+    try {
+        loadingEl.style.display = 'flex';
+        errorEl.style.display = 'none';
+        emptyEl.style.display = 'none';
+        listEl.style.display = 'none';
+        
+        const response = await fetch(CLOUD_PACK_INDEX_URL);
+        if (!response.ok) throw new Error('网络请求失败');
+        
+        const data = await response.json();
+        cloudPackIndex = data;
+        cloudPacks = data.packs || [];
+        
+        loadingEl.style.display = 'none';
+        
+        if (cloudPacks.length === 0) {
+            emptyEl.style.display = 'flex';
+        } else {
+            listEl.style.display = 'grid';
+            renderCloudPackList(cloudPacks);
+        }
+    } catch (err) {
+        console.error('加载云端剧本索引失败:', err);
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'flex';
+    }
+}
+
+function renderCloudPackList(packs) {
+    const container = document.getElementById('cloud-pack-list');
+    container.innerHTML = packs.map(pack => `
+        <div class="cloud-pack-card" data-pack-id="${pack.id}" onclick="selectCloudPack('${pack.id}')">
+            <div class="cloud-pack-card-header">
+                <div class="cloud-pack-card-title">${pack.packName}</div>
+                <div class="cloud-pack-card-difficulty ${pack.difficulty}">${getDifficultyText(pack.difficulty)}</div>
+            </div>
+            <div class="cloud-pack-card-meta">
+                <span>📅 ${pack.dynasty}</span>
+                <span>📖 ${pack.volumeCount || 1}卷/${pack.levelCount}关</span>
+                <span>👤 ${pack.identityCount}身份</span>
+            </div>
+            <div class="cloud-pack-card-desc">${pack.description}</div>
+            <div class="cloud-pack-card-tags">
+                ${(pack.tags || []).slice(0, 3).map(tag => `<span class="cloud-pack-tag">${tag}</span>`).join('')}
+            </div>
+            <div class="cloud-pack-card-footer">
+                <div class="cloud-pack-card-rating">
+                    <span class="star">★</span>
+                    <span>${pack.rating ? pack.rating.toFixed(1) : '暂无'}</span>
+                    ${pack.downloadCount ? `<span style="margin-left: 10px;">⬇️ ${pack.downloadCount}</span>` : ''}
+                </div>
+                <button class="cloud-pack-card-download" onclick="event.stopPropagation(); downloadCloudPack('${pack.id}')">
+                    ⬇️ 下载
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getDifficultyText(difficulty) {
+    const map = { easy: '入门', medium: '进阶', hard: '挑战' };
+    return map[difficulty] || difficulty;
+}
+
+function switchPackTab(tab) {
+    const localSection = document.getElementById('local-pack-section');
+    const cloudSection = document.getElementById('cloud-pack-section');
+    const tabBtns = document.querySelectorAll('.pack-tab-btn');
+    
+    tabBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    
+    if (tab === 'local') {
+        localSection.style.display = 'block';
+        cloudSection.style.display = 'none';
+    } else {
+        localSection.style.display = 'none';
+        cloudSection.style.display = 'block';
+        // 如果还没加载过索引，则加载
+        if (cloudPacks.length === 0 && !cloudPackIndex) {
+            loadCloudPackIndex();
+        }
+    }
+}
+
+function selectCloudPack(packId) {
+    const pack = cloudPacks.find(p => p.id === packId);
+    if (!pack) return;
+    
+    // 取消其他选中状态
+    document.querySelectorAll('.cloud-pack-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.querySelectorAll('.pack-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // 选中新卡片
+    const targetCard = document.querySelector(`.cloud-pack-card[data-pack-id="${packId}"]`);
+    if (targetCard) targetCard.classList.add('selected');
+    
+    currentCloudPack = pack;
+    appState.selectedPackType = 'cloud';
+    appState.selectedCloudPackId = packId;
+    document.getElementById('confirm-pack-btn').disabled = false;
+}
+
+async function downloadCloudPack(packId) {
+    const pack = cloudPacks.find(p => p.id === packId);
+    if (!pack) return;
+    
+    try {
+        // 显示加载状态
+        const btn = document.querySelector(`.cloud-pack-card[data-pack-id="${packId}"] .cloud-pack-card-download`);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ 加载中...';
+        btn.disabled = true;
+        
+        // 获取剧本JSON
+        const response = await fetch(pack.filePath);
+        if (!response.ok) throw new Error('剧本文件加载失败');
+        
+        const packData = await response.json();
+        
+        // 验证格式
+        if (!validatePackFormat(packData, true)) {
+            throw new Error('剧本格式验证失败');
+        }
+        
+        // 保存到本地
+        localStorage.setItem(CUSTOM_PACK_KEY, JSON.stringify(packData));
+        
+        // 更新剧本列表
+        const packEntry = saveCustomPackToList(packData);
+        appState.customPack = packData;
+        
+        // 更新自定义剧本列表显示
+        renderCustomPackCards();
+        
+        // 自动选中新下载的剧本
+        setTimeout(() => {
+            selectPack('custom');
+        }, 100);
+        
+        // 切换到本地Tab显示下载的剧本
+        switchPackTab('local');
+        
+        // 恢复按钮状态
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        alert(`「${pack.packName}」下载成功！已添加到本地剧本列表。`);
+    } catch (err) {
+        console.error('下载剧本失败:', err);
+        alert('下载失败：' + err.message);
+        
+        // 恢复按钮状态
+        const btn = document.querySelector(`.cloud-pack-card[data-pack-id="${packId}"] .cloud-pack-card-download`);
+        if (btn) {
+            btn.innerHTML = '⬇️ 下载';
+            btn.disabled = false;
+        }
+    }
+}
+
+function filterCloudPacks() {
+    const searchKeyword = document.getElementById('cloud-pack-search').value.toLowerCase();
+    const dynastyFilter = document.getElementById('cloud-dynasty-filter').value;
+    const difficultyFilter = document.getElementById('cloud-difficulty-filter').value;
+    
+    const filteredPacks = cloudPacks.filter(pack => {
+        // 搜索过滤
+        if (searchKeyword) {
+            const matchName = pack.packName.toLowerCase().includes(searchKeyword);
+            const matchDesc = (pack.description || '').toLowerCase().includes(searchKeyword);
+            const matchTags = (pack.tags || []).some(tag => tag.toLowerCase().includes(searchKeyword));
+            if (!matchName && !matchDesc && !matchTags) return false;
+        }
+        
+        // 朝代过滤
+        if (dynastyFilter && pack.dynasty !== dynastyFilter) {
+            // 检查dynasty字段是否包含筛选值
+            if (!pack.dynasty.includes(dynastyFilter)) return false;
+        }
+        
+        // 难度过滤
+        if (difficultyFilter && pack.difficulty !== difficultyFilter) return false;
+        
+        return true;
+    });
+    
+    const emptyEl = document.getElementById('cloud-pack-empty');
+    const listEl = document.getElementById('cloud-pack-list');
+    
+    if (filteredPacks.length === 0) {
+        listEl.style.display = 'none';
+        emptyEl.style.display = 'flex';
+    } else {
+        listEl.style.display = 'grid';
+        emptyEl.style.display = 'none';
+        renderCloudPackList(filteredPacks);
+    }
+}
+
 // ===================== 剧本选择核心逻辑 =====================
 function bindPackCardEvents() {
     const defaultCard = document.getElementById('default-pack-card');
@@ -1492,7 +1715,29 @@ function selectPack(packType) {
     document.getElementById('confirm-pack-btn').disabled = false;
 }
 
-function confirmPack() {
+async function confirmPack() {
+    // 如果是云端剧本且尚未下载，先加载完整剧本
+    if (appState.selectedPackType === 'cloud' && !appState.selectedPack) {
+        const pack = currentCloudPack;
+        if (!pack) return;
+        
+        try {
+            const response = await fetch(pack.filePath);
+            if (!response.ok) throw new Error('剧本文件加载失败');
+            const packData = await response.json();
+            
+            if (!validatePackFormat(packData, true)) {
+                throw new Error('剧本格式验证失败');
+            }
+            
+            appState.selectedPack = packData;
+        } catch (err) {
+            console.error('加载云端剧本失败:', err);
+            alert('加载剧本失败：' + err.message);
+            return;
+        }
+    }
+    
     if (!appState.selectedPack) return;
     appState.gameState = initGameState();
     appState.triggeredEventIds = [];

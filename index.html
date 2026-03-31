@@ -127,35 +127,99 @@
         <h1 class="title">选择游戏剧本</h1>
         <p class="subtitle">选择内置剧本，或上传自定义JSON剧本文件</p>
 
-        <div class="upload-area" id="upload-area">
-            <h3>上传自定义剧本</h3>
-            <p style="margin: 15px 0;">点击选择或拖拽JSON剧本文件到此处，即可导入</p>
-            <input type="file" id="pack-upload" class="upload-input" accept=".json" />
-            <button class="btn" onclick="document.getElementById('pack-upload').click()">选择JSON文件</button>
-            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">支持符合格式标准的JSON剧本文件，上传后会自动缓存到浏览器本地</p>
+        <!-- 剧本Tab切换 -->
+        <div class="pack-tab-container">
+            <button class="pack-tab-btn active" data-tab="local" onclick="switchPackTab('local')">
+                <span class="tab-icon">📁</span>
+                <span class="tab-text">本地剧本</span>
+            </button>
+            <button class="pack-tab-btn" data-tab="cloud" onclick="switchPackTab('cloud')">
+                <span class="tab-icon">☁️</span>
+                <span class="tab-text">云端剧本</span>
+            </button>
         </div>
 
-        <div id="upload-error" style="display: none;"></div>
-
-        <div class="pack-card" id="default-pack-card" data-pack-type="default">
-            <div class="pack-title">唐朝历史生存剧本（内置完整版）</div>
-            <div class="pack-meta">
-                <span>朝代：唐朝</span>
-                <span>篇章数量：2卷</span>
-                <span>作者：官方内置</span>
-                <span>版本：3.0</span>
+        <!-- 本地剧本区域 -->
+        <div id="local-pack-section">
+            <div class="upload-area" id="upload-area">
+                <h3>上传自定义剧本</h3>
+                <p style="margin: 15px 0;">点击选择或拖拽JSON剧本文件到此处，即可导入</p>
+                <input type="file" id="pack-upload" class="upload-input" accept=".json" />
+                <button class="btn" onclick="document.getElementById('pack-upload').click()">选择JSON文件</button>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">支持符合格式标准的JSON剧本文件，上传后会自动缓存到浏览器本地</p>
             </div>
-            <div class="pack-desc">分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷，所有剧情均基于唐代正史、律令设计。</div>
+
+            <div id="upload-error" style="display: none;"></div>
+
+            <div class="pack-card" id="default-pack-card" data-pack-type="default">
+                <div class="pack-title">唐朝历史生存剧本（内置完整版）</div>
+                <div class="pack-meta">
+                    <span>朝代：唐朝</span>
+                    <span>篇章数量：2卷</span>
+                    <span>作者：官方内置</span>
+                    <span>版本：3.0</span>
+                </div>
+                <div class="pack-desc">分卷式还原唐朝贞观、开元年间的人生历程，强制从第一卷开始，通关解锁下卷，所有剧情均基于唐代正史、律令设计。</div>
+            </div>
+
+            <!-- 自定义剧本列表容器 -->
+            <div id="custom-pack-container" style="width: 100%;">
+                <p style="text-align: center; color: var(--text-muted); padding: 20px;">暂无上传的自定义剧本</p>
+            </div>
+
+
+            <div class="format-tip">
+                提示：自定义剧本上传后，会永久保存在浏览器本地，刷新页面无需重新上传；若要更换剧本，重新上传新文件即可覆盖。
+            </div>
         </div>
 
-        <!-- 【修改】自定义剧本列表容器 -->
-        <div id="custom-pack-container" style="width: 100%;">
-            <p style="text-align: center; color: var(--text-muted); padding: 20px;">暂无上传的自定义剧本</p>
-        </div>
+        <!-- 云端剧本区域 -->
+        <div id="cloud-pack-section" style="display: none;">
+            <!-- 搜索和筛选 -->
+            <div class="cloud-pack-toolbar">
+                <div class="search-box">
+                    <input type="text" id="cloud-pack-search" placeholder="搜索剧本..." oninput="filterCloudPacks()">
+                </div>
+                <div class="filter-box">
+                    <select id="cloud-dynasty-filter" onchange="filterCloudPacks()">
+                        <option value="">全部朝代</option>
+                        <option value="宋朝">宋朝</option>
+                        <option value="唐朝">唐朝</option>
+                        <option value="三国">三国</option>
+                        <option value="东汉">东汉</option>
+                        <option value="大航海时代">大航海时代</option>
+                    </select>
+                    <select id="cloud-difficulty-filter" onchange="filterCloudPacks()">
+                        <option value="">全部难度</option>
+                        <option value="easy">入门</option>
+                        <option value="medium">进阶</option>
+                        <option value="hard">挑战</option>
+                    </select>
+                </div>
+            </div>
 
+            <!-- 云端剧本加载状态 -->
+            <div id="cloud-pack-loading" class="cloud-pack-loading">
+                <div class="loading-spinner"></div>
+                <p>正在加载云端剧本...</p>
+            </div>
 
-        <div class="format-tip">
-            提示：自定义剧本上传后，会永久保存在浏览器本地，刷新页面无需重新上传；若要更换剧本，重新上传新文件即可覆盖。
+            <!-- 云端剧本列表 -->
+            <div id="cloud-pack-list" class="cloud-pack-grid" style="display: none;">
+                <!-- 云端剧本卡片由JS动态生成 -->
+            </div>
+
+            <!-- 云端剧本错误/空状态 -->
+            <div id="cloud-pack-error" class="cloud-pack-empty" style="display: none;">
+                <p class="empty-icon">⚠️</p>
+                <p class="empty-text">加载失败，请检查网络连接</p>
+                <button class="btn" onclick="loadCloudPackIndex()">重试</button>
+            </div>
+
+            <div id="cloud-pack-empty" class="cloud-pack-empty" style="display: none;">
+                <p class="empty-icon">📭</p>
+                <p class="empty-text">未找到匹配的剧本</p>
+            </div>
         </div>
 
         <div class="control-box">

@@ -1,0 +1,139 @@
+{
+    "_comment": "云剧本索引文件 - 放在 data/ 目录下供前端读取",
+    "_version": "1.0",
+    "_lastUpdated": "2026-03-31",
+    "packs": [
+        {
+            "id": "song-dynasty-pack",
+            "packName": "宋朝历史生存剧本",
+            "dynasty": "北宋",
+            "version": "1.0",
+            "author": "官方内置",
+            "authorUrl": "",
+            "description": "分卷式还原宋朝开封府辖区内的人生历程。玩家将体验北宋仁宗年间的市井生活，感受大宋盛世的繁华与危机。",
+            "coverImage": "",
+            "tags": ["宋朝", "北宋", "市井生活", "科举", "商业"],
+            "difficulty": "medium",
+            "filePath": "data/song_pack.json",
+            "levelCount": 12,
+            "identityCount": 2,
+            "volumeCount": 2,
+            "downloadCount": 0,
+            "rating": 4.5,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-03-30",
+            "updatedAt": "2026-03-30",
+            "highlights": [
+                "体验仁宗年间的市井生活",
+                "从商铺掌柜或寒门学子视角展开",
+                "涉及宋代商业制度、科举考试等知识点"
+            ]
+        },
+        {
+            "id": "tang-dynasty-pack",
+            "packName": "唐朝历史生存剧本",
+            "dynasty": "唐朝贞观-开元年间",
+            "version": "1.0",
+            "author": "官方内置",
+            "authorUrl": "",
+            "description": "完整还原唐朝农户、商人、官员三大身份的生存历程，所有剧情均基于唐代正史、律令、农书设计。",
+            "coverImage": "",
+            "tags": ["唐朝", "贞观", "开元", "农耕", "丝绸之路"],
+            "difficulty": "hard",
+            "filePath": "tang-dynasty-pack.json",
+            "levelCount": 10,
+            "identityCount": 3,
+            "volumeCount": 1,
+            "downloadCount": 0,
+            "rating": 4.2,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-03-29",
+            "updatedAt": "2026-03-29",
+            "highlights": [
+                "体验贞观之治到开元盛世",
+                "农户、商人、官员三大身份线",
+                "涉及均田制、科举制度等知识点"
+            ]
+        },
+        {
+            "id": "magellan-voyage-pack",
+            "packName": "麦哲伦环球航行生存剧本",
+            "dynasty": "大航海时代 1519-1522",
+            "version": "3.0",
+            "author": "官方测试剧本",
+            "authorUrl": "",
+            "description": "以麦哲伦船队环球航行为背景，完整还原16世纪大航海时代的艰险历程。你将作为一名普通水手，从西班牙出发，跨越两大洋，见证人类历史上首次环球航行的壮举。",
+            "coverImage": "",
+            "tags": ["大航海时代", "麦哲伦", "环球航行", "地理发现"],
+            "difficulty": "hard",
+            "filePath": "magellan-voyage-pack.json",
+            "levelCount": 10,
+            "identityCount": 2,
+            "volumeCount": 1,
+            "downloadCount": 0,
+            "rating": 4.7,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-03-28",
+            "updatedAt": "2026-03-28",
+            "highlights": [
+                "体验人类首次环球航行",
+                "船队见习水手或航海家身份",
+                "涉及坏血病预防、风暴应对等知识点"
+            ]
+        },
+        {
+            "id": "three-kingdoms-pack",
+            "packName": "三国志·英雄的诞生",
+            "dynasty": "东汉末年~三国时期",
+            "version": "1.0",
+            "author": "官方内置",
+            "authorUrl": "",
+            "description": "完整还原东汉末年到三国鼎立的历史进程。你将穿越到群雄并起的乱世，体验一名普通将士或谋士的崛起之路。从平定黄巾之乱到三国鼎立，在刀光剑影与运筹帷幄中做出决定命运的选择。",
+            "coverImage": "",
+            "tags": ["三国", "东汉", "黄巾起义", "赤壁之战", "魏蜀吴"],
+            "difficulty": "medium",
+            "filePath": "three-kingdoms-pack.json",
+            "levelCount": 24,
+            "identityCount": 5,
+            "volumeCount": 2,
+            "downloadCount": 0,
+            "rating": 4.8,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-03-31",
+            "updatedAt": "2026-03-31",
+            "highlights": [
+                "黄巾之乱到三国鼎立完整历史线",
+                "普通将士、初出谋士、曹魏/蜀汉/东吴将领5条身份线",
+                "涉及官渡之战、赤壁之战、夷陵之战等经典战役"
+            ]
+        }
+    ],
+    "categories": [
+        {
+            "id": "chinese-history",
+            "name": "中国历史",
+            "icon": "🏯",
+            "tags": ["宋朝", "唐朝", "明朝", "三国", "东汉"]
+        },
+        {
+            "id": "world-history",
+            "name": "世界历史",
+            "icon": "🌍",
+            "tags": ["大航海时代", "古罗马", "中世纪"]
+        },
+        {
+            "id": "difficulty",
+            "name": "难度分类",
+            "icon": "📊",
+            "options": [
+                {"value": "easy", "name": "入门"},
+                {"value": "medium", "name": "进阶"},
+                {"value": "hard", "name": "挑战"}
+            ]
+        }
+    ]
+}
