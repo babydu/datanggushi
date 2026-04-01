@@ -1204,7 +1204,8 @@ let appState = {
         isActive: false,
         currentStep: 0,
         isCompleted: false
-    }
+    },
+    gameEnded: false  // 游戏是否已结束，防止结束后继续处理选项
 };
 
 // 初始化游戏状态
@@ -2236,6 +2237,8 @@ function startCountdown() {
 
             if (appState.gameState.health <= 0) {
                 clearCountdown();
+                appState.gameEnded = true;  // 标记游戏结束
+                disableAllOptions();  // 立即禁用所有选项按钮
                 gameEnd(false, "你答题超时，耗尽了所有生命值，在历史的长河中黯然落幕。");
                 return;
             }
@@ -2277,6 +2280,14 @@ function clearCountdown() {
     appState.countdown.currentConfig = null;
 }
 
+// 禁用所有选项按钮
+function disableAllOptions() {
+    const optionBtns = document.querySelectorAll('.option-btn');
+    optionBtns.forEach(btn => {
+        btn.disabled = true;
+    });
+}
+
 // ===================== 游戏核心逻辑 =====================
 function startGame() {
     const selectedLevelCount = parseInt(document.getElementById('level-slider')?.value || appState.gameState.userSelectedLevelCount);
@@ -2296,6 +2307,9 @@ function startGame() {
         appState.gameState.totalLevel = totalLevel;
         appState.gameState.userSelectedLevelCount = finalLevelCount;
     }
+    
+    // 重置游戏结束标志
+    appState.gameEnded = false;
 
     updateGameUI();
     loadLevel(appState.gameState.currentLevel);
@@ -2303,6 +2317,9 @@ function startGame() {
 }
 
 async function loadLevel(levelNum) {
+    // 如果游戏已结束，不加载新关卡
+    if (appState.gameEnded) return;
+    
     const levelList = appState.gameState.currentIdentity.levelList;
     if (levelNum > appState.gameState.userSelectedLevelCount) {
         gameEnd(appState.gameState.health > 0, appState.gameState.health > 0 
@@ -2409,7 +2426,10 @@ async function loadLevel(levelNum) {
 }
 
 async function selectOption(option, index, levelData) {
+    // 如果游戏已结束，不处理任何选项
+    if (appState.gameEnded) return;
     if (appState.gameState.selectedOption) return;
+    appState.gameEnded = true;  // 立即标记游戏结束，防止并发选择
     clearCountdown();
     appState.gameState.selectedOption = option;
 
@@ -2596,6 +2616,8 @@ function useDeathHelp() {
     appState.gameState.health = 1;
     appState.gameState.consecutiveCorrect = 0;
     appState.gameState.debuff = 0;
+    // 重置游戏结束标志，允许继续游戏
+    appState.gameEnded = false;
     updateGameUI();
     
     const option = appState.gameState.pendingDeathOption;
@@ -2672,6 +2694,12 @@ function showHistoryModal(title, text) {
 // 【修复】closeHistoryModal改为async，正确处理await
 // 【终极修复】确保100%能进入下一关
 function closeHistoryModal() {
+    // 如果游戏已结束，不做任何事
+    if (appState.gameEnded) {
+        document.getElementById('history-modal').classList.remove('active');
+        return;
+    }
+
     // 1. 关闭弹窗
     const historyModal = document.getElementById('history-modal');
     historyModal.classList.remove('active');
@@ -2802,6 +2830,12 @@ function analyzeWeakness(gameRecord) {
 
 // ===================== 游戏结束逻辑 =====================
 function gameEnd(isSuccess, desc) {
+    // 标记游戏已结束，防止后续逻辑干扰
+    appState.gameEnded = true;
+    
+    // 禁用所有选项按钮
+    disableAllOptions();
+    
     clearCountdown();
     clearGameProgress();
     
