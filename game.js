@@ -1316,11 +1316,18 @@ function getCurrentTimeConfig() {
     const gameState = appState.gameState;
     const currentLevelData = gameState.currentIdentity.levelList.find(item => item.level === gameState.currentLevel);
     
-    return currentLevelData?.timeLimitConfig 
-        || gameState.currentIdentity.timeLimitConfig 
-        || gameState.currentVolume.timeLimitConfig
-        || gameState.currentPack.timeLimitConfig 
-        || DEFAULT_TIME_CONFIG;
+    const timeConfig = currentLevelData?.timeLimitConfig 
+        || gameState.currentIdentity?.timeLimitConfig 
+        || gameState.currentVolume?.timeLimitConfig
+        || gameState.currentPack?.timeLimitConfig 
+        || {};
+    
+    // 确保返回完整的配置，包含 healthDeductPerSecond
+    return {
+        baseTime: timeConfig.baseTime || DEFAULT_TIME_CONFIG.baseTime,
+        healthDeductPerSecond: timeConfig.healthDeductPerSecond ?? DEFAULT_TIME_CONFIG.healthDeductPerSecond,
+        freezeOnModal: timeConfig.freezeOnModal ?? DEFAULT_TIME_CONFIG.freezeOnModal
+    };
 }
 
 function checkConditions(conditions) {
@@ -1585,6 +1592,7 @@ function selectCloudPack(packId) {
     
     currentCloudPack = pack;
     appState.selectedPackType = 'cloud';
+    appState.selectedPack = null; // 重置selectedPack，强制confirmPack重新加载云端剧本
     appState.selectedCloudPackId = packId;
     document.getElementById('confirm-pack-btn').disabled = false;
 }
@@ -2231,14 +2239,19 @@ function startCountdown() {
         updateCountdownUI();
 
         if (appState.countdown.remainingTime < 0) {
-            const deductValue = timeConfig.healthDeductPerSecond;
+            const deductValue = timeConfig.healthDeductPerSecond * 5; // 加快扣血速度，每秒扣5倍
+            console.log('[DEBUG] Timeout: remainingTime=' + appState.countdown.remainingTime + ', deductValue=' + deductValue + ', health=' + appState.gameState.health);
             updateAttribute('health', -deductValue);
             updateHealthUI();
 
+            console.log('[DEBUG] After deduct: health=' + appState.gameState.health + ', gameEnded=' + appState.gameEnded);
             if (appState.gameState.health <= 0) {
+                console.log('[DEBUG] Health <= 0, calling gameEnd');
+                appState.gameState.health = 0;
+                updateHealthUI();
                 clearCountdown();
-                appState.gameEnded = true;  // 标记游戏结束
-                disableAllOptions();  // 立即禁用所有选项按钮
+                appState.gameEnded = true;
+                disableAllOptions();
                 gameEnd(false, "你答题超时，耗尽了所有生命值，在历史的长河中黯然落幕。");
                 return;
             }
@@ -2426,6 +2439,7 @@ async function loadLevel(levelNum) {
 }
 
 async function selectOption(option, index, levelData) {
+    console.log('[DEBUG] selectOption called, gameEnded:', appState.gameEnded);
     // 如果游戏已结束，不处理任何选项
     if (appState.gameEnded) return;
     if (appState.gameState.selectedOption) return;
@@ -2547,8 +2561,13 @@ function processNormalOption(option) {
         return;
     }
 
+    // 【修复】在显示弹窗前重置gameEnded标志，允许closeHistoryModal正常处理下一关
+    appState.gameEnded = false;
+    console.log('[DEBUG] processNormalOption: set gameEnded to false');
+    
     // 【修复】直接弹出知识点弹窗，不等待事件
     setTimeout(() => {
+        console.log('[DEBUG] Showing history modal');
         const title = option.isCorrect ? "选择正确！" : "选择错误";
         let content = option.isCorrect 
             ? `<div class="success-box">${option.result}</div><br><strong>历史知识点：</strong>${option.history}`
@@ -2683,6 +2702,7 @@ function useHelp() {
 }
 
 function showHistoryModal(title, text) {
+    console.log('[DEBUG] showHistoryModal called, gameEnded:', appState.gameEnded);
     document.getElementById('history-modal-title').innerText = title;
     document.getElementById('history-modal-text').innerHTML = text;
     document.getElementById('history-modal').classList.add('active');
@@ -2694,8 +2714,11 @@ function showHistoryModal(title, text) {
 // 【修复】closeHistoryModal改为async，正确处理await
 // 【终极修复】确保100%能进入下一关
 function closeHistoryModal() {
+    console.log('[DEBUG] closeHistoryModal called, gameEnded:', appState.gameEnded);
+    
     // 如果游戏已结束，不做任何事
     if (appState.gameEnded) {
+        console.log('[DEBUG] gameEnded is true, returning early');
         document.getElementById('history-modal').classList.remove('active');
         return;
     }
@@ -2711,6 +2734,7 @@ function closeHistoryModal() {
 
     // 3. 【关键修复】完全重置状态，确保下一关能正常加载
     const nextLevel = appState.gameState.currentLevel + 1;
+    console.log('[DEBUG] nextLevel:', nextLevel);
     
     // 强制清空所有临时状态
     appState.gameState.currentOptions = [];
@@ -2720,6 +2744,7 @@ function closeHistoryModal() {
     setTimeout(() => {
         // 重新初始化部分状态
         appState.gameState.currentLevel = nextLevel;
+        console.log('[DEBUG] Loading level:', nextLevel);
         loadLevel(nextLevel);
     }, 200);
 }
@@ -2832,6 +2857,12 @@ function analyzeWeakness(gameRecord) {
 function gameEnd(isSuccess, desc) {
     // 标记游戏已结束，防止后续逻辑干扰
     appState.gameEnded = true;
+    
+    // 关闭可能存在的弹窗
+    const historyModal = document.getElementById('history-modal');
+    const deathModal = document.getElementById('death-modal');
+    if (historyModal) historyModal.classList.remove('active');
+    if (deathModal) deathModal.classList.remove('active');
     
     // 禁用所有选项按钮
     disableAllOptions();

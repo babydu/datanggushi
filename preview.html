@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史生存模拟器 - 项目预览</title>
+    <style>
+        :root {
+            --primary: #8b4513;
+            --secondary: #d4a574;
+            --accent: #c9a66b;
+            --bg: #faf6f0;
+            --bg-dark: #f5ede0;
+            --text: #3d2914;
+            --text-muted: #7a6a5a;
+            --success: #5d8a4a;
+            --danger: #a63d3d;
+            --gold: #b8860b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #6b3410 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--secondary);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 4px;
+        }
+        
+        .tag-primary { background: var(--secondary); color: white; }
+        .tag-success { background: var(--success); color: white; }
+        .tag-danger { background: var(--danger); color: white; }
+        .tag-gold { background: var(--gold); color: white; }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--secondary);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--bg);
+        }
+        
+        .timeline-item h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .flow-chart {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        
+        .flow-chart pre {
+            margin: 0;
+            color: var(--text);
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        
+        .feature-item .icon {
+            font-size: 1.2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--secondary);
+        }
+        
+        th {
+            background: var(--bg);
+            color: var(--primary);
+        }
+        
+        .stat-box {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 20px;
+        }
+        
+        .stat-item .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-item .label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .badge-p0 { background: #e74c3c; color: white; }
+        .badge-p1 { background: #f39c12; color: white; }
+        .badge-p2 { background: #3498db; color: white; }
+        .badge-p3 { background: #95a5a6; color: white; }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fff3cd 0%, #fff3cd 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .tech-item {
+            background: var(--bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>历史生存模拟器</h1>
+        <p class="subtitle">项目预览报告 | 基于深度代码分析</p>
+        <p style="margin-top: 15px; opacity: 0.7; font-size: 0.9rem;">
+            GitHub: <a href="https://github.com/babydu/datanggushi" style="color: white;">babydu/datanggushi</a>
+        </p>
+    </header>
+    
+    <div class="container">
+        <!-- 项目概况 -->
+        <div class="section">
+            <h2>项目概况</h2>
+            <div class="stat-box">
+                <div class="stat-item">
+                    <div class="value">2.3MB</div>
+                    <div class="label">项目大小</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value">5,900</div>
+                    <div class="label">代码总行数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value">5</div>
+                    <div class="label">内置剧本</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value">v2.1.1</div>
+                    <div class="label">当前版本</div>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <h3>技术栈</h3>
+                <div class="tech-stack">
+                    <span class="tech-item">HTML5</span>
+                    <span class="tech-item">CSS3 (CSS Variables, Flexbox, Grid)</span>
+                    <span class="tech-item">原生 JavaScript</span>
+                    <span class="tech-item">localStorage</span>
+                    <span class="tech-item">Web Audio API</span>
+                    <span class="tech-item">Python (可选服务器)</span>
+                </div>
+                <p style="margin-top: 15px; color: var(--text-muted);">
+                    <strong>特点：</strong>纯前端实现，无需后端依赖；框架与剧情JSON完全分离；响应式设计支持移动端
+                </p>
+            </div>
+        </div>
+        
+        <!-- 内置剧本 -->
+        <div class="section">
+            <h2>内置剧本一览</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>剧本名称</th>
+                        <th>朝代/背景</th>
+                        <th>卷数</th>
+                        <th>身份数</th>
+                        <th>难度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>宋朝历史生存剧本</td>
+                        <td>北宋仁宗年间</td>
+                        <td><span class="badge badge-primary">2卷</span></td>
+                        <td>4 (掌柜/学子/将领/郎中)</td>
+                        <td><span class="tag tag-success">中等</span></td>
+                    </tr>
+                    <tr>
+                        <td>唐朝历史生存剧本</td>
+                        <td>贞观-开元年间</td>
+                        <td><span class="badge badge-p3">1卷</span></td>
+                        <td>3 (农户/商人/官员)</td>
+                        <td><span class="tag tag-danger">困难</span></td>
+                    </tr>
+                    <tr>
+                        <td>麦哲伦环球航行</td>
+                        <td>大航海时代 1519-1522</td>
+                        <td><span class="badge badge-p3">1卷</span></td>
+                        <td>2 (见习水手/航海家)</td>
+                        <td><span class="tag tag-danger">困难</span></td>
+                    </tr>
+                    <tr>
+                        <td>三国志·英雄的诞生</td>
+                        <td>东汉末年~三国</td>
+                        <td><span class="badge badge-primary">2卷</span></td>
+                        <td>5 (将士/谋士/魏/蜀/吴)</td>
+                        <td><span class="tag tag-success">中等</span></td>
+                    </tr>
+                    <tr>
+                        <td>明朝那些事儿</td>
+                        <td>洪武至万历年间</td>
+                        <td><span class="badge badge-p3">1卷</span></td>
+                        <td>2 (士兵/士子)</td>
+                        <td><span class="tag tag-danger">困难</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 核心功能架构 -->
+        <div class="section">
+            <h2>核心功能架构</h2>
+            <div class="flow-chart">
+                <pre>
+┌─────────────────────────────────────────────────────────────────────┐
+│                        游戏核心引擎 game.js                          │
+├──────────────┬──────────────┬──────────────┬──────────────┬─────────┤
+│  剧本管理    │   多卷解锁    │   多身份系统  │   属性系统    │  计时器  │
+│  JSON格式    │ 强制从第一卷  │  每卷多身份   │ 生命/求救等  │ 渐进扣血 │
+├──────────────┼──────────────┼──────────────┼──────────────┼─────────┤
+│  特殊事件    │   成绩评定    │   复盘系统    │   学识爵位    │  成就    │
+│ afterOption  │ 多维度评分    │ 完整闯关记录  │ 科举功名体系  │ 5核心成就│
+├──────────────┼──────────────┼──────────────┼──────────────┼─────────┤
+│  每日任务    │  知识点详解   │   排行榜      │   音效系统    │  新手引导│
+│ 登录+答题   │ 分类/搜索/收藏 │ 最高分/正确率 │ Web Audio API│  8步流程 │
+├──────────────┴──────────────┴──────────────┴──────────────┴─────────┤
+│                         存档系统 (localStorage)                       │
+└─────────────────────────────────────────────────────────────────────┘</pre>
+            </div>
+        </div>
+        
+        <!-- 游戏流程 -->
+        <div class="section">
+            <h2>游戏流程</h2>
+            <div class="flow-chart">
+                <pre>
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   首页      │ ──▶ │   剧本选择   │ ──▶ │   卷选择    │ ──▶ │  身份选择   │
+│ Welcome     │     │ Pack Select │     │ Volume      │     │  Identity   │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+                                                                    │
+                                                                    ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   结束页    │ ◀── │   下一卷    │ ◀── │   游戏进行  │ ◀── │  关卡选择   │
+│   End       │     │  Enter Next  │     │   Gaming    │     │ Level Select│
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+       │                                       │
+       │                                       ▼
+       │                              ┌─────────────────────┐
+       │                              │   选项 → 结果反馈   │
+       │                              │   特殊事件触发     │
+       │                              │   属性变化更新     │
+       │                              └─────────────────────┘
+       ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   复盘页    │     │  知识点页   │     │   排行榜    │
+│   Review    │     │  Knowledge  │     │ Leaderboard │
+└─────────────┘     └─────────────┘     └─────────────┘</pre>
+            </div>
+        </div>
+        
+        <!-- 已实现系统详情 -->
+        <div class="section">
+            <h2>已实现系统详情</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3><span class="icon">📜</span> 剧本管理系统</h3>
+                    <p>JSON格式剧本，完全解耦游戏逻辑与内容。支持自定义剧本上传、本地缓存、多剧本管理。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🏆</span> 学识爵位系统</h3>
+                    <p>科举功名体系：白丁→童生→秀才→举人→贡生→进士→传胪→编修→侍读→大学士。积分影响特权。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">⏱️</span> 限时答题机制</h3>
+                    <p>多级配置覆盖、超时扣血、弹窗冻结。答对恢复生命，答错扣除生命，死选项可能导致游戏结束。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🎭</span> 多结局判定</h3>
+                    <p>根据属性和答题情况评定：英年早逝/平淡一生/功成名就/学而优则仕/千古流芳等结局。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">📚</span> 知识点详解</h3>
+                    <p>分类浏览、搜索功能、收藏、掌握状态标记。答题后自动提取知识点，薄弱点分析。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🔊</span> 音效系统</h3>
+                    <p>Web Audio API实现：答题正确/错误音效、点击音效、通关成功/失败音效。</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 未来开发路线 -->
+        <div class="section">
+            <h2>未来开发路线图</h2>
+            
+            <h3 style="margin: 20px 0 10px;">P0 必须实施</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3><span class="icon">🧭</span> 新手引导</h3>
+                    <p>8步引导流程，高亮提示框，步骤指引，支持跳过。 <span class="badge badge-p0">P0</span></p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🔊</span> 音效系统</h3>
+                    <p>已实现基础版，持续优化提升沉浸感。 <span class="badge badge-p0">P0</span></p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 10px;">P1 核心优化（1-2周）</h3>
+            <div class="feature-list">
+                <div class="feature-item"><span class="icon">🏅</span> 成就系统（5-6核心）</div>
+                <div class="feature-item"><span class="icon">✨</span> 动画效果增强</div>
+                <div class="feature-item"><span class="icon">📋</span> 每日任务（简化版）</div>
+                <div class="feature-item"><span class="icon">⚡</span> 性能优化</div>
+            </div>
+            
+            <h3 style="margin: 30px 0 10px;">P2 体验优化（1-2周）</h3>
+            <div class="feature-list">
+                <div class="feature-item"><span class="icon">📖</span> 历史年表</div>
+                <div class="feature-item"><span class="icon">📤</span> 社交分享</div>
+                <div class="feature-item"><span class="icon">📊</span> 本地排行榜</div>
+                <div class="feature-item"><span class="icon">🌙</span> 夜间模式</div>
+            </div>
+            
+            <h3 style="margin: 30px 0 10px;">P3 内容扩展</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3><span class="icon">🧪</span> 道具系统（简化版）</h3>
+                    <p>仅3种基础道具：延时沙漏(+5秒)、生命药水(+30HP)、知识锦囊(排除1错误选项)</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">👑</span> 历史名人互动</h3>
+                    <p>达成条件解锁名人，对话获得知识加成或特殊事件。李世民/魏征/李白等。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🌲</span> 天赋系统</h3>
+                    <p>三大流派：史学派(答题加成)、生存派(生命加成)、社交派(事件加成)</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">⚔️</span> 命运/支线系统</h3>
+                    <p>随机命运事件：路遇书生/庙宇祈福等，支线任务完成奖励</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 10px;">v3.0+ 高级功能</h3>
+            <div class="feature-list">
+                <div class="feature-item"><span class="icon">📝</span> 剧本编辑器</div>
+                <div class="feature-item"><span class="icon">🤖</span> AI错题讲解</div>
+                <div class="feature-item"><span class="icon">☁️</span> 云端排行榜</div>
+                <div class="feature-item"><span class="icon">🌐</span> 更多剧本</div>
+            </div>
+        </div>
+        
+        <!-- 规划文档 -->
+        <div class="section">
+            <h2>项目规划文档</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>文档</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OPTIMIZATION_ROADMAP.md</td>
+                        <td>全面的优化升级路径规划，包含各功能优先级、工作量评估</td>
+                    </tr>
+                    <tr>
+                        <td>GAME_ENGINE_UPGRADE.md</td>
+                        <td>游戏引擎深度优化设计：爵位系统、多结局、名 人系统、天赋系统等</td>
+                    </tr>
+                    <tr>
+                        <td>FEASIBILITY_REVIEW.md</td>
+                        <td>功能可行性核查报告，评估逻辑合理性、实现难度、建议</td>
+                    </tr>
+                    <tr>
+                        <td>CHANGELOG.md</td>
+                        <td>版本更新日志</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 本地运行 -->
+        <div class="section">
+            <h2>本地运行</h2>
+            <div class="flow-chart">
+                <pre>
+# 方式一：Python服务器（推荐）
+cd datanggushi
+python3 server.py
+访问 http://localhost:8080
+
+# 方式二：静态文件服务器
+cd datanggushi
+python3 -m http.server 8080
+访问 http://localhost:8080
+
+# 方式三：直接打开
+双击 index.html（需确保 data/song_pack.json 在同目录）</pre>
+            </div>
+        </div>
+        
+        <!-- 项目亮点 -->
+        <div class="section">
+            <h2>项目亮点</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3><span class="icon">🔌</span> 框架与剧情分离</h3>
+                    <p>JSON剧本格式设计，内容创作者无需修改代码，通过编辑JSON即可扩展游戏内容。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">📈</span> 科举爵位创新</h3>
+                    <p>独特的学识积分与科举功名体系，增加玩家成长感和长期粘性。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">🎲</span> 多结局系统</h3>
+                    <p>根据属性、答题情况、选择组合评定不同结局，增加重玩价值。</p>
+                </div>
+                <div class="card">
+                    <h3><span class="icon">📚</span> 学习闭环</h3>
+                    <p>答题→知识点提取→薄弱点分析→收藏复习，构建完整的历史学习闭环。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>历史生存模拟器 - 项目预览报告</p>
+        <p>基于代码深度分析生成 | GitHub: babydu/datanggushi</p>
+    </footer>
+</body>
+</html>
