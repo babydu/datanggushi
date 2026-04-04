@@ -440,15 +440,17 @@ function updateRankFromPoints() {
 }
 
 function addKnowledgePoints(points, source) {
-    knowledgeState.totalPoints += points;
+    // Keep knowledge progression consistent: always persist and re-evaluate rank.
+    // Also keep totals non-negative to avoid confusing negative progression.
+    knowledgeState.totalPoints = Math.max(0, knowledgeState.totalPoints + points);
     if (points > 0) {
         knowledgeState.currentPoints += points;
         if (appState.gameState) {
             appState.gameState.currentKnowledge = (appState.gameState.currentKnowledge || 0) + points;
         }
-        updateRankFromPoints();
-        saveKnowledgeState();
     }
+    updateRankFromPoints();
+    saveKnowledgeState();
     return knowledgeState.currentPoints;
 }
 
@@ -484,6 +486,7 @@ function calculateKnowledgeForAnswer(isCorrect, timeUsed, consecutiveCorrect, le
         }
         
         // 完成关卡加成
+        // Only award on full-run completion (handled by caller).
         if (levelComplete) {
             points += KNOWLEDGE_CONFIG.levelComplete;
         }
@@ -492,6 +495,198 @@ function calculateKnowledgeForAnswer(isCorrect, timeUsed, consecutiveCorrect, le
     }
     
     return Math.max(0, points);
+}
+
+function applyKnowledgeBonusByRank(basePoints) {
+    const priv = getCurrentRankPrivileges();
+    const bonus = priv.correctBonus;
+    if (!bonus || typeof bonus !== 'number') return basePoints;
+    return Math.max(0, Math.floor(basePoints * bonus));
+}
+
+// ===================== 安全条件解析（替代 eval） =====================
+// Allow only a small DSL in triggerConditions.
+// Supported:
+// - Identifiers: letters, digits, underscore (must be whitelisted)
+// - Numbers: integer/float
+// - Operators: < <= > >= == != && ||
+// - Parentheses: ( )
+// No strings, no function calls, no member access.
+const CONDITION_ALLOWED_FIELDS = new Set([
+    'health', 'helpTimes', 'debuff', 'wealth', 'officialRank',
+    'currentLevel', 'totalLevel', 'userSelectedLevelCount',
+    'consecutiveCorrect', 'levelPassed',
+    'isCorrect', 'correct', 'endGame', 'helpUsed'
+]);
+
+function tokenizeCondition(expr) {
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length) {
+        const ch = expr[i];
+        if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
+            i++;
+            continue;
+        }
+
+        // two-char operators
+        const two = expr.slice(i, i + 2);
+        if (two === '&&' || two === '||' || two === '==' || two === '!=' || two === '<=' || two === '>=') {
+            tokens.push({ type: 'op', value: two });
+            i += 2;
+            continue;
+        }
+
+        // one-char operators / parens
+        if (ch === '<' || ch === '>' ) {
+            tokens.push({ type: 'op', value: ch });
+            i++;
+            continue;
+        }
+        if (ch === '(' || ch === ')') {
+            tokens.push({ type: 'paren', value: ch });
+            i++;
+            continue;
+        }
+
+        // number
+        if ((ch >= '0' && ch <= '9') || (ch === '.' && (expr[i+1] >= '0' && expr[i+1] <= '9'))) {
+            let j = i + 1;
+            while (j < expr.length && ((expr[j] >= '0' && expr[j] <= '9') || expr[j] === '.')) j++;
+            const numStr = expr.slice(i, j);
+            const num = Number(numStr);
+            if (!Number.isFinite(num)) throw new Error('Invalid number');
+            tokens.push({ type: 'num', value: num });
+            i = j;
+            continue;
+        }
+
+        // identifier / boolean literal
+        if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch === '_') {
+            let j = i + 1;
+            while (j < expr.length) {
+                const c = expr[j];
+                const isAlphaNum = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_';
+                if (!isAlphaNum) break;
+                j++;
+            }
+            const ident = expr.slice(i, j);
+
+            if (ident === 'true') {
+                tokens.push({ type: 'bool', value: true });
+            } else if (ident === 'false') {
+                tokens.push({ type: 'bool', value: false });
+            } else {
+                tokens.push({ type: 'id', value: ident });
+            }
+            i = j;
+            continue;
+        }
+
+        // reject anything else (quotes, dots, brackets, etc)
+        throw new Error('Unsupported character');
+    }
+    return tokens;
+}
+
+function parseConditionToRpn(tokens) {
+    // Shunting-yard algorithm
+    const output = [];
+    const ops = [];
+    const prec = {
+        '||': 1,
+        '&&': 2,
+        '==': 3,
+        '!=': 3,
+        '<': 4,
+        '<=': 4,
+        '>': 4,
+        '>=': 4
+    };
+    for (const t of tokens) {
+        if (t.type === 'num' || t.type === 'bool' || t.type === 'id') {
+            output.push(t);
+            continue;
+        }
+        if (t.type === 'op') {
+            while (ops.length > 0) {
+                const top = ops[ops.length - 1];
+                if (top.type !== 'op') break;
+                if ((prec[top.value] ?? 0) >= (prec[t.value] ?? 0)) {
+                    output.push(ops.pop());
+                } else {
+                    break;
+                }
+            }
+            ops.push(t);
+            continue;
+        }
+        if (t.type === 'paren' && t.value === '(') {
+            ops.push(t);
+            continue;
+        }
+        if (t.type === 'paren' && t.value === ')') {
+            while (ops.length > 0 && !(ops[ops.length - 1].type === 'paren' && ops[ops.length - 1].value === '(')) {
+                output.push(ops.pop());
+            }
+            if (ops.length === 0) throw new Error('Mismatched parentheses');
+            ops.pop();
+            continue;
+        }
+        throw new Error('Unexpected token');
+    }
+    while (ops.length > 0) {
+        const op = ops.pop();
+        if (op.type === 'paren') throw new Error('Mismatched parentheses');
+        output.push(op);
+    }
+    return output;
+}
+
+function evalConditionRpn(rpn, context) {
+    const stack = [];
+    for (const t of rpn) {
+        if (t.type === 'num') {
+            stack.push(t.value);
+            continue;
+        }
+        if (t.type === 'bool') {
+            stack.push(t.value);
+            continue;
+        }
+        if (t.type === 'id') {
+            if (!CONDITION_ALLOWED_FIELDS.has(t.value)) {
+                throw new Error(`Field not allowed: ${t.value}`);
+            }
+            stack.push(context[t.value]);
+            continue;
+        }
+        if (t.type === 'op') {
+            const b = stack.pop();
+            const a = stack.pop();
+            switch (t.value) {
+                case '&&': stack.push(Boolean(a) && Boolean(b)); break;
+                case '||': stack.push(Boolean(a) || Boolean(b)); break;
+                case '==': stack.push(a == b); break; // intentional loose equals for number/bool
+                case '!=': stack.push(a != b); break;
+                case '<': stack.push(Number(a) < Number(b)); break;
+                case '<=': stack.push(Number(a) <= Number(b)); break;
+                case '>': stack.push(Number(a) > Number(b)); break;
+                case '>=': stack.push(Number(a) >= Number(b)); break;
+                default: throw new Error('Unknown operator');
+            }
+            continue;
+        }
+        throw new Error('Unexpected token in RPN');
+    }
+    if (stack.length !== 1) throw new Error('Invalid expression');
+    return Boolean(stack[0]);
+}
+
+function evaluateConditionExpression(expression, context) {
+    const tokens = tokenizeCondition(expression);
+    const rpn = parseConditionToRpn(tokens);
+    return evalConditionRpn(rpn, context);
 }
 
 // ===================== 成就系统 =====================
@@ -1219,6 +1414,7 @@ function initGameState() {
         userSelectedLevelCount: 0,
         health: 100,
         helpTimes: 3,
+        initialHelpTimes: 3,
         debuff: 0,
         wealth: 0,
         officialRank: 0,
@@ -1229,7 +1425,8 @@ function initGameState() {
         pendingDeathOption: null,
         isFromSave: false,
         gameRecord: [],
-        currentKnowledge: 0  // 本局获得的学识积分
+        currentKnowledge: 0,  // 本局获得的学识积分
+        lastHelpBonusLevel: 0 // 防止每3关奖励重复发放
     };
 }
 
@@ -1335,14 +1532,9 @@ function checkConditions(conditions) {
     const context = { ...gameState };
 
     try {
-        return conditions.every(condition => {
-            const expression = condition.replace(/([a-zA-Z0-9_]+)/g, (match) => {
-                return context.hasOwnProperty(match) ? `context.${match}` : match;
-            });
-            return eval(expression);
-        });
+        return conditions.every((conditionExpr) => evaluateConditionExpression(conditionExpr, context));
     } catch (err) {
-        console.error("条件解析错误：", condition, err);
+        console.error("条件解析错误：", conditions, err);
         return false;
     }
 }
@@ -2319,6 +2511,18 @@ function startGame() {
         ) || appState.selectedVolume.identityList[0];
         appState.gameState.totalLevel = totalLevel;
         appState.gameState.userSelectedLevelCount = finalLevelCount;
+
+        // Apply rank privileges at run start.
+        const priv = getCurrentRankPrivileges();
+        if (priv.healthBonus) {
+            updateAttribute('health', priv.healthBonus);
+        }
+        if (priv.helpTimesBonus) {
+            updateAttribute('helpTimes', priv.helpTimesBonus);
+        }
+
+        // Capture baseline helpTimes for accurate helpUsed stats.
+        appState.gameState.initialHelpTimes = appState.gameState.helpTimes;
     }
     
     // 重置游戏结束标志
@@ -2332,12 +2536,14 @@ function startGame() {
 async function loadLevel(levelNum) {
     // 如果游戏已结束，不加载新关卡
     if (appState.gameEnded) return;
-    
+
     const levelList = appState.gameState.currentIdentity.levelList;
     if (levelNum > appState.gameState.userSelectedLevelCount) {
-        gameEnd(appState.gameState.health > 0, appState.gameState.health > 0 
-            ? `你成功走完了${appState.gameState.userSelectedLevelCount}关的${appState.gameState.currentVolume.dynasty}人生历程，凭借对历史、制度、规则的精准把握，顺利通关！`
-            : "你虽然走完了所选关卡，但生命值耗尽，最终没能安享晚年，抱憾而终。"
+        gameEnd(
+            appState.gameState.health > 0,
+            appState.gameState.health > 0
+                ? `你成功走完了${appState.gameState.userSelectedLevelCount}关的${appState.gameState.currentVolume.dynasty}人生历程，凭借对历史、制度、规则的精准把握，顺利通关！`
+                : "你虽然走完了所选关卡，但生命值耗尽，最终没能安享晚年，抱憾而终。"
         );
         return;
     }
@@ -2528,12 +2734,13 @@ function processNormalOption(option) {
         
         // 计算学识积分
         const timeUsed = getCurrentTimeConfig().baseTime - appState.countdown.remainingTime;
-        const knowledgePoints = calculateKnowledgeForAnswer(
+        let knowledgePoints = calculateKnowledgeForAnswer(
             true,
             timeUsed,
             appState.gameState.consecutiveCorrect,
-            true
+            false
         );
+        knowledgePoints = applyKnowledgeBonusByRank(knowledgePoints);
         const knowledgeGained = addKnowledgePoints(knowledgePoints, 'answer');
         
         if (appState.gameState.consecutiveCorrect >= 4) {
@@ -2695,7 +2902,7 @@ function useHelp() {
     showHistoryModal("求救成功", 
         `<div class="tip-box">
             当地的资深人士给了你关键提示：<br><br>
-            <strong>正确的选择，与「${correctOption.text.split('，')[0]}」有关。</strong>
+            <strong>正确的选择，与「${(correctOption?.text || '').split('，')[0] || '关键史实'}」有关。</strong>
         </div>
         <p>你清除了所有负面状态，恢复了20点生命值，还剩${appState.gameState.helpTimes}次求救机会。</p>`
     );
@@ -2711,9 +2918,8 @@ function showHistoryModal(title, text) {
     }
 }
 
-// 【修复】closeHistoryModal改为async，正确处理await
-// 【终极修复】确保100%能进入下一关
-function closeHistoryModal() {
+// Close the history modal, trigger afterOptionSelect events, then go next level.
+async function closeHistoryModal() {
     console.log('[DEBUG] closeHistoryModal called, gameEnded:', appState.gameEnded);
     
     // 如果游戏已结束，不做任何事
@@ -2732,17 +2938,36 @@ function closeHistoryModal() {
         resumeCountdown();
     }
 
-    // 3. 【关键修复】完全重置状态，确保下一关能正常加载
+    // 3. Trigger afterOptionSelect events for the level that just ended.
+    // Use the stored lastAnswer context (set in selectOption).
+    const last = appState.gameState.lastAnswer || {};
+    appState.gameState.isCorrect = !!last.isCorrect;
+    appState.gameState.correct = !!last.correct;
+    appState.gameState.endGame = !!last.endGame;
+    appState.gameState.helpUsed = Number.isFinite(last.helpUsed) ? last.helpUsed : 0;
+
+    try {
+        await checkAndTriggerEvents('afterOptionSelect');
+    } catch (err) {
+        console.error('afterOptionSelect events failed:', err);
+    } finally {
+        delete appState.gameState.isCorrect;
+        delete appState.gameState.correct;
+        delete appState.gameState.endGame;
+        delete appState.gameState.helpUsed;
+        delete appState.gameState.lastAnswer;
+    }
+
+    // 4. Move to next level.
     const nextLevel = appState.gameState.currentLevel + 1;
     console.log('[DEBUG] nextLevel:', nextLevel);
-    
+
     // 强制清空所有临时状态
     appState.gameState.currentOptions = [];
     appState.gameState.selectedOption = null;
-    
+
     // 使用 setTimeout 确保 DOM 更新完成
     setTimeout(() => {
-        // 重新初始化部分状态
         appState.gameState.currentLevel = nextLevel;
         console.log('[DEBUG] Loading level:', nextLevel);
         loadLevel(nextLevel);
@@ -2758,8 +2983,15 @@ function updateGameUI() {
     debuffTag.innerHTML = appState.gameState.debuff > 0 ? `<span class="debuff-tag">负面状态 x${appState.gameState.debuff}</span>` : '';
     const streakTag = document.getElementById('streak-tag');
     streakTag.innerHTML = appState.gameState.consecutiveCorrect >= 3 ? `<span class="streak-tag">连胜 x${appState.gameState.consecutiveCorrect}</span>` : '';
-    if (appState.gameState.currentLevel % 3 === 0 && appState.gameState.currentLevel > 0 && !appState.gameState.selectedOption) {
+    // Award helpTimes once per milestone level (avoid repeated grants due to frequent UI refresh).
+    if (
+        appState.gameState.currentLevel % 3 === 0 &&
+        appState.gameState.currentLevel > 0 &&
+        !appState.gameState.selectedOption &&
+        (appState.gameState.lastHelpBonusLevel || 0) !== appState.gameState.currentLevel
+    ) {
         updateAttribute('helpTimes', 1);
+        appState.gameState.lastHelpBonusLevel = appState.gameState.currentLevel;
     }
     updateHealthUI();
 }
@@ -2904,6 +3136,12 @@ function gameEnd(isSuccess, desc) {
     }
     
     // 计算学识积分
+    // Award completion bonus once per successful run.
+    if (isSuccess) {
+        const completionPoints = applyKnowledgeBonusByRank(KNOWLEDGE_CONFIG.levelComplete);
+        addKnowledgePoints(completionPoints, 'run_complete');
+        appState.gameState.currentKnowledge = (appState.gameState.currentKnowledge || 0) + completionPoints;
+    }
     const knowledgeGained = appState.gameState.currentKnowledge || 0;
     
     const scoreResult = calculateScore(appState.gameState, isSuccess);
@@ -3029,6 +3267,9 @@ function enterNextVolume() {
     appState.selectedVolume = nextVolume;
     appState.gameState.currentVolume = nextVolume;
     appState.triggeredEventIds = [];
+
+    // Capture baseline helpTimes for accurate helpUsed stats in events.
+    appState.gameState.initialHelpTimes = appState.gameState.helpTimes;
     
     // 跳转到关卡选择页面（如果有多个身份则先选身份）
     if (nextVolume.identityList.length === 1) {
@@ -3619,5 +3860,3 @@ function resetTutorial() {
     appState.tutorial.isActive = false;
     appState.tutorial.currentStep = 0;
 }
-
-
