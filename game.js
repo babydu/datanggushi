@@ -1410,6 +1410,8 @@ function initGameState() {
         currentVolume: null,
         currentIdentity: null,
         currentLevel: 1,
+        // For branching runs, progress should be based on answered questions rather than level number.
+        // currentLevel remains the node/scene id in levelList.
         totalLevel: 0,
         userSelectedLevelCount: 0,
         health: 100,
@@ -1525,6 +1527,34 @@ function getCurrentTimeConfig() {
         healthDeductPerSecond: timeConfig.healthDeductPerSecond ?? DEFAULT_TIME_CONFIG.healthDeductPerSecond,
         freezeOnModal: timeConfig.freezeOnModal ?? DEFAULT_TIME_CONFIG.freezeOnModal
     };
+}
+
+function getAnsweredLevelCount() {
+    return appState.gameState?.gameRecord?.length || 0;
+}
+
+function getRunProgressText() {
+    const answered = getAnsweredLevelCount();
+    const total = appState.gameState?.userSelectedLevelCount || 0;
+    return `${Math.min(answered + 1, total)}/${total}`;
+}
+
+function resolveStoryForLevel(levelData) {
+    // Base story
+    let story = levelData.story || '';
+
+    // Optional variants: pick the first matching conditions.
+    // Format: storyVariants: [{ conditions: ["wealth >= 100"], story: "..." }, ...]
+    if (Array.isArray(levelData.storyVariants) && levelData.storyVariants.length > 0) {
+        for (const v of levelData.storyVariants) {
+            if (!v || typeof v.story !== 'string') continue;
+            if (checkConditions(v.conditions || [])) {
+                story = v.story;
+                break;
+            }
+        }
+    }
+    return story;
 }
 
 function checkConditions(conditions) {
@@ -2254,6 +2284,16 @@ function validatePackFormat(pack, showError) {
                     if (!hasOptionPool && !hasFixedOptions) {
                         return errorTip(`卷「${volume.name}」身份「${identity.name}」第${level.level}关必须包含optionPool选项池或options固定选项`);
                     }
+
+                    // Branching support: validate nextLevel if present in options
+                    const optionsToCheck = hasOptionPool ? level.optionPool : level.options;
+                    for (const opt of optionsToCheck || []) {
+                        if (opt && opt.nextLevel !== undefined && opt.nextLevel !== null) {
+                            if (typeof opt.nextLevel !== 'number' || !Number.isFinite(opt.nextLevel) || opt.nextLevel < 1) {
+                                return errorTip(`卷「${volume.name}」身份「${identity.name}」第${level.level}关选项 nextLevel 必须是>=1的数字`);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2538,7 +2578,8 @@ async function loadLevel(levelNum) {
     if (appState.gameEnded) return;
 
     const levelList = appState.gameState.currentIdentity.levelList;
-    if (levelNum > appState.gameState.userSelectedLevelCount) {
+    const answered = getAnsweredLevelCount();
+    if (answered >= appState.gameState.userSelectedLevelCount) {
         gameEnd(
             appState.gameState.health > 0,
             appState.gameState.health > 0
@@ -2583,9 +2624,10 @@ async function loadLevel(levelNum) {
 
     // 更新UI
     document.getElementById('volume-text').innerText = appState.gameState.currentVolume.name;
-    document.getElementById('story-text').innerText = currentLevelData.story;
-    document.getElementById('level-text').innerText = `${levelNum}/${appState.gameState.userSelectedLevelCount}`;
-    document.getElementById('progress-fill').style.width = `${(levelNum / appState.gameState.userSelectedLevelCount) * 100}%`;
+    document.getElementById('story-text').innerText = resolveStoryForLevel(currentLevelData);
+    document.getElementById('level-text').innerText = getRunProgressText();
+    const progressCurrent = Math.min(answered + 1, appState.gameState.userSelectedLevelCount);
+    document.getElementById('progress-fill').style.width = `${(progressCurrent / appState.gameState.userSelectedLevelCount) * 100}%`;
     
     // 【美化版】渲染选项
     const optionsBox = document.getElementById('options-box');
@@ -2689,6 +2731,15 @@ async function selectOption(option, index, levelData) {
         timeUsed: getCurrentTimeConfig().baseTime - appState.countdown.remainingTime
     });
 
+    // Persist branching info for the just-answered node.
+    appState.gameState.lastAnswer = {
+        isCorrect: !!option.isCorrect,
+        correct: !!option.isCorrect,
+        endGame: !!option.endGame,
+        helpUsed: (appState.gameState.initialHelpTimes || 0) - (appState.gameState.helpTimes || 0),
+        nextLevel: option.nextLevel || null
+    };
+
     // 必死选项判定
     if (option.endGame) {
         appState.gameState.pendingDeathOption = option;
@@ -2720,6 +2771,25 @@ function processNormalOption(option) {
     }
     if (option.moraleChange !== undefined) {
         updateAttribute('morale', option.moraleChange);
+    }
+
+    // Generic effects support for branching/narrative packs.
+    // Format:
+    // - effects: { "health": 5, "wealth": 10 }
+    // - setEffects: { "debuff": 0 }
+    if (option.effects && typeof option.effects === 'object') {
+        Object.keys(option.effects).forEach((key) => {
+            updateAttribute(key, option.effects[key]);
+        });
+    }
+    if (option.setEffects && typeof option.setEffects === 'object') {
+        Object.keys(option.setEffects).forEach((key) => {
+            const current = appState.gameState[key];
+            if (current === undefined) return;
+            const target = option.setEffects[key];
+            if (typeof target !== 'number') return;
+            updateAttribute(key, target - current);
+        });
     }
 
     // 连续答题正确计数
@@ -2779,6 +2849,11 @@ function processNormalOption(option) {
         let content = option.isCorrect 
             ? `<div class="success-box">${option.result}</div><br><strong>历史知识点：</strong>${option.history}`
             : `<div class="warning-box">${option.result}</div><br><strong>历史知识点：</strong>${option.history}`;
+
+        // Branching hint
+        if (option.nextLevel) {
+            content += `<div class="tip-box" style="margin-top: 12px;"><strong>剧情走向：</strong>你的选择将引导剧情走向新的岔路。</div>`;
+        }
         
         if (option.isCorrect && appState.gameState.consecutiveCorrect >= 3) {
             content = `<div class="success-box">${option.result}</div>
@@ -2958,8 +3033,11 @@ async function closeHistoryModal() {
         delete appState.gameState.lastAnswer;
     }
 
-    // 4. Move to next level.
-    const nextLevel = appState.gameState.currentLevel + 1;
+    // 4. Move to next level (support branching).
+    const branchingNext = last.nextLevel;
+    const nextLevel = (typeof branchingNext === 'number' && Number.isFinite(branchingNext) && branchingNext >= 1)
+        ? branchingNext
+        : appState.gameState.currentLevel + 1;
     console.log('[DEBUG] nextLevel:', nextLevel);
 
     // 强制清空所有临时状态
@@ -2984,14 +3062,16 @@ function updateGameUI() {
     const streakTag = document.getElementById('streak-tag');
     streakTag.innerHTML = appState.gameState.consecutiveCorrect >= 3 ? `<span class="streak-tag">连胜 x${appState.gameState.consecutiveCorrect}</span>` : '';
     // Award helpTimes once per milestone level (avoid repeated grants due to frequent UI refresh).
+    const answered = getAnsweredLevelCount();
+    // Every 3 answered questions, grant 1 help time once.
     if (
-        appState.gameState.currentLevel % 3 === 0 &&
-        appState.gameState.currentLevel > 0 &&
+        answered > 0 &&
+        answered % 3 === 0 &&
         !appState.gameState.selectedOption &&
-        (appState.gameState.lastHelpBonusLevel || 0) !== appState.gameState.currentLevel
+        (appState.gameState.lastHelpBonusLevel || 0) !== answered
     ) {
         updateAttribute('helpTimes', 1);
-        appState.gameState.lastHelpBonusLevel = appState.gameState.currentLevel;
+        appState.gameState.lastHelpBonusLevel = answered;
     }
     updateHealthUI();
 }

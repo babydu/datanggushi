@@ -1,0 +1,226 @@
+{
+  "packInfo": {
+    "packName": "汴京风云·分支演示",
+    "dynasty": "北宋仁宗年间",
+    "version": "1.0",
+    "author": "官方演示",
+    "description": "一个小型分支剧情演示剧本：你的选择会影响后续剧情节点走向，同时每题都包含对应制度与史实知识点。适合用于测试分支引擎。"
+  },
+  "attributeConfig": {
+    "health": { "name": "生命值", "max": 100, "min": 0 },
+    "helpTimes": { "name": "求救次数", "max": 10, "min": 0 },
+    "debuff": { "name": "负面状态", "max": 5, "min": 0 },
+    "wealth": { "name": "财富值", "max": 300, "min": 0 },
+    "officialRank": { "name": "官职品级", "max": 9, "min": 0 }
+  },
+  "timeLimitConfig": {
+    "baseTime": 14,
+    "healthDeductPerSecond": 1,
+    "freezeOnModal": true
+  },
+  "volumeList": [
+    {
+      "id": "bianjing",
+      "name": "汴京卷",
+      "subtitle": "市井与法度",
+      "dynasty": "北宋仁宗年间",
+      "description": "你初到汴京，既要谋生，也要守法。每个选择都会把你引向不同剧情节点。",
+      "isFirst": true,
+      "identityList": [
+        {
+          "id": "newcomer",
+          "name": "初到汴京",
+          "description": "一名外来小民，身无长物。你能否在东京立足，取决于你对制度与现实的把握。",
+          "levelList": [
+            {
+              "level": 1,
+              "story": "仁宗年间，东京汴梁人潮如织。你带着少量盘缠想在州桥附近摆摊卖茶点，但开张前必须做一个决定：要不要先去报备？",
+              "knowledgeTag": ["宋代城市管理", "宋代市井生活", "东京开封"],
+              "options": [
+                {
+                  "id": "b1_correct",
+                  "text": "先去里坊/街司询问，按规矩缴纳摊位费用再开张",
+                  "isCorrect": true,
+                  "result": "你先去问明白规矩，虽耽误半日，但摊位合法，巡检也不为难。",
+                  "history": "宋代城市管理更成熟，坊市界限逐步松动，但街司、巡检等仍会管理摊贩秩序。按规矩缴纳费用、遵守位置与时段，能避免纠纷与罚没。",
+                  "knowledgeTag": ["宋代城市管理"],
+                  "effects": {"wealth": -5, "health": 3},
+                  "nextLevel": 2
+                },
+                {
+                  "id": "b1_wrong",
+                  "text": "不报备直接开张，先赚了再说",
+                  "isCorrect": false,
+                  "result": "你图快直接摆摊，遇到巡检盘查，被罚没了部分货物。",
+                  "history": "宋代虽商业繁荣，但巡检、街司仍负责治安与市场秩序。无证经营可能被罚没、驱逐，严重者还会牵连保伍与邻里。",
+                  "knowledgeTag": ["宋代治安与市政"],
+                  "effects": {"wealth": -15, "health": -8, "debuff": 1},
+                  "nextLevel": 3
+                }
+              ]
+            },
+            {
+              "level": 2,
+              "story": "你的摊位合法开张，邻摊大娘提醒你：州桥一带商贾多，想长久做下去，关键是信用。此时有位客商提出赊账。你怎么做？",
+              "knowledgeTag": ["宋代商业信用", "行会与口碑"],
+              "storyVariants": [
+                {
+                  "conditions": ["wealth < 0"],
+                  "story": "你手头拮据，摊位刚合法开张。邻摊大娘提醒你：州桥一带商贾多，想长久做下去，关键是信用。此时有位客商提出赊账。你怎么做？"
+                }
+              ],
+              "options": [
+                {
+                  "id": "b2_correct",
+                  "text": "记录赊账信息并约定期限，允许小额赊欠",
+                  "isCorrect": true,
+                  "result": "你立下账目，赊欠可控，客商认可你的做法，后续也常来光顾。",
+                  "history": "宋代商业活动频繁，赊账并不罕见。关键在于账目、担保与期限。信用是长期交易的基石，口碑传播极快。",
+                  "knowledgeTag": ["宋代商业信用"],
+                  "effects": {"wealth": 10, "health": 2},
+                  "nextLevel": 4
+                },
+                {
+                  "id": "b2_wrong",
+                  "text": "一概拒绝赊账，怕收不回来",
+                  "isCorrect": false,
+                  "result": "你过于谨慎，客商转身去了别家，你错失了稳定客源。",
+                  "history": "在高度商业化的城市中，完全拒绝赊欠会降低交易弹性。对陌生人拒绝无妨，但对可靠客源应通过账目与期限控制风险。",
+                  "knowledgeTag": ["宋代市井交易"],
+                  "effects": {"wealth": -5},
+                  "nextLevel": 4
+                }
+              ]
+            },
+            {
+              "level": 3,
+              "story": "你因无证摆摊被罚没，心里不服，想找巡检理论。你该用什么方式？",
+              "knowledgeTag": ["宋代诉讼与申诉", "基层治理"],
+              "options": [
+                {
+                  "id": "b3_correct",
+                  "text": "先补齐手续，再按程序向街司说明情况，请求减免",
+                  "isCorrect": true,
+                  "result": "你先补手续再说明情况，态度得当，街司从轻处理，你避免了更大麻烦。",
+                  "history": "宋代基层治理体系较细，街司、巡检、里正等各司其职。多数纠纷可通过程序化沟通解决，强行闹事往往会升级为治安案件。",
+                  "knowledgeTag": ["基层治理"],
+                  "effects": {"debuff": -1, "health": 2},
+                  "nextLevel": 4
+                },
+                {
+                  "id": "b3_wrong",
+                  "text": "当街争吵，聚众围观，逼巡检退还罚没",
+                  "isCorrect": false,
+                  "result": "你当街闹事，引来围观，巡检以扰乱秩序为由把你带走盘问。",
+                  "history": "城市治安对“聚众扰乱秩序”极为敏感。即便原本是轻微处罚，一旦扩大为治安事件，往往会受到更严厉处置。",
+                  "knowledgeTag": ["宋代治安"],
+                  "effects": {"health": -15, "debuff": 2},
+                  "nextLevel": 4
+                }
+              ]
+            },
+            {
+              "level": 4,
+              "story": "数日后，你听说开封府将清查市井摊贩，重点查“假冒伪劣”和“短斤少两”。你的同乡劝你‘做点手脚’。你如何抉择？",
+              "knowledgeTag": ["宋代商业监管", "度量衡", "城市治理"],
+              "options": [
+                {
+                  "id": "b4_correct",
+                  "text": "坚持足斤足两，宁可少赚，也不坏名声",
+                  "isCorrect": true,
+                  "result": "你坚持足斤足两，清查时安然无恙，还被街坊称赞。",
+                  "history": "宋代对市场秩序和度量衡管理较重。短斤少两不仅损害信用，还可能触犯官府监管，导致罚没与禁业。",
+                  "knowledgeTag": ["度量衡管理"],
+                  "effects": {"wealth": 15, "debuff": -1},
+                  "nextLevel": 5
+                },
+                {
+                  "id": "b4_deadly",
+                  "text": "用改过的秤砣混过清查，侥幸一把",
+                  "isCorrect": false,
+                  "result": "你动了歪心思，被抽检当场查获，货物被没收，你也被逐出市口。",
+                  "history": "度量衡属于官府重点监管内容。被查获的商贩往往遭罚没、禁业乃至治罪，口碑也会彻底崩坏。",
+                  "knowledgeTag": ["宋代商业监管"],
+                  "effects": {"health": -30, "debuff": 3},
+                  "endGame": true,
+                  "endDesc": "你因短斤少两被官府处罚并驱逐，名声尽毁，难以在汴京立足。"
+                }
+              ]
+            },
+            {
+              "level": 5,
+              "story": "你逐渐在汴京立足。有人邀请你加入同业组织，以便互通货源与消息。你是否加入？",
+              "knowledgeTag": ["宋代行会", "市井组织"],
+              "options": [
+                {
+                  "id": "b5_correct",
+                  "text": "加入并遵守规约，以稳定供货与互助",
+                  "isCorrect": true,
+                  "result": "你加入组织，货源更稳，遇到纠纷也有人帮你说话。",
+                  "history": "宋代行业组织与商人网络十分发达。加入同业组织有助于稳定货源、解决纠纷，但也要遵守规约，避免破坏市场秩序。",
+                  "knowledgeTag": ["宋代行会"],
+                  "effects": {"wealth": 20, "health": 5},
+                  "nextLevel": 6
+                },
+                {
+                  "id": "b5_wrong",
+                  "text": "不加入，独自经营，避免被约束",
+                  "isCorrect": false,
+                  "result": "你独自经营也能活，但遇到货源紧张和纠纷时更吃亏。",
+                  "history": "独自经营并非不可，但在竞争激烈的市口，缺乏互助网络会导致抗风险能力更弱。",
+                  "knowledgeTag": ["宋代市井组织"],
+                  "effects": {"wealth": 0},
+                  "nextLevel": 6
+                }
+              ]
+            },
+            {
+              "level": 6,
+              "story": "你站稳脚跟，回想初到汴京的选择。能在东京生存，靠的是对制度与人心的理解。你准备把经验写进账册，教给后辈。",
+              "knowledgeTag": ["宋代市政", "商业信用"],
+              "options": [
+                {
+                  "id": "b6_correct",
+                  "text": "总结‘守法、信用、互助’三条准则",
+                  "isCorrect": true,
+                  "result": "你总结得当，后辈受益，你的商号也得以延续。",
+                  "history": "宋代城市治理与商业繁荣并存，个人的生存策略往往要兼顾法度与信用网络。理解制度结构，才能降低风险。",
+                  "knowledgeTag": ["宋代市政", "商业信用"],
+                  "effects": {"health": 5, "debuff": -1},
+                  "nextLevel": 7
+                },
+                {
+                  "id": "b6_wrong",
+                  "text": "总结‘只要胆大就能发财’",
+                  "isCorrect": false,
+                  "result": "你总结过于片面，后辈照做容易翻车。",
+                  "history": "在制度化的城市环境里，‘胆大’常常意味着触碰监管红线。可持续的成功更多来自规则理解与信用积累。",
+                  "knowledgeTag": ["风险与制度"],
+                  "effects": {"debuff": 1},
+                  "nextLevel": 7
+                }
+              ]
+            },
+            {
+              "level": 7,
+              "story": "（终章节点）你在汴京继续经营。",
+              "knowledgeTag": ["总结"],
+              "options": [
+                {
+                  "id": "b7_end",
+                  "text": "继续前行",
+                  "isCorrect": true,
+                  "result": "故事告一段落。",
+                  "history": "本剧本用于演示分支剧情引擎：不同选择会跳转到不同节点，并影响后续剧情文本。",
+                  "knowledgeTag": ["复盘"],
+                  "effects": {},
+                  "nextLevel": 999
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

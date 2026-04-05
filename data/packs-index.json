@@ -4,6 +4,33 @@
     "_lastUpdated": "2026-03-31",
     "packs": [
         {
+            "id": "branching-demo-pack",
+            "packName": "汴京风云·分支演示",
+            "dynasty": "北宋仁宗年间",
+            "version": "1.0",
+            "author": "官方演示",
+            "authorUrl": "",
+            "description": "一个小型分支剧情演示剧本：你的选择会影响后续剧情节点走向，同时每题都包含对应制度与史实知识点。适合用于测试分支引擎。",
+            "coverImage": "",
+            "tags": ["北宋", "汴京", "分支剧情", "市政", "商业"],
+            "difficulty": "easy",
+            "filePath": "data/branching-demo-pack.json",
+            "levelCount": 7,
+            "identityCount": 1,
+            "volumeCount": 1,
+            "downloadCount": 0,
+            "rating": 4.6,
+            "ratingCount": 0,
+            "status": "published",
+            "createdAt": "2026-04-05",
+            "updatedAt": "2026-04-05",
+            "highlights": [
+                "答案会引导到不同剧情节点",
+                "支持 storyVariants 条件化剧情文本",
+                "每题附制度与史实知识点"
+            ]
+        },
+        {
             "id": "song-dynasty-pack",
             "packName": "宋朝历史生存剧本",
             "dynasty": "北宋",
