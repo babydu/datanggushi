@@ -1,0 +1,605 @@
+{
+  "packInfo": {
+    "packName": "贞观入仕录·科举与官箴",
+    "dynasty": "唐·贞观年间",
+    "version": "1.0",
+    "author": "官方创作",
+    "description": "以贞观之治为背景，你从寒门士子入京应举到县曹办事。每一关都围绕唐代科举门类、文书体例、律令与官场规矩设置陷阱，重点考察时代与制度细节，避免仅凭常识推理。"
+  },
+  "attributeConfig": {
+    "health": {
+      "name": "生命值",
+      "max": 100,
+      "min": 0
+    },
+    "helpTimes": {
+      "name": "求救次数",
+      "max": 10,
+      "min": 0
+    },
+    "debuff": {
+      "name": "负面状态",
+      "max": 5,
+      "min": 0
+    },
+    "wealth": {
+      "name": "盘缠",
+      "max": 300,
+      "min": 0
+    },
+    "officialRank": {
+      "name": "仕途进度",
+      "max": 9,
+      "min": 0
+    }
+  },
+  "timeLimitConfig": {
+    "baseTime": 14,
+    "healthDeductPerSecond": 1,
+    "freezeOnModal": true
+  },
+  "scoreConfig": {
+    "dimensions": [
+      {
+        "name": "最终生命值",
+        "field": "finalHealth",
+        "weight": 0.25,
+        "max": 100
+      },
+      {
+        "name": "答题正确率",
+        "field": "correctRate",
+        "weight": 0.45,
+        "max": 1
+      },
+      {
+        "name": "关卡完成度",
+        "field": "levelCompleteRate",
+        "weight": 0.2,
+        "max": 1
+      },
+      {
+        "name": "剩余求救次数",
+        "field": "remainingHelpTimes",
+        "weight": 0.1,
+        "max": 3
+      }
+    ],
+    "levels": [
+      {
+        "id": "excellent",
+        "name": "一举成名",
+        "desc": "你对贞观制度与官场细节了然于胸，进退合礼法，仕途坦荡。",
+        "minTotalScore": 90,
+        "mustPass": true
+      },
+      {
+        "id": "good",
+        "name": "名列前茅",
+        "desc": "你把握制度脉络，偶有疏漏但能及时补救。",
+        "minTotalScore": 80,
+        "mustPass": true
+      },
+      {
+        "id": "pass",
+        "name": "勉强入仕",
+        "desc": "你凭运气混过部分关卡，但制度细节仍需补课。",
+        "minTotalScore": 60,
+        "mustPass": true
+      },
+      {
+        "id": "fail",
+        "name": "名落孙山",
+        "desc": "你多次误判时代与制度，屡犯官场大忌，只得重头再来。",
+        "minTotalScore": 0,
+        "mustPass": false
+      }
+    ]
+  },
+  "specialEvents": [
+    {
+      "id": "zhenguan_low_health_relief",
+      "triggerTiming": "afterOptionSelect",
+      "triggerConditions": [
+        "health < 20"
+      ],
+      "triggerOnce": true,
+      "eventType": "dialog",
+      "eventData": {
+        "character": "驿丞",
+        "title": "驿站施粥",
+        "content": "你一路奔波，形容憔悴。驿丞见你像个读书人，给你一碗热粥并提醒：‘入仕先守礼法，莫逞口舌。’",
+        "effects": {
+          "health": 20,
+          "debuff": -1
+        }
+      }
+    }
+  ],
+  "volumeList": [
+    {
+      "id": "zhenguan",
+      "name": "贞观卷",
+      "subtitle": "从应举到入曹",
+      "dynasty": "唐·贞观年间",
+      "description": "你以寒门之身入京应举，科场、文书与律令处处是坑。答对不仅靠常识，而靠对唐制与时代的精确理解。",
+      "isFirst": true,
+      "unlockCondition": null,
+      "inheritFrom": null,
+      "timeLimitConfig": {
+        "baseTime": 14
+      },
+      "identityList": [
+        {
+          "id": "candidate",
+          "name": "寒门应举",
+          "description": "你准备参加贞观年间的进士科，随后被派往县衙办事。你必须分清唐代科举门类、考务规矩、文书体例与官场禁忌。",
+          "levelList": [
+            {
+              "level": 1,
+              "story": "贞观年间，你抵达长安。坊间有人兜售‘应试捷径’，满口都是后世名词。你首先要辨别：唐代进士科最核心的考察，更接近哪一种？",
+              "knowledgeTag": [
+                "唐代科举",
+                "进士科",
+                "时代错置"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg1_c1",
+                  "type": "correct",
+                  "text": "重视诗赋与策问，尤看文章才气与经义贯通",
+                  "isCorrect": true,
+                  "result": "你识破了‘后世程式化’的误导：唐代进士更看重文才、诗赋与策问。",
+                  "history": "唐代进士科以诗赋、策问见长，取士偏重文才与经义。明清八股程式化是后世发展，不能倒推到贞观。",
+                  "knowledgeTag": [
+                    "唐代科举",
+                    "进士科"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "wealth": -5
+                  }
+                },
+                {
+                  "id": "zg1_c2",
+                  "type": "correct",
+                  "text": "以策问论时务为要，兼取诗赋，不拘一格求实才",
+                  "isCorrect": true,
+                  "result": "你抓住了关键：策问关乎治国用人之道，诗赋体现文采。",
+                  "history": "唐代策问常考治国方略与时务，取士强调‘能用’。诗赋与策问并重，是唐代进士科的重要特征。",
+                  "knowledgeTag": [
+                    "策问",
+                    "进士科"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg1_c3",
+                  "type": "correct",
+                  "text": "诗赋取其格调，策问取其见识，二者合观其才",
+                  "isCorrect": true,
+                  "result": "你回答得体：进士取士讲究‘才气’与‘见识’并重。",
+                  "history": "唐代进士科评价更强调文学才气与政治见识的综合。",
+                  "knowledgeTag": [
+                    "进士科"
+                  ],
+                  "endGame": false,
+                  "debuffChange": -1
+                },
+                {
+                  "id": "zg1_w1",
+                  "type": "major_wrong",
+                  "text": "背熟《本草纲目》药性条目以应对时务问答",
+                  "isCorrect": false,
+                  "result": "你被时代错置骗了：这书要到明代才成。",
+                  "history": "《本草纲目》为李时珍所著，成书于明代。贞观年间不可能作为应试材料。用后世知识套前代，是常见历史陷阱。",
+                  "knowledgeTag": [
+                    "时代错置",
+                    "本草纲目"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1
+                },
+                {
+                  "id": "zg1_w2",
+                  "type": "minor_wrong",
+                  "text": "专攻八股文破题承题起讲，按格式套写",
+                  "isCorrect": false,
+                  "result": "你准备方向跑偏：八股程式是明清科举特色。",
+                  "history": "八股文成型并制度化于明代，唐代科举不存在这一程式。",
+                  "knowledgeTag": [
+                    "科举演变",
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -6
+                },
+                {
+                  "id": "zg1_d1",
+                  "type": "deadly",
+                  "text": "托人走‘内阁’门路买题，保证必中",
+                  "isCorrect": false,
+                  "result": "你触犯了制度与时代的双重错误：唐代无‘内阁’，且舞弊必重惩。",
+                  "history": "内阁为明代政治机构。唐代科举同样严惩舞弊，买题行贿属于重罪。",
+                  "knowledgeTag": [
+                    "时代错置",
+                    "科举舞弊"
+                  ],
+                  "endGame": true,
+                  "healthChange": -100,
+                  "endDesc": "你行贿舞弊被揭发后革籍论罪，前程尽毁。"
+                }
+              ]
+            },
+            {
+              "level": 2,
+              "story": "你要在‘进士’与‘明经’之间选主攻方向。有人说‘明经最好考，等于稳过’，但你也听说两科出路不同。唐代两科的大致差别更接近哪一种？",
+              "knowledgeTag": [
+                "唐代科举",
+                "明经科",
+                "进士科"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg2_c1",
+                  "type": "correct",
+                  "text": "明经偏经义熟练，进士更重文才与策问，声望与仕途路径也常不同",
+                  "isCorrect": true,
+                  "result": "你把握了要点：两科考察重心不同，社会评价也不尽相同。",
+                  "history": "唐代明经科偏重经义与记诵（如帖经等），进士科更重诗赋与策问，常被视为更能体现才气。",
+                  "knowledgeTag": [
+                    "明经科",
+                    "进士科"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg2_c2",
+                  "type": "correct",
+                  "text": "明经更像经义训练，进士更像文章与见识，两者并非简单难易之分",
+                  "isCorrect": true,
+                  "result": "你没有被‘难易’误导：关键在于能力结构与用人偏好。",
+                  "history": "唐代科举门类服务于不同能力评价，不能简化成‘哪个更容易’。",
+                  "knowledgeTag": [
+                    "科举门类"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg2_c3",
+                  "type": "correct",
+                  "text": "明经重经义规范，进士重文学才气与策论时务",
+                  "isCorrect": true,
+                  "result": "你答得简洁准确，避免了把后世题型硬套进来。",
+                  "history": "理解两科差异，才能解释同中第但仕途路径不同的现象。",
+                  "knowledgeTag": [
+                    "唐代科举"
+                  ],
+                  "endGame": false,
+                  "debuffChange": -1
+                },
+                {
+                  "id": "zg2_w1",
+                  "type": "major_wrong",
+                  "text": "明经与进士都主要考八股格式，只是题目不同",
+                  "isCorrect": false,
+                  "result": "你把明清程式当成唐代常态，方向一开始就错了。",
+                  "history": "八股文是明代制度化的考试文体。唐代科举不以固定八股格式为核心。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 1
+                },
+                {
+                  "id": "zg2_w2",
+                  "type": "minor_wrong",
+                  "text": "明经就是背书，进士就是写诗，除此之外没有制度差别",
+                  "isCorrect": false,
+                  "result": "你过度简化了制度，忽略了策问与经义评价的差异。",
+                  "history": "科举是选官制度而非单纯作文比赛，题型对应能力画像。",
+                  "knowledgeTag": [
+                    "制度理解"
+                  ],
+                  "endGame": false,
+                  "healthChange": -6
+                }
+              ]
+            },
+            {
+              "level": 3,
+              "story": "入场前，监临官宣布搜检规则。有人劝你‘袖里藏点纸条，反正你文采好不怕’。在唐代考场语境下，哪种做法最稳妥？",
+              "knowledgeTag": [
+                "唐代考场",
+                "考务纪律",
+                "科举舞弊"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg3_c1",
+                  "type": "correct",
+                  "text": "只携带准许的文具与身份证明，不带任何抄录资料",
+                  "isCorrect": true,
+                  "result": "你选择守规矩。考务最怕舞弊，一旦坐实，轻则逐场，重则毁身。",
+                  "history": "唐代考场纪律并非宽松到可随意夹带。携带抄录资料属于舞弊风险点。",
+                  "knowledgeTag": [
+                    "考务纪律"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg3_c2",
+                  "type": "correct",
+                  "text": "把准备稿留在驿舍，入场前再核对题型，避免携带任何可疑纸片",
+                  "isCorrect": true,
+                  "result": "你把风险降到最低，避免在搜检时被误判。",
+                  "history": "很多考场事故并非真舞弊，而是携带可疑纸片引发误会。",
+                  "knowledgeTag": [
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "debuffChange": -1
+                },
+                {
+                  "id": "zg3_w1",
+                  "type": "major_wrong",
+                  "text": "把要点写在衣袖内侧，称作袖珍备忘",
+                  "isCorrect": false,
+                  "result": "你觉得聪明，实则是常见舞弊手段，搜检一查一个准。",
+                  "history": "衣物夹带是各时代常见舞弊形式，往往成为重点搜检对象。",
+                  "knowledgeTag": [
+                    "科举舞弊"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg3_w2",
+                  "type": "minor_wrong",
+                  "text": "带上《朱子语类》以备引用，显得学问渊博",
+                  "isCorrect": false,
+                  "result": "你再次犯了时代错置：朱熹是南宋人。",
+                  "history": "朱熹为南宋理学大师，贞观年间不可能引用《朱子语类》。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8
+                }
+              ]
+            },
+            {
+              "level": 4,
+              "story": "开考后，你发现策问题目偏向‘律令与行政’。你决定采用哪种答卷策略？不同策略会引向不同后续遭遇。",
+              "knowledgeTag": [
+                "策问",
+                "唐律",
+                "行政"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg4_c1",
+                  "type": "correct",
+                  "text": "以律令框架解释治理边界：先明权限，再谈德化（稳健）",
+                  "isCorrect": true,
+                  "result": "你用制度框架先立住‘能做什么’与‘不能做什么’，答卷稳健。",
+                  "history": "唐代治理强调德治与法度并行。策问中先明制度边界是常见的高分写法。",
+                  "knowledgeTag": [
+                    "唐律",
+                    "策问技巧"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  },
+                  "nextLevel": 5
+                },
+                {
+                  "id": "zg4_c2",
+                  "type": "correct",
+                  "text": "以经史立论，再用律令落到执行细节（兼顾）",
+                  "isCorrect": true,
+                  "result": "你经史立论、制度落地，结构完整。",
+                  "history": "高分答卷常以经史为体、制度为用：既讲价值，也讲执行。",
+                  "knowledgeTag": [
+                    "经史结合"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2,
+                  "nextLevel": 5
+                },
+                {
+                  "id": "zg4_w1",
+                  "type": "major_wrong",
+                  "text": "通篇抒情颂圣，不谈制度与执行，越华丽越好",
+                  "isCorrect": false,
+                  "result": "你写得很热闹，但缺少制度与执行，容易被判为空泛。",
+                  "history": "策问是‘问政’，不是纯文学比赛。空泛颂圣会被视为无实才。",
+                  "knowledgeTag": [
+                    "策问评分"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1,
+                  "nextLevel": 6
+                },
+                {
+                  "id": "zg4_w2",
+                  "type": "minor_wrong",
+                  "text": "引用《资治通鉴》评语压题，显得通史功底深",
+                  "isCorrect": false,
+                  "result": "你引用了未来的书：这书在北宋才编成。",
+                  "history": "《资治通鉴》成书于北宋，贞观年间不可能引用。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 1,
+                  "nextLevel": 6
+                }
+              ]
+            },
+            {
+              "level": 5,
+              "story": "你答卷得体，中第后被分配到县衙为曹吏。县令叮嘱：‘文书体例不对，比算错账更要命。’下列哪种描述更符合唐代官府文书逻辑？",
+              "knowledgeTag": [
+                "唐代文书",
+                "官署称谓",
+                "时代错置"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg5_c1",
+                  "type": "correct",
+                  "text": "对上用奏/表等上行文，对下用牒/移等公文往来，分清上下行",
+                  "isCorrect": true,
+                  "result": "你把握了关键：文书类型对应权力方向。",
+                  "history": "公文体系有严格方向性。唐代官府往来强调上下行文类型区分。",
+                  "knowledgeTag": [
+                    "公文方向"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg5_c2",
+                  "type": "correct",
+                  "text": "行文谨守官署称谓与职名，不使用后世固定格式（如‘奏折’）",
+                  "isCorrect": true,
+                  "result": "你避开了最致命的坑：把后世制度硬套唐代。",
+                  "history": "奏折制度是清代形成的文书形态。唐代有奏、表等，但制度不同。",
+                  "knowledgeTag": [
+                    "文书制度",
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg5_w1",
+                  "type": "major_wrong",
+                  "text": "向上级呈送‘奏折’，并以‘臣某某谨奏’作结",
+                  "isCorrect": false,
+                  "result": "你把清代制度搬进唐代，文书被驳回。",
+                  "history": "奏折制度与语言习惯在清代高度定型。唐代不是同一制度形态。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -18,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg5_w2",
+                  "type": "minor_wrong",
+                  "text": "文书开头写‘奉天承运皇帝诏曰’，以示庄重",
+                  "isCorrect": false,
+                  "result": "你把明清诏书套话套进唐代公文，显得非常突兀。",
+                  "history": "‘奉天承运’为明清常见诏书套语，唐代诏令措辞不同。",
+                  "knowledgeTag": [
+                    "文体演变"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10
+                }
+              ]
+            },
+            {
+              "level": 6,
+              "story": "你的答卷空泛/时代错置，被阅卷官圈出数处硬伤。你还有一次当场补救机会：最应该做的是哪一步？",
+              "knowledgeTag": [
+                "科举补救",
+                "官场规矩"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg6_c1",
+                  "type": "correct",
+                  "text": "承认用典失当，迅速改为经史与制度论证，避免继续自曝穿越",
+                  "isCorrect": true,
+                  "result": "你及时止损，换回可接受的论证框架。",
+                  "history": "在制度化场域中，及时纠错比硬撑更重要。继续引用时代错置材料只会越描越黑。",
+                  "knowledgeTag": [
+                    "答题策略"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "debuff": -1,
+                    "health": 2
+                  }
+                },
+                {
+                  "id": "zg6_c2",
+                  "type": "correct",
+                  "text": "删去所有可疑后世名词，改用可验证的经史语汇与贞观政治实践",
+                  "isCorrect": true,
+                  "result": "你把答卷拉回到贞观语境，减少致命风险。",
+                  "history": "最安全的做法是回到当代语境可成立的材料：经史、制度、现实政务。",
+                  "knowledgeTag": [
+                    "时代语境"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg6_w1",
+                  "type": "major_wrong",
+                  "text": "继续引用更多后世名著证明你读书多，用数量压过质疑",
+                  "isCorrect": false,
+                  "result": "你越引用越露馅：时代错置叠加，等同自证其罪。",
+                  "history": "历史题的‘权威’必须在时间轴上成立。未来的书越多，越像伪造。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -20,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg6_d1",
+                  "type": "deadly",
+                  "text": "当场质疑主考官不识书，强行争辩",
+                  "isCorrect": false,
+                  "result": "你触犯大忌：当场顶撞主考，轻则逐出，重则治罪。",
+                  "history": "科场是权力秩序现场，顶撞主考属于严重违礼违制行为。",
+                  "knowledgeTag": [
+                    "官场禁忌"
+                  ],
+                  "endGame": true,
+                  "healthChange": -100,
+                  "endDesc": "你当场顶撞主考官，被逐出考场并列入黑名单，仕途断绝。"
+                },
+                {
+                  "id": "zg6_w2",
+                  "type": "minor_wrong",
+                  "text": "把论证改成‘唯有重商富国’，并引用《盐铁论》当作唐代现行政策依据",
+                  "isCorrect": false,
+                  "result": "你把汉代论辩材料当作唐代现行政策依据，论证会被认为牵强且失当。",
+                  "history": "《盐铁论》记录的是西汉时期关于盐铁专卖等政策的争论，不能直接当作唐代现行政策依据。策问材料要考虑时代、制度与语境。",
+                  "knowledgeTag": [
+                    "时代语境",
+                    "用典失当"
+                  ],
+                  "healthChange": -10,
+                  "endGame": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
