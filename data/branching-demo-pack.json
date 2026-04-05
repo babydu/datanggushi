@@ -214,7 +214,7 @@
                   "history": "本剧本用于演示分支剧情引擎：不同选择会跳转到不同节点，并影响后续剧情文本。",
                   "knowledgeTag": ["复盘"],
                   "effects": {},
-                  "nextLevel": 999
+                  "nextLevel": 1
                 },
                 {
                   "id": "b7_wrong",
@@ -224,7 +224,7 @@
                   "history": "学习型游戏的关键不只是‘过关’，而是复盘。把一次选择的后果与制度、背景对应起来，才能形成可迁移的知识。",
                   "knowledgeTag": ["复盘"],
                   "effects": {"debuff": 1},
-                  "nextLevel": 999
+                  "nextLevel": 1
                 }
               ]
             }

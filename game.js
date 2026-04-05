@@ -2603,7 +2603,18 @@ async function loadLevel(levelNum) {
 
     const currentLevelData = levelList.find(item => item.level === levelNum);
     if (!currentLevelData) {
-        alert("关卡数据错误！");
+        // Branching packs may intentionally jump to a non-existent level as a terminal node.
+        // If a pack accidentally references a missing level, end the run gracefully instead
+        // of blocking the player with an error alert.
+        console.warn('关卡数据不存在，结束本局:', {
+            levelNum,
+            answered,
+            selected: appState.gameState.userSelectedLevelCount
+        });
+        gameEnd(
+            appState.gameState.health > 0,
+            "你走到了故事的尽头。若这是分支剧本的终章节点，恭喜你完成本次历程；若非预期，请在剧本中检查 nextLevel 是否指向了不存在的关卡。"
+        );
         return;
     }
 
