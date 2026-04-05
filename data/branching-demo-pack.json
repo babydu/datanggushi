@@ -215,6 +215,16 @@
                   "knowledgeTag": ["复盘"],
                   "effects": {},
                   "nextLevel": 999
+                },
+                {
+                  "id": "b7_wrong",
+                  "text": "回想往事，执拗己见",
+                  "isCorrect": false,
+                  "result": "你执拗己见，不愿复盘，很多错误会在未来重演。",
+                  "history": "学习型游戏的关键不只是‘过关’，而是复盘。把一次选择的后果与制度、背景对应起来，才能形成可迁移的知识。",
+                  "knowledgeTag": ["复盘"],
+                  "effects": {"debuff": 1},
+                  "nextLevel": 999
                 }
               ]
             }
