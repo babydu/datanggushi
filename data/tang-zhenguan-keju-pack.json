@@ -2,7 +2,7 @@
   "packInfo": {
     "packName": "贞观入仕录·科举与官箴",
     "dynasty": "唐·贞观年间",
-    "version": "1.0",
+    "version": "1.2",
     "author": "官方创作",
     "description": "以贞观之治为背景，你从寒门士子入京应举到县曹办事。每一关都围绕唐代科举门类、文书体例、律令与官场规矩设置陷阱，重点考察时代与制度细节，避免仅凭常识推理。"
   },
@@ -594,6 +594,693 @@
                   ],
                   "healthChange": -10,
                   "endGame": false
+                }
+              ]
+            },
+            {
+              "level": 7,
+              "story": "中第后，你才明白“登科”只是起点。吏部（或相关官司）要按资序、缺额与任用规则安排去处。下列哪种理解更贴近贞观官制？",
+              "knowledgeTag": [
+                "唐代官制",
+                "授官",
+                "铨选"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg7_c1",
+                  "type": "correct",
+                  "text": "中第是入仕门槛，授官仍需铨选与缺额安排，未必立刻得一县主官",
+                  "isCorrect": true,
+                  "result": "你把考试与授官分开理解，避免“一步登天”的后世想象。",
+                  "history": "唐代仕途涉及铨选、缺额、资序与推荐。中第并不等于立刻出任一县主官。",
+                  "knowledgeTag": [
+                    "铨选",
+                    "资序"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg7_c2",
+                  "type": "correct",
+                  "text": "更常见是先在州县或官署历练、候缺，再授具体官职",
+                  "isCorrect": true,
+                  "result": "你理解了官僚系统的“慢变量”：缺额与资序。",
+                  "history": "古代官僚任用常受缺额影响。候缺与历练是常见路径。",
+                  "knowledgeTag": [
+                    "授官逻辑"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg7_w1",
+                  "type": "major_wrong",
+                  "text": "考中进士就相当于拿到现代“录用通知”，次日直接赴任知县",
+                  "isCorrect": false,
+                  "result": "你把现代行政流程套到唐代，制度语言完全不通。",
+                  "history": "现代“录用通知”逻辑不适用于唐代官制。授官与铨选有其独立制度链条。",
+                  "knowledgeTag": [
+                    "制度差异"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 1
+                },
+                {
+                  "id": "zg7_w2",
+                  "type": "minor_wrong",
+                  "text": "只要在考场写明“愿任知县”，主考官会按志愿分配岗位",
+                  "isCorrect": false,
+                  "result": "你把个人志愿当成制度核心，忽略缺额与铨选。",
+                  "history": "授官更依赖制度程序与缺额。个人志愿并非决定性因素。",
+                  "knowledgeTag": [
+                    "授官逻辑"
+                  ],
+                  "endGame": false,
+                  "healthChange": -6
+                }
+              ]
+            },
+            {
+              "level": 8,
+              "story": "入京后你第一次听到朝廷政务。有人说“内阁票拟”，有人说“中书出命、门下封驳”。在贞观年间，中央运转更贴近哪套结构？",
+              "knowledgeTag": [
+                "三省六部",
+                "中书门下",
+                "时代错置"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg8_c1",
+                  "type": "correct",
+                  "text": "三省分权：中书出命、门下审议（封驳）、尚书执行，六部承办具体事务",
+                  "isCorrect": true,
+                  "result": "你避开“内阁票拟”的时代错置，抓住了唐制骨架。",
+                  "history": "唐代中央以“三省六部”为核心。内阁为明代机构，“票拟”程序不属唐制。",
+                  "knowledgeTag": [
+                    "三省六部"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg8_c2",
+                  "type": "correct",
+                  "text": "决策与执行分层：命令形成与审议、行政执行不在同一机构完成",
+                  "isCorrect": true,
+                  "result": "你不仅记名词，更理解分工与制衡的制度精神。",
+                  "history": "三省设计强调分工制衡。理解流程比背名词更关键。",
+                  "knowledgeTag": [
+                    "制度设计"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg8_w1",
+                  "type": "major_wrong",
+                  "text": "内阁票拟后交军机处传达，再由都察院监察落实",
+                  "isCorrect": false,
+                  "result": "你把明清机构拼盘塞进贞观，属于典型时代错置。",
+                  "history": "内阁、军机处、都察院为明清或后世机构。贞观中央运转不依赖这些机构。",
+                  "knowledgeTag": [
+                    "时代错置"
+                  ],
+                  "endGame": false,
+                  "healthChange": -18,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg8_w2",
+                  "type": "minor_wrong",
+                  "text": "唐代只有六部没有三省，六部直接向皇帝汇报",
+                  "isCorrect": false,
+                  "result": "你忽略了三省在出命、审议、执行中的关键作用。",
+                  "history": "三省在唐代政治结构中地位重要，不可省略。",
+                  "knowledgeTag": [
+                    "三省六部"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8
+                }
+              ]
+            },
+            {
+              "level": 9,
+              "story": "你被派去跟随法曹学习断狱。案头同时摆着《唐律疏议》和《大明律》。你起草判牒时应以哪套为准？",
+              "knowledgeTag": [
+                "唐律疏议",
+                "法典对应",
+                "时代错置"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg9_c1",
+                  "type": "correct",
+                  "text": "以唐代法典体系为准（如唐律及其疏议），不能用明代法典倒灌",
+                  "isCorrect": true,
+                  "result": "你选对了依据：时代对应的法典才是权威。",
+                  "history": "《唐律疏议》属唐代法典体系代表；《大明律》为明代法典，不能用于贞观断案。",
+                  "knowledgeTag": [
+                    "唐律疏议"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg9_c2",
+                  "type": "correct",
+                  "text": "先确立事实与证据，再对应唐律条文定罪量刑，写清推理链条",
+                  "isCorrect": true,
+                  "result": "你抓住了断狱的“事实-法条-量刑”链条。",
+                  "history": "断狱不是背法条，而是把事实与法条对应并可复核。",
+                  "knowledgeTag": [
+                    "断狱方法"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg9_w1",
+                  "type": "major_wrong",
+                  "text": "两本都行，哪个更严就用哪个，法律反正差不多",
+                  "isCorrect": false,
+                  "result": "你把法典当通用模板，忽略法制变迁。",
+                  "history": "不同朝代罪名结构与量刑尺度不同，乱用会造成程序与量刑失当。",
+                  "knowledgeTag": [
+                    "法制变迁"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg9_w2",
+                  "type": "minor_wrong",
+                  "text": "用大明律更严，能震慑百姓，所以更合适",
+                  "isCorrect": false,
+                  "result": "你以“效果主义”代替“合法性”，官场风险极高。",
+                  "history": "官府断案讲究合法性与程序正当。用后世法律震慑等同承认无视现行法度。",
+                  "knowledgeTag": [
+                    "官场禁忌"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8,
+                  "debuffChange": 1
+                }
+              ]
+            },
+            {
+              "level": 10,
+              "story": "盗窃案中嫌疑人否认。老吏说“先取供词”，法曹说“先固证据”。你先做哪一步？不同选择会引向不同后续。",
+              "knowledgeTag": [
+                "断案取证",
+                "官场实务"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg10_c1",
+                  "type": "correct",
+                  "text": "先固定物证与证人证言，形成事实框架，再审讯补足细节",
+                  "isCorrect": true,
+                  "result": "你先稳住证据链，审讯才不至被口舌牵着走。",
+                  "history": "供词重要，但缺证据支撑易致冤错与翻案风险。",
+                  "knowledgeTag": [
+                    "证据链"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  },
+                  "nextLevel": 11
+                },
+                {
+                  "id": "zg10_c2",
+                  "type": "correct",
+                  "text": "先清点失物与现场痕迹，登记在案，避免“物证消失”",
+                  "isCorrect": true,
+                  "result": "你把“登记”当作官府办案基本功。",
+                  "history": "登记能锁定事实状态，减少事实漂移与扯皮。",
+                  "knowledgeTag": [
+                    "文书与登记"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2,
+                  "nextLevel": 11
+                },
+                {
+                  "id": "zg10_w1",
+                  "type": "major_wrong",
+                  "text": "先用重刑逼供，只要认了就结案",
+                  "isCorrect": false,
+                  "result": "你图快走偏：冤错风险与追责风险同时上升。",
+                  "history": "逼供结案会导致冤错与翻案，官场风险不止道德，更有追责。",
+                  "knowledgeTag": [
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -18,
+                  "debuffChange": 2,
+                  "nextLevel": 12
+                },
+                {
+                  "id": "zg10_w2",
+                  "type": "minor_wrong",
+                  "text": "先听里长一句话定案，反正他最了解本乡",
+                  "isCorrect": false,
+                  "result": "你把熟人意见当证据本身，程序上站不住。",
+                  "history": "基层意见可参考，但仍需形成可书写、可核对的证据材料。",
+                  "knowledgeTag": [
+                    "程序正当"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8,
+                  "nextLevel": 12
+                }
+              ]
+            },
+            {
+              "level": 11,
+              "story": "你按证据链办案，被安排起草“勘验文书”。下列哪种写法更符合官府记录事实的要求？",
+              "knowledgeTag": [
+                "勘验文书",
+                "文书体例"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg11_c1",
+                  "type": "correct",
+                  "text": "只记可观察事实与来源：何物、何处、何人见证，不写主观猜测",
+                  "isCorrect": true,
+                  "result": "你写得像官府文书，而不是像故事。",
+                  "history": "勘验重事实与来源，可复核性越强越稳。主观猜测会污染证据价值。",
+                  "knowledgeTag": [
+                    "勘验"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg11_c2",
+                  "type": "correct",
+                  "text": "按时间与地点分段，便于上级复核与归档",
+                  "isCorrect": true,
+                  "result": "结构化写作提高了可复核性。",
+                  "history": "官府文书服务复核与归档，结构化能减少歧义与扯皮。",
+                  "knowledgeTag": [
+                    "文书结构"
+                  ],
+                  "endGame": false,
+                  "debuffChange": -1
+                },
+                {
+                  "id": "zg11_w1",
+                  "type": "major_wrong",
+                  "text": "用华丽辞藻渲染“其人凶顽”，增强说服力",
+                  "isCorrect": false,
+                  "result": "你把文学写法带进证据文书，容易被认为带偏见。",
+                  "history": "证据材料要避免价值判断，否则降低可信度。",
+                  "knowledgeTag": [
+                    "文书禁忌"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 1
+                },
+                {
+                  "id": "zg11_w2",
+                  "type": "minor_wrong",
+                  "text": "直接写“嫌疑人必是某某”，不用写理由，显得果断",
+                  "isCorrect": false,
+                  "result": "果断不等于正确。没有理由的结论会让你承担全部风险。",
+                  "history": "官场结论必须能被文书与证据支撑，否则就是替人背锅。",
+                  "knowledgeTag": [
+                    "责任风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8
+                }
+              ]
+            },
+            {
+              "level": 12,
+              "story": "你走“先取供词”的路子，案子暂结，却被上级抽查问：为何缺少关键物证登记？你最稳妥的补救是什么？",
+              "knowledgeTag": [
+                "卷宗",
+                "官场补救"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg12_c1",
+                  "type": "correct",
+                  "text": "补做勘验与登记，把缺失环节补齐，并在文书中说明时间与原因",
+                  "isCorrect": true,
+                  "result": "你补齐程序并留下可追踪解释，降低翻案风险。",
+                  "history": "补救关键是补全程序链条并可追踪；遮掩反而放大风险。",
+                  "knowledgeTag": [
+                    "卷宗管理"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "debuff": -1,
+                    "health": 2
+                  }
+                },
+                {
+                  "id": "zg12_c2",
+                  "type": "correct",
+                  "text": "主动承认疏漏，请求法曹指导如何补齐卷宗材料",
+                  "isCorrect": true,
+                  "result": "你把风险从“隐瞒”变为“可控改正”。",
+                  "history": "官场里主动暴露小错，往往比被动爆雷大错更安全。",
+                  "knowledgeTag": [
+                    "官场策略"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg12_w1",
+                  "type": "major_wrong",
+                  "text": "把卷宗改写成“当场已登记”，反正无人核对",
+                  "isCorrect": false,
+                  "result": "你选择造假，一旦被发现就是红线。",
+                  "history": "文书造假属于官场红线，后果远重于业务疏漏。",
+                  "knowledgeTag": [
+                    "文书造假"
+                  ],
+                  "endGame": false,
+                  "healthChange": -25,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg12_d1",
+                  "type": "deadly",
+                  "text": "推给下属说是他们没做，你完全不知情",
+                  "isCorrect": false,
+                  "result": "甩锅会触发更深追查，风险极大。",
+                  "history": "上级常交叉核对卷宗与口供，甩锅易暴露矛盾并升级追责。",
+                  "knowledgeTag": [
+                    "官场禁忌"
+                  ],
+                  "endGame": true,
+                  "healthChange": -100,
+                  "endDesc": "你被查出甩锅与卷宗问题，遭严惩，仕途断绝。"
+                },
+                {
+                  "id": "zg12_w2",
+                  "type": "minor_wrong",
+                  "text": "把“缺物证登记”的责任写成“上级口头允许”，用一句话糊过去",
+                  "isCorrect": false,
+                  "result": "你试图用“口头允许”逃避卷宗缺陷，反而让上级觉得你在推诿。",
+                  "history": "官府办事以文书为凭。用“口头允许”替代卷宗材料，无法复核，也无法归档，等同继续扩大程序风险。",
+                  "knowledgeTag": [
+                    "卷宗",
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10
+                }
+              ]
+            },
+            {
+              "level": 13,
+              "story": "你誊抄上行文书，老吏提醒“避讳”会决定你能不能活过第一年。关于避讳与用字，下列哪种处理更稳妥？",
+              "knowledgeTag": [
+                "避讳",
+                "文书细节",
+                "官场规矩"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg13_c1",
+                  "type": "correct",
+                  "text": "对涉及尊亲名讳等敏感字谨慎处理，遵循当时通行避讳规则，避免在上行文触犯",
+                  "isCorrect": true,
+                  "result": "你把政治风险当成文书的一部分，这才像官府里的人。",
+                  "history": "避讳是礼法与政治的交叉点，尤其在上行文中，触犯会被视为不敬并引发处分。",
+                  "knowledgeTag": [
+                    "避讳制度"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg13_c2",
+                  "type": "correct",
+                  "text": "遇到不确定的敏感字先请教老吏或查旧卷格式，不自作主张",
+                  "isCorrect": true,
+                  "result": "你用流程降低风险，官场里这是硬本事。",
+                  "history": "官场风险常来自“自作聪明”。请示与参照旧卷是常见避险策略。",
+                  "knowledgeTag": [
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "debuffChange": -1
+                },
+                {
+                  "id": "zg13_w1",
+                  "type": "major_wrong",
+                  "text": "避讳是迷信，直接写全名更显诚实",
+                  "isCorrect": false,
+                  "result": "你把制度当迷信，会在官场吃大亏。",
+                  "history": "避讳属于制度性礼法，与个人信不信无关。触犯会带来真实后果。",
+                  "knowledgeTag": [
+                    "制度理解"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg13_w2",
+                  "type": "minor_wrong",
+                  "text": "把所有字都写成同音替代，越多越安全",
+                  "isCorrect": false,
+                  "result": "你滥用替代会让文书难读，反而引发误会与驳回。",
+                  "history": "避讳有边界，过度替换会影响准确性与可读性，制造行政成本。",
+                  "knowledgeTag": [
+                    "文书可读性"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8
+                }
+              ]
+            },
+            {
+              "level": 14,
+              "story": "县里要核算租庸调。你被问到“丁口与授田、赋役如何挂钩”。你选择去哪个曹学习：户曹还是兵曹？不同选择会进入不同后续。",
+              "knowledgeTag": [
+                "租庸调",
+                "户籍制度",
+                "赋役"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg14_c1",
+                  "type": "correct",
+                  "text": "去户曹：先把户籍、丁口与授田、租庸调的对应关系理清",
+                  "isCorrect": true,
+                  "result": "你从账簿入手：先把制度算明白。",
+                  "history": "唐代赋役以户籍为基础，丁口与授田、租庸调相互关联。户曹是理解这套逻辑的关键位置。",
+                  "knowledgeTag": [
+                    "租庸调",
+                    "户曹"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  },
+                  "nextLevel": 15
+                },
+                {
+                  "id": "zg14_c2",
+                  "type": "correct",
+                  "text": "去兵曹：了解征发与徭役环节，再回头核对户籍数据的可执行性",
+                  "isCorrect": true,
+                  "result": "你从执行端理解制度，能发现账簿与现实的差距。",
+                  "history": "赋役不仅是账簿问题，也涉及征发与执行。理解执行端有助于识别数据造假与逃亡挂名。",
+                  "knowledgeTag": [
+                    "徭役",
+                    "执行"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2,
+                  "nextLevel": 16
+                },
+                {
+                  "id": "zg14_w1",
+                  "type": "major_wrong",
+                  "text": "去户部：全国财政都归户部，你一个县曹直接去中央领任务更快",
+                  "isCorrect": false,
+                  "result": "你越级行事，制度上走不通，还会被认为不懂规矩。",
+                  "history": "基层官吏有明确层级与分工。越级不仅无效，还会带来政治风险。",
+                  "knowledgeTag": [
+                    "层级分工"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 2,
+                  "nextLevel": 15
+                },
+                {
+                  "id": "zg14_w2",
+                  "type": "minor_wrong",
+                  "text": "不用学，租庸调就是交钱，不会算就让百姓多交一点",
+                  "isCorrect": false,
+                  "result": "你把制度当随手加码，这是官场大雷。",
+                  "history": "赋役加码会引发逃亡、诉讼与社会不稳，最终反噬地方官。",
+                  "knowledgeTag": [
+                    "赋役风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1,
+                  "nextLevel": 16
+                }
+              ]
+            },
+            {
+              "level": 15,
+              "story": "你在户曹核对簿籍，发现一户“丁口”与“授田”对不上。里正含糊其辞。你下一步最该核查什么，才能避免“账簿正确但现实错误”？",
+              "knowledgeTag": [
+                "户籍核查",
+                "基层治理",
+                "均田制"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg15_c1",
+                  "type": "correct",
+                  "text": "核查逃亡与挂名：实有人口是否与簿籍一致，并追溯授田来源与变动记录",
+                  "isCorrect": true,
+                  "result": "你抓住痛点：人不在，账再漂亮也是假。",
+                  "history": "人口逃亡与挂名会造成赋役失衡。核查实有人口与授田变动记录，是户曹实务核心。",
+                  "knowledgeTag": [
+                    "逃亡",
+                    "挂名",
+                    "均田制"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg15_c2",
+                  "type": "correct",
+                  "text": "调阅旧年簿籍与里正证明，交叉比对变动原因（生死、迁徙、分户）",
+                  "isCorrect": true,
+                  "result": "你用交叉验证减少被口供带偏的风险。",
+                  "history": "簿籍工作最怕单点信息。跨年度、跨来源比对能发现异常变动。",
+                  "knowledgeTag": [
+                    "簿籍",
+                    "交叉核对"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg15_w1",
+                  "type": "major_wrong",
+                  "text": "把簿籍数字改成对得上就行，现实不重要",
+                  "isCorrect": false,
+                  "result": "你把文书当目的，会制造更大的制度风险。",
+                  "history": "簿籍服务赋役与治理。改数字掩盖现实问题会导致征发失败、摊派与民怨。",
+                  "knowledgeTag": [
+                    "文书造假"
+                  ],
+                  "endGame": false,
+                  "healthChange": -18,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg15_w2",
+                  "type": "minor_wrong",
+                  "text": "听里正一句“没问题”就盖章，因为他最了解本里",
+                  "isCorrect": false,
+                  "result": "你把权力交给单点信息源，风险很高。",
+                  "history": "里正熟悉情况但也可能有利益关联。官府核查需要制度化证据链。",
+                  "knowledgeTag": [
+                    "基层风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8
+                }
+              ]
+            },
+            {
+              "level": 16,
+              "story": "你在兵曹看到征发名单，发现某些户被重复抽丁。军府催得急，里胥建议“先征了再说”。你如何处理，才最符合制度与风险控制？",
+              "knowledgeTag": [
+                "徭役征发",
+                "基层执行",
+                "风险控制"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg16_c1",
+                  "type": "correct",
+                  "text": "先核对户籍与前次征发记录，避免重复征发引发逃亡与诉讼，再按程序更正名单",
+                  "isCorrect": true,
+                  "result": "你先止损：重复征发会直接导致地方不稳。",
+                  "history": "征发与赋役高度敏感。重复征发会引发逃亡、民变与诉讼，最终责任会落到经办人身上。",
+                  "knowledgeTag": [
+                    "征发程序"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg16_c2",
+                  "type": "correct",
+                  "text": "把异常户单独标注上报，请求军府延期或替补，同时保留核对凭据以备复核",
+                  "isCorrect": true,
+                  "result": "你把“程序+凭据”作为护身符。",
+                  "history": "官场风险控制核心是可复核的凭据链。标注与上报能把风险转为可控流程。",
+                  "knowledgeTag": [
+                    "风险控制"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg16_w1",
+                  "type": "major_wrong",
+                  "text": "先征发再补手续，反正百姓不敢说话",
+                  "isCorrect": false,
+                  "result": "你把风险转嫁给百姓，短期快，长期爆雷更大。",
+                  "history": "赋役失衡会触发逃亡与摊派，最终导致地方财政与治安恶化，追责会回到经办人。",
+                  "knowledgeTag": [
+                    "赋役风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg16_w2",
+                  "type": "minor_wrong",
+                  "text": "听里胥建议，私下改名单，不留痕迹，免得上级追问",
+                  "isCorrect": false,
+                  "result": "你试图不留痕迹，反而让自己承担全部责任。",
+                  "history": "无痕改动等同程序性违规。一旦出事，你无法用卷宗自证。",
+                  "knowledgeTag": [
+                    "卷宗",
+                    "责任风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1
                 }
               ]
             }

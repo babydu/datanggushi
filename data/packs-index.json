@@ -7,7 +7,7 @@
             "id": "tang-zhenguan-keju-pack",
             "packName": "贞观入仕录·科举与官箴",
             "dynasty": "唐·贞观年间",
-            "version": "1.0",
+            "version": "1.2",
             "author": "官方创作",
             "authorUrl": "",
             "description": "以贞观之治为背景，你从寒门士子入京应举到县曹办事。每一关都围绕唐代科举、文书、律令与官场规矩设置‘时代错置’与‘制度细节’陷阱，避免仅凭常识推理。",
@@ -15,7 +15,7 @@
             "tags": ["唐朝", "贞观", "科举", "唐律", "官场"],
             "difficulty": "medium",
             "filePath": "data/tang-zhenguan-keju-pack.json",
-            "levelCount": 6,
+            "levelCount": 16,
             "identityCount": 1,
             "volumeCount": 1,
             "downloadCount": 0,
@@ -27,7 +27,7 @@
             "highlights": [
                 "正确项随机抽取，不固定选项位置",
                 "大量时代错置陷阱，靠常识难以通关",
-                "科举与文书细节驱动剧情"
+                "扩充到16关，含分支与官场实务"
             ]
         },
         {
