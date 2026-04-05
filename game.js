@@ -1716,8 +1716,12 @@ async function loadCloudPackIndex() {
         emptyEl.style.display = 'none';
         listEl.style.display = 'none';
         
-        const response = await fetch(CLOUD_PACK_INDEX_URL);
-        if (!response.ok) throw new Error('网络请求失败');
+        const url = new URL(CLOUD_PACK_INDEX_URL, window.location.href).toString();
+        // Avoid 304/conditional caching edge cases in some environments.
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`网络请求失败（HTTP ${response.status}）`);
+        }
         
         const data = await response.json();
         cloudPackIndex = data;
@@ -1831,8 +1835,9 @@ async function downloadCloudPack(packId) {
         btn.disabled = true;
         
         // 获取剧本JSON
-        const response = await fetch(pack.filePath);
-        if (!response.ok) throw new Error('剧本文件加载失败');
+        const url = new URL(pack.filePath, window.location.href).toString();
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`剧本文件加载失败（HTTP ${response.status}）`);
         
         const packData = await response.json();
         
@@ -1946,8 +1951,9 @@ async function confirmPack() {
         if (!pack) return;
         
         try {
-            const response = await fetch(pack.filePath);
-            if (!response.ok) throw new Error('剧本文件加载失败');
+            const url = new URL(pack.filePath, window.location.href).toString();
+            const response = await fetch(url, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`剧本文件加载失败（HTTP ${response.status}）`);
             const packData = await response.json();
             
             if (!validatePackFormat(packData, true)) {
