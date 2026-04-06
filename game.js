@@ -516,7 +516,11 @@ const CONDITION_ALLOWED_FIELDS = new Set([
     'health', 'helpTimes', 'debuff', 'wealth', 'officialRank',
     'currentLevel', 'totalLevel', 'userSelectedLevelCount',
     'consecutiveCorrect', 'levelPassed',
-    'isCorrect', 'correct', 'endGame', 'helpUsed'
+    'isCorrect', 'correct', 'endGame', 'helpUsed',
+    // runFlags are exposed as `flag_<name>` booleans in the condition context.
+    // e.g. triggerConditions: ["flag_forgedRecord == true"]
+    // Note: actual allowed names are dynamic; enforced by prefix check in evalConditionRpn.
+    'flag'
 ]);
 
 function tokenizeCondition(expr) {
@@ -655,6 +659,11 @@ function evalConditionRpn(rpn, context) {
             continue;
         }
         if (t.type === 'id') {
+            // Allow dynamic flag access: flag_xxx
+            if (t.value.startsWith('flag_')) {
+                stack.push(Boolean(context[t.value]));
+                continue;
+            }
             if (!CONDITION_ALLOWED_FIELDS.has(t.value)) {
                 throw new Error(`Field not allowed: ${t.value}`);
             }
@@ -1428,7 +1437,9 @@ function initGameState() {
         isFromSave: false,
         gameRecord: [],
         currentKnowledge: 0,  // 本局获得的学识积分
-        lastHelpBonusLevel: 0 // 防止每3关奖励重复发放
+        lastHelpBonusLevel: 0, // 防止每3关奖励重复发放
+        // Per-run narrative flags. These do NOT persist across runs.
+        runFlags: {}
     };
 }
 
@@ -1561,6 +1572,17 @@ function checkConditions(conditions) {
     const gameState = appState.gameState;
     const context = { ...gameState };
 
+    // Expose runFlags as `flag_<name>` booleans.
+    // Keep it flat so the condition DSL can stay simple.
+    const flags = gameState?.runFlags;
+    if (flags && typeof flags === 'object') {
+        Object.keys(flags).forEach((k) => {
+            // only allow simple keys
+            if (!/^[a-zA-Z0-9_]+$/.test(k)) return;
+            context[`flag_${k}`] = Boolean(flags[k]);
+        });
+    }
+
     try {
         return conditions.every((conditionExpr) => evaluateConditionExpression(conditionExpr, context));
     } catch (err) {
@@ -1624,6 +1646,22 @@ function triggerEvent(event) {
             }
         } else {
             effectEl.style.display = 'none';
+        }
+
+        // Per-run narrative flags from events
+        if (eventData.setFlags && typeof eventData.setFlags === 'object') {
+            const flags = gameState.runFlags || (gameState.runFlags = {});
+            Object.keys(eventData.setFlags).forEach((k) => {
+                if (!/^[a-zA-Z0-9_]+$/.test(k)) return;
+                flags[k] = Boolean(eventData.setFlags[k]);
+            });
+        }
+        if (Array.isArray(eventData.clearFlags)) {
+            const flags = gameState.runFlags || (gameState.runFlags = {});
+            eventData.clearFlags.forEach((k) => {
+                if (!/^[a-zA-Z0-9_]+$/.test(k)) return;
+                delete flags[k];
+            });
         }
 
         updateGameUI();
@@ -2806,6 +2844,25 @@ function processNormalOption(option) {
             const target = option.setEffects[key];
             if (typeof target !== 'number') return;
             updateAttribute(key, target - current);
+        });
+    }
+
+    // Per-run narrative flags
+    // Format:
+    // - setFlags: { "forgedRecord": true, "tookBribe": true }
+    // - clearFlags: ["forgedRecord"]
+    if (option.setFlags && typeof option.setFlags === 'object') {
+        const flags = appState.gameState.runFlags || (appState.gameState.runFlags = {});
+        Object.keys(option.setFlags).forEach((k) => {
+            if (!/^[a-zA-Z0-9_]+$/.test(k)) return;
+            flags[k] = Boolean(option.setFlags[k]);
+        });
+    }
+    if (Array.isArray(option.clearFlags)) {
+        const flags = appState.gameState.runFlags || (appState.gameState.runFlags = {});
+        option.clearFlags.forEach((k) => {
+            if (!/^[a-zA-Z0-9_]+$/.test(k)) return;
+            delete flags[k];
         });
     }
 

@@ -819,6 +819,9 @@
                   "effects": {
                     "officialRank": 1
                   },
+                  "setFlags": {
+                    "evidenceFirst": true
+                  },
                   "nextLevel": 11
                 },
                 {
@@ -833,6 +836,9 @@
                   ],
                   "endGame": false,
                   "healthChange": 2,
+                  "setFlags": {
+                    "evidenceFirst": true
+                  },
                   "nextLevel": 11
                 },
                 {
@@ -848,6 +854,9 @@
                   "endGame": false,
                   "healthChange": -18,
                   "debuffChange": 2,
+                  "setFlags": {
+                    "coercedConfession": true
+                  },
                   "nextLevel": 12
                 },
                 {
@@ -862,6 +871,9 @@
                   ],
                   "endGame": false,
                   "healthChange": -8,
+                  "setFlags": {
+                    "coercedConfession": true
+                  },
                   "nextLevel": 12
                 }
               ]
@@ -869,6 +881,12 @@
             {
               "level": 11,
               "story": "你按证据链办案，被安排起草“勘验文书”。下列哪种写法更符合官府记录事实的要求？",
+              "storyVariants": [
+                {
+                  "conditions": ["flag_evidenceFirst == true"],
+                  "story": "你坚持先固证据，法曹对你另眼相看，安排你起草“勘验文书”，并暗示你日后可转入法曹线。你该怎么写，才经得起复核？"
+                }
+              ],
               "knowledgeTag": [
                 "勘验文书",
                 "文书体例"
@@ -932,6 +950,12 @@
             {
               "level": 12,
               "story": "你走“先取供词”的路子，案子暂结，却被上级抽查问：为何缺少关键物证登记？你最稳妥的补救是什么？",
+              "storyVariants": [
+                {
+                  "conditions": ["flag_coercedConfession == true"],
+                  "story": "你依赖口供把案子结得很快，但卷宗被抽查时漏洞百出。上级盯着你问：‘物证何在？勘验何在？’你必须立刻补救，否则风险会滚成大雷。"
+                }
+              ],
               "knowledgeTag": [
                 "卷宗",
                 "官场补救"
