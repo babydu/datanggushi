@@ -2,7 +2,7 @@
   "packInfo": {
     "packName": "贞观入仕录·科举与官箴",
     "dynasty": "唐·贞观年间",
-    "version": "1.2",
+    "version": "1.3",
     "author": "官方创作",
     "description": "以贞观之治为背景，你从寒门士子入京应举到县曹办事。每一关都围绕唐代科举门类、文书体例、律令与官场规矩设置陷阱，重点考察时代与制度细节，避免仅凭常识推理。"
   },
@@ -883,7 +883,9 @@
               "story": "你按证据链办案，被安排起草“勘验文书”。下列哪种写法更符合官府记录事实的要求？",
               "storyVariants": [
                 {
-                  "conditions": ["flag_evidenceFirst == true"],
+                  "conditions": [
+                    "flag_evidenceFirst == true"
+                  ],
                   "story": "你坚持先固证据，法曹对你另眼相看，安排你起草“勘验文书”，并暗示你日后可转入法曹线。你该怎么写，才经得起复核？"
                 }
               ],
@@ -952,7 +954,9 @@
               "story": "你走“先取供词”的路子，案子暂结，却被上级抽查问：为何缺少关键物证登记？你最稳妥的补救是什么？",
               "storyVariants": [
                 {
-                  "conditions": ["flag_coercedConfession == true"],
+                  "conditions": [
+                    "flag_coercedConfession == true"
+                  ],
                   "story": "你依赖口供把案子结得很快，但卷宗被抽查时漏洞百出。上级盯着你问：‘物证何在？勘验何在？’你必须立刻补救，否则风险会滚成大雷。"
                 }
               ],
@@ -1122,7 +1126,10 @@
                   "effects": {
                     "officialRank": 1
                   },
-                  "nextLevel": 15
+                  "nextLevel": 15,
+                  "setFlags": {
+                    "track_hucao": true
+                  }
                 },
                 {
                   "id": "zg14_c2",
@@ -1137,7 +1144,10 @@
                   ],
                   "endGame": false,
                   "healthChange": 2,
-                  "nextLevel": 16
+                  "nextLevel": 16,
+                  "setFlags": {
+                    "track_bingcao": true
+                  }
                 },
                 {
                   "id": "zg14_w1",
@@ -1152,7 +1162,10 @@
                   "endGame": false,
                   "healthChange": -12,
                   "debuffChange": 2,
-                  "nextLevel": 15
+                  "nextLevel": 15,
+                  "setFlags": {
+                    "track_hucao": true
+                  }
                 },
                 {
                   "id": "zg14_w2",
@@ -1167,7 +1180,10 @@
                   "endGame": false,
                   "healthChange": -10,
                   "debuffChange": 1,
-                  "nextLevel": 16
+                  "nextLevel": 16,
+                  "setFlags": {
+                    "track_bingcao": true
+                  }
                 }
               ]
             },
@@ -1238,6 +1254,14 @@
                   "endGame": false,
                   "healthChange": -8
                 }
+              ],
+              "storyVariants": [
+                {
+                  "conditions": [
+                    "flag_track_hucao == true"
+                  ],
+                  "story": "你在户曹翻簿籍，发现一户丁口与授田对不上。里正含糊其辞，周围里胥还在暗示你“别多问”。这是户曹线最常见的坑：账簿可能正确，但现实早已变形。你下一步最该核查什么？"
+                }
               ]
             },
             {
@@ -1305,6 +1329,327 @@
                   "endGame": false,
                   "healthChange": -10,
                   "debuffChange": 1
+                }
+              ],
+              "storyVariants": [
+                {
+                  "conditions": [
+                    "flag_track_bingcao == true"
+                  ],
+                  "story": "你在兵曹对照征发名单，发现某些户被重复抽丁。军府催得急，里胥建议“先征了再说”。兵曹线的坑在于：一旦重复征发引发逃亡与讼诉，责任会落到卷宗经办人身上。你如何处理？"
+                }
+              ]
+            },
+            {
+              "level": 17,
+              "story": "案件结了，但法曹说：真正的麻烦在“复核”。你需要把卷宗写到“任何人接手都能复盘”的程度。下列哪种做法更符合官府风险控制？",
+              "knowledgeTag": [
+                "卷宗复核",
+                "官场风险控制",
+                "断狱"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg17_c1",
+                  "type": "correct",
+                  "text": "把关键事实与证据逐条编号对应，保证“证据-事实-法条-量刑”可一一追溯",
+                  "isCorrect": true,
+                  "result": "你把卷宗写成可复核结构，风险陡降。",
+                  "history": "官府体系最看重可复核性。编号对应能减少争议并降低翻案风险。",
+                  "knowledgeTag": [
+                    "可复核性"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg17_c2",
+                  "type": "correct",
+                  "text": "在卷宗中明确“哪些是事实、哪些是推断”，避免把推断当事实写死",
+                  "isCorrect": true,
+                  "result": "你区分事实与推断，避免卷宗被抓到逻辑漏洞。",
+                  "history": "把推断写成事实会在复核时被一击致命。区分层次是官场写作的硬技能。",
+                  "knowledgeTag": [
+                    "事实与推断"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg17_w1",
+                  "type": "major_wrong",
+                  "text": "把所有材料写成一段长文，显得文采好，复核的人自然能看懂",
+                  "isCorrect": false,
+                  "result": "你把文采当作官府文书的核心，复核时会被嫌“难查”。",
+                  "history": "官府文书服务复核与交接。结构混乱会提高误读与争议概率。",
+                  "knowledgeTag": [
+                    "文书结构"
+                  ],
+                  "endGame": false,
+                  "healthChange": -12,
+                  "debuffChange": 1
+                },
+                {
+                  "id": "zg17_w2",
+                  "type": "minor_wrong",
+                  "text": "只写结论，不写过程，避免暴露你推理中的不确定性",
+                  "isCorrect": false,
+                  "result": "你想遮掩不确定性，结果是让自己无法自证。",
+                  "history": "官场风险控制不是“遮掩”，而是“留痕可证”。没有过程等于没有护身符。",
+                  "knowledgeTag": [
+                    "留痕"
+                  ],
+                  "endGame": false,
+                  "healthChange": -8,
+                  "debuffChange": 1
+                }
+              ],
+              "storyVariants": [
+                {
+                  "conditions": [
+                    "flag_evidenceFirst == true"
+                  ],
+                  "story": "你因坚持证据链被法曹赏识，开始接触“卷宗复核”与“封驳风险”。此时你的文字不再是文章，而是护身符。你该怎么写？"
+                },
+                {
+                  "conditions": [
+                    "flag_coercedConfession == true"
+                  ],
+                  "story": "你曾依赖口供结案，法曹把你叫来训诫：再这样迟早翻案。你被迫学习“可复核卷宗”的写法。你该怎么写，才能不再踩雷？"
+                }
+              ]
+            },
+            {
+              "level": 18,
+              "story": "你需要向上级说明某里丁口异常，但又不想越级惹祸。下列哪种处理更符合“层级与文书方向”的官场逻辑？",
+              "knowledgeTag": [
+                "层级分工",
+                "文书方向",
+                "基层治理"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg18_c1",
+                  "type": "correct",
+                  "text": "先按本县内部程序形成案卷，再由县令按上行文路径呈报，不越级直达中央",
+                  "isCorrect": true,
+                  "result": "你按层级办事，避免“越级”带来的政治风险。",
+                  "history": "官场讲层级与程序。越级直达会打脸上级，风险极高。",
+                  "knowledgeTag": [
+                    "层级分工"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg18_c2",
+                  "type": "correct",
+                  "text": "把事实与证据写清，给县令留下“可签发”的材料，而不是自己去“上奏”",
+                  "isCorrect": true,
+                  "result": "你把自己定位在“提供可签发材料”的位置，既有效又安全。",
+                  "history": "基层经办的核心是把材料写到可签发。擅自上奏属于越权。",
+                  "knowledgeTag": [
+                    "官场定位"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg18_w1",
+                  "type": "major_wrong",
+                  "text": "直接写给皇帝的奏章，绕过县令与州府，效率最高",
+                  "isCorrect": false,
+                  "result": "你越级行事，哪怕内容对，也会被程序直接否决。",
+                  "history": "越级意味着否定上级权威。官场中“程序错”往往比“内容错”更致命。",
+                  "knowledgeTag": [
+                    "越级风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg18_w2",
+                  "type": "minor_wrong",
+                  "text": "让里正口头带话给州府，避免留下文书痕迹",
+                  "isCorrect": false,
+                  "result": "你试图不留痕迹，反而让自己没有护身符。",
+                  "history": "官场靠文书留痕。口头传话无法复核，出事时经办人最危险。",
+                  "knowledgeTag": [
+                    "留痕"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10
+                }
+              ]
+            },
+            {
+              "level": 19,
+              "story": "案子后，苦主送来“薄礼”表示感谢。老吏说“收了不算贪”，法曹说“留痕就是祸”。在贞观官场，你最稳妥的处理是什么？",
+              "knowledgeTag": [
+                "官箴",
+                "受贿风险",
+                "官场文化"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg19_c1",
+                  "type": "correct",
+                  "text": "当场婉拒，并让对方把谢意写成“具状感谢”或转为公开渠道（如修桥铺路）",
+                  "isCorrect": true,
+                  "result": "你把私人利益转成公共表达，既保全人情，也控制风险。",
+                  "history": "官场风险来自“私相授受”与“无法解释的利益”。把谢意转为公开可见的形式更稳妥。",
+                  "knowledgeTag": [
+                    "风险控制"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  },
+                  "setFlags": {
+                    "integrity": true
+                  }
+                },
+                {
+                  "id": "zg19_c2",
+                  "type": "correct",
+                  "text": "不私收，建议按程序缴入官库或由上司见证处理",
+                  "isCorrect": true,
+                  "result": "你用程序与见证降低个人风险。",
+                  "history": "关键不是“礼轻礼重”，而是“是否可解释、可复核、可公示”。",
+                  "knowledgeTag": [
+                    "程序正当"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2,
+                  "setFlags": {
+                    "integrity": true
+                  }
+                },
+                {
+                  "id": "zg19_w1",
+                  "type": "major_wrong",
+                  "text": "收下再说，只要不写进卷宗就没人知道",
+                  "isCorrect": false,
+                  "result": "你把“无痕”当安全，其实是把自己推到最危险的位置。",
+                  "history": "官场里最大的风险是无法解释的利益。一旦被查，缺乏程序与见证等于自断退路。",
+                  "knowledgeTag": [
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -18,
+                  "debuffChange": 2,
+                  "setFlags": {
+                    "tookGift": true
+                  }
+                },
+                {
+                  "id": "zg19_w2",
+                  "type": "minor_wrong",
+                  "text": "让里胥代收，自己不碰钱就不算收",
+                  "isCorrect": false,
+                  "result": "你把责任转移给下属并不等于消失，反而会留下把柄。",
+                  "history": "代收与转移痕迹往往更明显，一旦翻供牵连更深。",
+                  "knowledgeTag": [
+                    "甩锅风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1,
+                  "setFlags": {
+                    "tookGift": true
+                  }
+                }
+              ]
+            },
+            {
+              "level": 20,
+              "story": "一年过去，你发现自己在官场的“名声”逐渐定型：有人说你谨慎守法，有人说你只求结案。此时上级要在两个人之间提拔一人，你如何陈述自己的“办事之道”？",
+              "knowledgeTag": [
+                "官场自陈",
+                "制度理解",
+                "风险控制"
+              ],
+              "optionPool": [
+                {
+                  "id": "zg20_c1",
+                  "type": "correct",
+                  "text": "强调程序与可复核：事前留痕、事中证据、事后卷宗，可让治理稳定且可交接",
+                  "isCorrect": true,
+                  "result": "你把“可复核”当作能力核心，最能打动重视制度的上级。",
+                  "history": "官场提拔看重“可复制、可交接、可问责”。程序与卷宗能力往往是关键。",
+                  "knowledgeTag": [
+                    "治理能力"
+                  ],
+                  "endGame": false,
+                  "effects": {
+                    "officialRank": 1
+                  }
+                },
+                {
+                  "id": "zg20_c2",
+                  "type": "correct",
+                  "text": "强调知边界：不越级、不私断，以制度为准绳，把风险控制在可解释范围内",
+                  "isCorrect": true,
+                  "result": "你讲清了“边界意识”，这是成熟官吏的标志。",
+                  "history": "制度不是束缚，而是护栏。知道边界的人更不容易惹出政治灾难。",
+                  "knowledgeTag": [
+                    "边界意识"
+                  ],
+                  "endGame": false,
+                  "healthChange": 2
+                },
+                {
+                  "id": "zg20_w1",
+                  "type": "major_wrong",
+                  "text": "强调效率：只要结案快，程序可以灵活处理",
+                  "isCorrect": false,
+                  "result": "你把效率凌驾于程序之上，会被视为风险源。",
+                  "history": "官场里“效率”必须建立在可复核与合法性之上，否则就是埋雷。",
+                  "knowledgeTag": [
+                    "程序正当"
+                  ],
+                  "endGame": false,
+                  "healthChange": -15,
+                  "debuffChange": 2
+                },
+                {
+                  "id": "zg20_w2",
+                  "type": "minor_wrong",
+                  "text": "强调人情：和里正里胥打好关系，比制度更重要",
+                  "isCorrect": false,
+                  "result": "你把人情放在制度之前，会让上级担心你难以约束。",
+                  "history": "人情网络有用，但一旦压过制度，会被认为可能形成私相授受与利益链条。",
+                  "knowledgeTag": [
+                    "官场风险"
+                  ],
+                  "endGame": false,
+                  "healthChange": -10,
+                  "debuffChange": 1
+                }
+              ],
+              "storyVariants": [
+                {
+                  "conditions": [
+                    "flag_integrity == true && flag_evidenceFirst == true"
+                  ],
+                  "story": "一年过去，你以“证据链+守规矩”在县里立住了口碑。上级要在两个人之间提拔一人，你如何陈述自己的办事之道？"
+                },
+                {
+                  "conditions": [
+                    "flag_tookGift == true"
+                  ],
+                  "story": "一年过去，你的卷宗勉强过关，但“收礼”的传闻像阴影一样跟着你。上级要在两个人之间提拔一人，你如何自陈才能不被抓住把柄？"
+                },
+                {
+                  "conditions": [
+                    "flag_coercedConfession == true"
+                  ],
+                  "story": "一年过去，你曾靠口供结案吃过一次大亏，从此处处小心。上级要在两个人之间提拔一人，你如何自陈才能证明自己已学会官场规矩？"
                 }
               ]
             }
