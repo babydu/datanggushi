@@ -33,6 +33,17 @@ function bootstrapAfterLegacyLoad() {
   pm.register(window.Plugins.createSettingsPlugin());
   pm.initAll(ctx);
 
+  // Apply initial toggles for UI-only behaviors that live in legacy code.
+  // Cloud tab visibility
+  try {
+    const cloudBtn = document.querySelector('.pack-tab-btn[data-tab="cloud"]');
+    if (cloudBtn) {
+      cloudBtn.style.display = (ctx.flags.cloudPacks === false) ? 'none' : '';
+    }
+  } catch {}
+
+  // Level select page visibility (kept, but will be skipped when disabled)
+
   // Add a Settings button to welcome page controls.
   const welcomeBtnRow = document.querySelector('#welcome-page > div[style*="display: flex"]');
   if (welcomeBtnRow && !document.getElementById('open-settings-btn')) {

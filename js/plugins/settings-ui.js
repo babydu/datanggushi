@@ -51,6 +51,17 @@ function createSettingsPlugin() {
           el.addEventListener('change', (e) => {
             const id = e.target.dataset.flagId;
             ctx.pluginManager.toggle(id, e.target.checked, ctx);
+
+            // Lightweight UI updates for legacy DOM
+            if (id === 'cloudPacks') {
+              const cloudBtn = document.querySelector('.pack-tab-btn[data-tab="cloud"]');
+              if (cloudBtn) cloudBtn.style.display = e.target.checked ? '' : 'none';
+              if (!e.target.checked) {
+                try {
+                  window.switchPackTab && window.switchPackTab('local');
+                } catch {}
+              }
+            }
           });
         });
       }

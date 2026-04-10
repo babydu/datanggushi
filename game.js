@@ -1743,6 +1743,12 @@ function updateTutorialForPage(pageId) {
 
 // ===================== 云端剧本系统 =====================
 async function loadCloudPackIndex() {
+    // Plugin toggle: cloud packs
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.cloudPacks === false) return;
+    } catch {}
+
     const loadingEl = document.getElementById('cloud-pack-loading');
     const errorEl = document.getElementById('cloud-pack-error');
     const emptyEl = document.getElementById('cloud-pack-empty');
@@ -1820,6 +1826,15 @@ function switchPackTab(tab) {
     const localSection = document.getElementById('local-pack-section');
     const cloudSection = document.getElementById('cloud-pack-section');
     const tabBtns = document.querySelectorAll('.pack-tab-btn');
+
+    // Plugin toggle: cloud packs
+    // If disabled, force local tab and hide cloud tab.
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.cloudPacks === false) {
+            tab = 'local';
+        }
+    } catch {}
     
     tabBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -1862,6 +1877,15 @@ function selectCloudPack(packId) {
 }
 
 async function downloadCloudPack(packId) {
+    // Plugin toggle: cloud packs
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.cloudPacks === false) {
+            alert('云端剧本功能已在设置中关闭');
+            return;
+        }
+    } catch {}
+
     const pack = cloudPacks.find(p => p.id === packId);
     if (!pack) return;
     
@@ -1983,6 +2007,15 @@ function selectPack(packType) {
 }
 
 async function confirmPack() {
+    // Plugin toggle: cloud packs
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.cloudPacks === false && appState.selectedPackType === 'cloud') {
+            alert('云端剧本功能已在设置中关闭');
+            return;
+        }
+    } catch {}
+
     // 如果是云端剧本且尚未下载，先加载完整剧本
     if (appState.selectedPackType === 'cloud' && !appState.selectedPack) {
         const pack = currentCloudPack;
@@ -2436,6 +2469,17 @@ function selectIdentity(identity) {
 
 // 【新增】直接进入关卡选择页（跳过身份选择）
 function goToLevelSelectDirectly() {
+    // Plugin toggle: level select
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.levelSelect === false) {
+            // Skip level select entirely.
+            appState.gameState.userSelectedLevelCount = appState.gameState.currentIdentity.levelList.length;
+            startGame();
+            return;
+        }
+    } catch {}
+
     const totalLevel = appState.gameState.currentIdentity.levelList.length;
     document.getElementById('level-select-identity').innerText = `当前身份：${appState.gameState.currentIdentity.name}`;
     document.getElementById('total-level-count').innerText = totalLevel;
@@ -2453,6 +2497,17 @@ function goToLevelSelectDirectly() {
 // ===================== 关卡数量选择逻辑 =====================
 function goToLevelSelect() {
     if (!appState.gameState.currentIdentity) return;
+
+    // Plugin toggle: level select
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.levelSelect === false) {
+            appState.gameState.userSelectedLevelCount = appState.gameState.currentIdentity.levelList.length;
+            startGame();
+            return;
+        }
+    } catch {}
+
     const totalLevel = appState.gameState.currentIdentity.levelList.length;
     document.getElementById('level-select-identity').innerText = `当前身份：${appState.gameState.currentIdentity.name}`;
     document.getElementById('total-level-count').innerText = totalLevel;
