@@ -1743,12 +1743,6 @@ function updateTutorialForPage(pageId) {
 
 // ===================== 云端剧本系统 =====================
 async function loadCloudPackIndex() {
-    // Plugin toggle: cloud packs
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.cloudPacks === false) return;
-    } catch {}
-
     const loadingEl = document.getElementById('cloud-pack-loading');
     const errorEl = document.getElementById('cloud-pack-error');
     const emptyEl = document.getElementById('cloud-pack-empty');
@@ -1827,15 +1821,6 @@ function switchPackTab(tab) {
     const cloudSection = document.getElementById('cloud-pack-section');
     const tabBtns = document.querySelectorAll('.pack-tab-btn');
 
-    // Plugin toggle: cloud packs
-    // If disabled, force local tab and hide cloud tab.
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.cloudPacks === false) {
-            tab = 'local';
-        }
-    } catch {}
-    
     tabBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tab);
     });
@@ -1877,15 +1862,6 @@ function selectCloudPack(packId) {
 }
 
 async function downloadCloudPack(packId) {
-    // Plugin toggle: cloud packs
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.cloudPacks === false) {
-            alert('云端剧本功能已在设置中关闭');
-            return;
-        }
-    } catch {}
-
     const pack = cloudPacks.find(p => p.id === packId);
     if (!pack) return;
     
@@ -2007,15 +1983,6 @@ function selectPack(packType) {
 }
 
 async function confirmPack() {
-    // Plugin toggle: cloud packs
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.cloudPacks === false && appState.selectedPackType === 'cloud') {
-            alert('云端剧本功能已在设置中关闭');
-            return;
-        }
-    } catch {}
-
     // 如果是云端剧本且尚未下载，先加载完整剧本
     if (appState.selectedPackType === 'cloud' && !appState.selectedPack) {
         const pack = currentCloudPack;
@@ -2469,17 +2436,6 @@ function selectIdentity(identity) {
 
 // 【新增】直接进入关卡选择页（跳过身份选择）
 function goToLevelSelectDirectly() {
-    // Plugin toggle: level select
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.levelSelect === false) {
-            // Skip level select entirely.
-            appState.gameState.userSelectedLevelCount = appState.gameState.currentIdentity.levelList.length;
-            startGame();
-            return;
-        }
-    } catch {}
-
     const totalLevel = appState.gameState.currentIdentity.levelList.length;
     document.getElementById('level-select-identity').innerText = `当前身份：${appState.gameState.currentIdentity.name}`;
     document.getElementById('total-level-count').innerText = totalLevel;
@@ -2497,17 +2453,6 @@ function goToLevelSelectDirectly() {
 // ===================== 关卡数量选择逻辑 =====================
 function goToLevelSelect() {
     if (!appState.gameState.currentIdentity) return;
-
-    // Plugin toggle: level select
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.levelSelect === false) {
-            appState.gameState.userSelectedLevelCount = appState.gameState.currentIdentity.levelList.length;
-            startGame();
-            return;
-        }
-    } catch {}
-
     const totalLevel = appState.gameState.currentIdentity.levelList.length;
     document.getElementById('level-select-identity').innerText = `当前身份：${appState.gameState.currentIdentity.name}`;
     document.getElementById('total-level-count').innerText = totalLevel;
@@ -2554,18 +2499,6 @@ function getRandomOptions(optionPool) {
 
 // ===================== 倒计时系统 =====================
 function startCountdown() {
-    // Plugin toggle: countdown
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.countdown === false) {
-            // Ensure UI is stable even when countdown is disabled.
-            const el = document.getElementById('countdown-text');
-            if (el) el.innerText = '--';
-            clearCountdown();
-            return;
-        }
-    } catch {}
-
     clearCountdown();
     const timeConfig = getCurrentTimeConfig();
     appState.countdown.currentConfig = timeConfig;
@@ -3052,15 +2985,6 @@ function showDeathModal(option) {
 }
 
 function useDeathHelp() {
-    // Plugin toggle: help
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.help === false) {
-            alert('求救功能已在设置中关闭');
-            return;
-        }
-    } catch {}
-
     document.getElementById('death-modal').classList.remove('active');
     
     updateAttribute('helpTimes', -1);
@@ -3105,15 +3029,6 @@ function acceptDeath() {
 }
 
 function useHelp() {
-    // Plugin toggle: help
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.help === false) {
-            alert('求救功能已在设置中关闭');
-            return;
-        }
-    } catch {}
-
     if (appState.gameState.helpTimes <= 0) {
         alert("你的求救机会已经用完了！");
         return;
@@ -3341,15 +3256,8 @@ function gameEnd(isSuccess, desc) {
     clearCountdown();
     clearGameProgress();
     
-    // Plugin toggle: review & knowledge extraction
-    let reviewKnowledgeEnabled = true;
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.reviewKnowledge === false) reviewKnowledgeEnabled = false;
-    } catch {}
-
     // 提取知识点到数据库
-    if (reviewKnowledgeEnabled && appState.gameState.gameRecord && appState.gameState.gameRecord.length > 0) {
+    if (appState.gameState.gameRecord && appState.gameState.gameRecord.length > 0) {
         extractKnowledgeFromGame(appState.gameState.gameRecord);
     }
     
@@ -3391,7 +3299,7 @@ function gameEnd(isSuccess, desc) {
     const knowledgeGained = appState.gameState.currentKnowledge || 0;
     
     const scoreResult = calculateScore(appState.gameState, isSuccess);
-    const weaknessResult = reviewKnowledgeEnabled ? analyzeWeakness(appState.gameState.gameRecord) : { weaknessList: [] };
+    const weaknessResult = analyzeWeakness(appState.gameState.gameRecord);
     
     // 获取结局
     const ending = determineEnding(appState.gameState, isSuccess);
@@ -3448,7 +3356,7 @@ function gameEnd(isSuccess, desc) {
 
     const weaknessBox = document.getElementById('weakness-box');
     const weaknessList = document.getElementById('weakness-list');
-    if (reviewKnowledgeEnabled && weaknessResult.weaknessList.length > 0) {
+    if (weaknessResult.weaknessList.length > 0) {
         weaknessBox.style.display = 'block';
         weaknessList.innerHTML = '';
         weaknessResult.weaknessList.forEach(item => {
@@ -3482,7 +3390,7 @@ function gameEnd(isSuccess, desc) {
             if (nextVolumeUnlocked) {
                  endControlBox.innerHTML = `
                      <button class="btn btn-success" onclick="enterNextVolume()">进入下一卷：${nextVolume.name}</button>
-                     ${reviewKnowledgeEnabled ? '<button class="btn btn-info" onclick="goToReview()">查看完整闯关复盘</button>' : ''}
+                     <button class="btn btn-info" onclick="goToReview()">查看完整闯关复盘</button>
                      <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
                  `;
                  switchPage('end-page');
@@ -3530,15 +3438,6 @@ function enterNextVolume() {
 
 // ===================== 复盘页面渲染 =====================
 function goToReview() {
-    // Plugin toggle: review
-    try {
-        const flags = window.FeatureFlags?.loadFeatureFlags?.();
-        if (flags && flags.reviewKnowledge === false) {
-            alert('复盘功能已在设置中关闭');
-            return;
-        }
-    } catch {}
-
     const reviewContent = document.getElementById('review-content');
     const gameRecord = appState.gameState.gameRecord;
 
