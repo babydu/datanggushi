@@ -28,3 +28,12 @@ function createPluginManager(flags) {
 }
 
 window.PluginManager = { createPluginManager };
+ if (plugin && typeof plugin.onToggle === 'function') {
+      plugin.onToggle(!!enabled, ctx);
+    }
+  }
+
+  return { register, initAll, toggle, plugins, flags };
+}
+
+window.PluginManager = { createPluginManager };

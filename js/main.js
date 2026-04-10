@@ -5,6 +5,11 @@ importScriptsFallback([
   'js/core/config.js',
   'js/core/plugin-manager.js',
   'js/plugins/settings-ui.js',
+  'js/plugins/cloud-packs.js',
+  'js/plugins/level-select.js',
+  'js/plugins/help.js',
+  'js/plugins/countdown.js',
+  'js/plugins/review-knowledge.js',
   'game.js'
 ]);
 
@@ -28,41 +33,22 @@ function bootstrapAfterLegacyLoad() {
   const flags = window.FeatureFlags.loadFeatureFlags();
   const pm = window.PluginManager.createPluginManager(flags);
   const ctx = { flags, pluginManager: pm };
+  ctx.flags = pm.flags;
+  ctx.pluginManager = pm;
 
   // Settings UI plugin (always on)
   pm.register(window.Plugins.createSettingsPlugin());
+
+  // Feature plugins
+  pm.register(window.Plugins.createCloudPacksPlugin());
+  pm.register(window.Plugins.createLevelSelectPlugin());
+  pm.register(window.Plugins.createHelpPlugin());
+  pm.register(window.Plugins.createCountdownPlugin());
+  pm.register(window.Plugins.createReviewKnowledgePlugin());
   pm.initAll(ctx);
 
-  // Apply initial toggles for UI-only behaviors that live in legacy code.
-  // Cloud tab visibility
-  try {
-    const cloudBtn = document.querySelector('.pack-tab-btn[data-tab="cloud"]');
-    if (cloudBtn) {
-      cloudBtn.style.display = (ctx.flags.cloudPacks === false) ? 'none' : '';
-    }
-  } catch {}
-
-  // Help button visibility
-  try {
-    const helpBtn = document.getElementById('help-btn');
-    if (helpBtn) helpBtn.style.display = (ctx.flags.help === false) ? 'none' : '';
-  } catch {}
-
-  // Countdown UI visibility
-  try {
-    const countdownItem = document.querySelector('.countdown-item');
-    if (countdownItem) countdownItem.style.display = (ctx.flags.countdown === false) ? 'none' : '';
-  } catch {}
-
-  // Review and weakness UI visibility
-  try {
-    const reviewBtn = document.getElementById('review-btn');
-    if (reviewBtn) reviewBtn.style.display = (ctx.flags.reviewKnowledge === false) ? 'none' : '';
-    const weaknessBox = document.getElementById('weakness-box');
-    if (weaknessBox && ctx.flags.reviewKnowledge === false) weaknessBox.style.display = 'none';
-  } catch {}
-
-  // Level select page visibility (kept, but will be skipped when disabled)
+  // Expose ctx for debugging.
+  window.__pluginCtx = ctx;
 
   // Add a Settings button to welcome page controls.
   const welcomeBtnRow = document.querySelector('#welcome-page > div[style*="display: flex"]');
