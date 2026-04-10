@@ -2554,6 +2554,18 @@ function getRandomOptions(optionPool) {
 
 // ===================== 倒计时系统 =====================
 function startCountdown() {
+    // Plugin toggle: countdown
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.countdown === false) {
+            // Ensure UI is stable even when countdown is disabled.
+            const el = document.getElementById('countdown-text');
+            if (el) el.innerText = '--';
+            clearCountdown();
+            return;
+        }
+    } catch {}
+
     clearCountdown();
     const timeConfig = getCurrentTimeConfig();
     appState.countdown.currentConfig = timeConfig;
@@ -3040,6 +3052,15 @@ function showDeathModal(option) {
 }
 
 function useDeathHelp() {
+    // Plugin toggle: help
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.help === false) {
+            alert('求救功能已在设置中关闭');
+            return;
+        }
+    } catch {}
+
     document.getElementById('death-modal').classList.remove('active');
     
     updateAttribute('helpTimes', -1);
@@ -3084,6 +3105,15 @@ function acceptDeath() {
 }
 
 function useHelp() {
+    // Plugin toggle: help
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.help === false) {
+            alert('求救功能已在设置中关闭');
+            return;
+        }
+    } catch {}
+
     if (appState.gameState.helpTimes <= 0) {
         alert("你的求救机会已经用完了！");
         return;
@@ -3311,8 +3341,15 @@ function gameEnd(isSuccess, desc) {
     clearCountdown();
     clearGameProgress();
     
+    // Plugin toggle: review & knowledge extraction
+    let reviewKnowledgeEnabled = true;
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.reviewKnowledge === false) reviewKnowledgeEnabled = false;
+    } catch {}
+
     // 提取知识点到数据库
-    if (appState.gameState.gameRecord && appState.gameState.gameRecord.length > 0) {
+    if (reviewKnowledgeEnabled && appState.gameState.gameRecord && appState.gameState.gameRecord.length > 0) {
         extractKnowledgeFromGame(appState.gameState.gameRecord);
     }
     
@@ -3354,7 +3391,7 @@ function gameEnd(isSuccess, desc) {
     const knowledgeGained = appState.gameState.currentKnowledge || 0;
     
     const scoreResult = calculateScore(appState.gameState, isSuccess);
-    const weaknessResult = analyzeWeakness(appState.gameState.gameRecord);
+    const weaknessResult = reviewKnowledgeEnabled ? analyzeWeakness(appState.gameState.gameRecord) : { weaknessList: [] };
     
     // 获取结局
     const ending = determineEnding(appState.gameState, isSuccess);
@@ -3411,7 +3448,7 @@ function gameEnd(isSuccess, desc) {
 
     const weaknessBox = document.getElementById('weakness-box');
     const weaknessList = document.getElementById('weakness-list');
-    if (weaknessResult.weaknessList.length > 0) {
+    if (reviewKnowledgeEnabled && weaknessResult.weaknessList.length > 0) {
         weaknessBox.style.display = 'block';
         weaknessList.innerHTML = '';
         weaknessResult.weaknessList.forEach(item => {
@@ -3443,16 +3480,16 @@ function gameEnd(isSuccess, desc) {
             );
             
             if (nextVolumeUnlocked) {
-                endControlBox.innerHTML = `
-                    <button class="btn btn-success" onclick="enterNextVolume()">进入下一卷：${nextVolume.name}</button>
-                    <button class="btn btn-info" onclick="goToReview()">查看完整闯关复盘</button>
-                    <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
-                `;
-                switchPage('end-page');
-                return;
-            }
-        }
-    }
+                 endControlBox.innerHTML = `
+                     <button class="btn btn-success" onclick="enterNextVolume()">进入下一卷：${nextVolume.name}</button>
+                     ${reviewKnowledgeEnabled ? '<button class="btn btn-info" onclick="goToReview()">查看完整闯关复盘</button>' : ''}
+                     <button class="btn btn-secondary" onclick="exitToHome()">结束游戏，返回首页</button>
+                 `;
+                 switchPage('end-page');
+                 return;
+             }
+         }
+     }
     
     switchPage('end-page');
 }
@@ -3493,6 +3530,15 @@ function enterNextVolume() {
 
 // ===================== 复盘页面渲染 =====================
 function goToReview() {
+    // Plugin toggle: review
+    try {
+        const flags = window.FeatureFlags?.loadFeatureFlags?.();
+        if (flags && flags.reviewKnowledge === false) {
+            alert('复盘功能已在设置中关闭');
+            return;
+        }
+    } catch {}
+
     const reviewContent = document.getElementById('review-content');
     const gameRecord = appState.gameState.gameRecord;
 

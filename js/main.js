@@ -42,6 +42,26 @@ function bootstrapAfterLegacyLoad() {
     }
   } catch {}
 
+  // Help button visibility
+  try {
+    const helpBtn = document.getElementById('help-btn');
+    if (helpBtn) helpBtn.style.display = (ctx.flags.help === false) ? 'none' : '';
+  } catch {}
+
+  // Countdown UI visibility
+  try {
+    const countdownItem = document.querySelector('.countdown-item');
+    if (countdownItem) countdownItem.style.display = (ctx.flags.countdown === false) ? 'none' : '';
+  } catch {}
+
+  // Review and weakness UI visibility
+  try {
+    const reviewBtn = document.getElementById('review-btn');
+    if (reviewBtn) reviewBtn.style.display = (ctx.flags.reviewKnowledge === false) ? 'none' : '';
+    const weaknessBox = document.getElementById('weakness-box');
+    if (weaknessBox && ctx.flags.reviewKnowledge === false) weaknessBox.style.display = 'none';
+  } catch {}
+
   // Level select page visibility (kept, but will be skipped when disabled)
 
   // Add a Settings button to welcome page controls.

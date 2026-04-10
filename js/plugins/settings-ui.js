@@ -62,6 +62,23 @@ function createSettingsPlugin() {
                 } catch {}
               }
             }
+
+            if (id === 'help') {
+              const helpBtn = document.getElementById('help-btn');
+              if (helpBtn) helpBtn.style.display = e.target.checked ? '' : 'none';
+            }
+
+            if (id === 'countdown') {
+              const countdownItem = document.querySelector('.countdown-item');
+              if (countdownItem) countdownItem.style.display = e.target.checked ? '' : 'none';
+            }
+
+            if (id === 'reviewKnowledge') {
+              const reviewBtn = document.getElementById('review-btn');
+              if (reviewBtn) reviewBtn.style.display = e.target.checked ? '' : 'none';
+              const weaknessBox = document.getElementById('weakness-box');
+              if (weaknessBox && !e.target.checked) weaknessBox.style.display = 'none';
+            }
           });
         });
       }
