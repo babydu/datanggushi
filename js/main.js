@@ -1,24 +1,35 @@
 // Main entry: load legacy game.js and add plugin toggles incrementally.
 // This is a transitional step towards full modularization.
 
-importScriptsFallback([
-  'js/core/config.js',
-  'js/core/plugin-manager.js',
-  'js/plugins/settings-ui.js',
-  'js/plugins/branching.js',
-  'js/plugins/cloud-packs.js',
-  'js/plugins/level-select.js',
-  'js/plugins/help.js',
-  'js/plugins/countdown.js',
-  'js/plugins/review-knowledge.js',
-  'game.js'
-]);
+importScriptsFallback(
+  [
+    'js/core/config.js',
+    'js/core/plugin-manager.js',
+    'js/plugins/settings-ui.js',
+    'js/plugins/branching.js',
+    'js/plugins/cloud-packs.js',
+    'js/plugins/level-select.js',
+    'js/plugins/help.js',
+    'js/plugins/countdown.js',
+    'js/plugins/review-knowledge.js',
+    'game.js'
+  ],
+  () => {
+    // Bootstrap immediately after scripts are loaded.
+    // Do NOT rely on the window load event: legacy game.js may consume it,
+    // and we can miss it if we attach too late.
+    bootstrapAfterLegacyLoad();
+  }
+);
 
-function importScriptsFallback(scripts) {
+function importScriptsFallback(scripts, onDone) {
   // Minimal sequential loader without bundler.
   let idx = 0;
   function next() {
-    if (idx >= scripts.length) return;
+    if (idx >= scripts.length) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
     const src = scripts[idx++];
     const s = document.createElement('script');
     s.src = src;
@@ -31,6 +42,14 @@ function importScriptsFallback(scripts) {
 
 // After legacy game.js loads, we install settings UI and initial toggles.
 function bootstrapAfterLegacyLoad() {
+  if (window.__settingsBootstrapped) return;
+  window.__settingsBootstrapped = true;
+
+  if (!window.FeatureFlags || !window.PluginManager || !window.Plugins) {
+    // If something failed to load, don't crash the app.
+    return;
+  }
+
   const flags = window.FeatureFlags.loadFeatureFlags();
   const pm = window.PluginManager.createPluginManager(flags);
   const ctx = { flags, pluginManager: pm };
@@ -63,13 +82,3 @@ function bootstrapAfterLegacyLoad() {
     welcomeBtnRow.appendChild(btn);
   }
 }
-
-// Wait until legacy game.js is loaded.
-(function waitForLegacy() {
-  if (typeof window.FeatureFlags === 'undefined' || typeof window.Plugins === 'undefined') {
-    setTimeout(waitForLegacy, 10);
-    return;
-  }
-  // game.js attaches window.onload; we attach a separate handler.
-  window.addEventListener('load', bootstrapAfterLegacyLoad);
-})();
