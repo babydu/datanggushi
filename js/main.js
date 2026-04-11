@@ -5,11 +5,13 @@ importScriptsFallback(
   [
     'js/core/config.js',
     'js/core/plugin-manager.js',
+    'js/core/api.js',
     'js/plugins/settings-ui.js',
     'js/plugins/branching.js',
     'js/plugins/cloud-packs.js',
     'js/plugins/level-select.js',
     'js/plugins/help.js',
+    'js/plugins/help-impl.js',
     'js/plugins/countdown.js',
     'js/plugins/review-knowledge.js',
     'game.js'
@@ -69,6 +71,7 @@ function bootstrapAfterLegacyLoad() {
   pm.register(window.Plugins.createCloudPacksPlugin());
   pm.register(window.Plugins.createLevelSelectPlugin());
   pm.register(window.Plugins.createHelpPlugin());
+  pm.register(window.Plugins.createHelpImplPlugin());
   pm.register(window.Plugins.createCountdownPlugin());
   pm.register(window.Plugins.createReviewKnowledgePlugin());
   pm.initAll(ctx);

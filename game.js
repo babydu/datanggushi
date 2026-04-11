@@ -2985,37 +2985,8 @@ function showDeathModal(option) {
 }
 
 function useDeathHelp() {
-    document.getElementById('death-modal').classList.remove('active');
-    
-    updateAttribute('helpTimes', -1);
-    appState.gameState.health = 1;
-    appState.gameState.consecutiveCorrect = 0;
-    appState.gameState.debuff = 0;
-    // 重置游戏结束标志，允许继续游戏
-    appState.gameEnded = false;
-    updateGameUI();
-    
-    const option = appState.gameState.pendingDeathOption;
-    const title = "死里逃生！";
-    const content = `
-        <div class="warning-box">
-            <strong>⚠️ 这个选择原本是致命的！</strong><br>
-            ${option.result}
-        </div>
-        <div class="tip-box">
-            <strong>你使用了1次求救机会，死里逃生！</strong><br>
-            - 消耗1次求救机会<br>
-            - 生命值降低到1点<br>
-            - 清除所有负面状态<br>
-            - 连续正确计数重置<br>
-            <br>
-            <strong>请谨慎选择，继续前行！</strong>
-        </div>
-        <br><strong>历史知识点：</strong>${option.history}
-    `;
-    
-    appState.gameState.pendingDeathOption = null;
-    showHistoryModal(title, content);
+    // Delegated to plugin implementation.
+    if (window.HelpImpl?.useDeathHelpImpl) return window.HelpImpl.useDeathHelpImpl();
 }
 
 function acceptDeath() {
@@ -3029,32 +3000,8 @@ function acceptDeath() {
 }
 
 function useHelp() {
-    if (appState.gameState.helpTimes <= 0) {
-        alert("你的求救机会已经用完了！");
-        return;
-    }
-    if (appState.gameState.selectedOption) {
-        alert("你已经做出了选择，无法再使用求救机会！");
-        return;
-    }
-
-    const correctOption = appState.gameState.currentOptions.find(opt => opt.isCorrect);
-    updateAttribute('helpTimes', -1);
-    appState.gameState.debuff = 0;
-    updateAttribute('health', 20);
-    appState.gameState.consecutiveCorrect = 0;
-    updateGameUI();
-
-    // 使用求救后，重置倒计时
-    startCountdown();
-
-    showHistoryModal("求救成功", 
-        `<div class="tip-box">
-            当地的资深人士给了你关键提示：<br><br>
-            <strong>正确的选择，与「${(correctOption?.text || '').split('，')[0] || '关键史实'}」有关。</strong>
-        </div>
-        <p>你清除了所有负面状态，恢复了20点生命值，还剩${appState.gameState.helpTimes}次求救机会。</p>`
-    );
+    // Delegated to plugin implementation.
+    if (window.HelpImpl?.useHelpImpl) return window.HelpImpl.useHelpImpl();
 }
 
 function showHistoryModal(title, text) {
