@@ -2987,6 +2987,7 @@ function showDeathModal(option) {
 function useDeathHelp() {
     // Delegated to plugin implementation.
     if (window.HelpImpl?.useDeathHelpImpl) return window.HelpImpl.useDeathHelpImpl();
+    console.warn('[help] HelpImpl.useDeathHelpImpl not available');
 }
 
 function acceptDeath() {
@@ -3002,6 +3003,7 @@ function acceptDeath() {
 function useHelp() {
     // Delegated to plugin implementation.
     if (window.HelpImpl?.useHelpImpl) return window.HelpImpl.useHelpImpl();
+    console.warn('[help] HelpImpl.useHelpImpl not available');
 }
 
 function showHistoryModal(title, text) {

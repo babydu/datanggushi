@@ -74,9 +74,9 @@ function createHelpImplPlugin() {
 
       w.HelpImpl = { useHelpImpl, useDeathHelpImpl };
 
-      // Delegate legacy globals to implementation.
-      w.useHelp = () => useHelpImpl();
-      w.useDeathHelp = () => useDeathHelpImpl();
+      // IMPORTANT: Do not overwrite legacy globals here.
+      // game.js keeps `useHelp()`/`useDeathHelp()` as stable entrypoints and delegates to HelpImpl.
+      // This avoids fighting with other plugins that wrap those globals.
     }
   };
 }

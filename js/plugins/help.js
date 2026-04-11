@@ -26,6 +26,12 @@ function createHelpPlugin() {
           return this._orig.useDeathHelp(...args);
         };
       }
+
+      // Ensure the help button always calls the current global.
+      try {
+        const btn = document.getElementById('help-btn');
+        if (btn) btn.onclick = () => w.useHelp && w.useHelp();
+      } catch {}
     },
     onToggle(enabled) {
       const helpBtn = document.getElementById('help-btn');
