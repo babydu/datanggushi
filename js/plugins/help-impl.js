@@ -9,6 +9,15 @@ function createHelpImplPlugin() {
         console.log('[help] useHelpImpl');
         const appState = w.appState;
         if (!appState?.gameState) return;
+
+        // Useful for diagnosing “click but no effect” reports.
+        try {
+          console.log('[help] state', {
+            helpTimes: appState.gameState.helpTimes,
+            selectedOption: !!appState.gameState.selectedOption,
+            hasOptions: Array.isArray(appState.gameState.currentOptions) ? appState.gameState.currentOptions.length : null
+          });
+        } catch {}
         if (appState.gameState.helpTimes <= 0) {
           alert('你的求救机会已经用完了！');
           return;
