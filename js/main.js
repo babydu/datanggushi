@@ -16,11 +16,10 @@ importScriptsFallback(
   ],
   () => {
     // Bootstrap after scripts are loaded, but ensure DOM is ready.
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => bootstrapAfterLegacyLoad(), { once: true });
-    } else {
-      bootstrapAfterLegacyLoad();
-    }
+    document.addEventListener('DOMContentLoaded', () => bootstrapAfterLegacyLoad(), { once: true });
+    window.addEventListener('load', () => bootstrapAfterLegacyLoad(), { once: true });
+    // Also attempt immediately (may fail if DOM not ready; bootstrap retries).
+    bootstrapAfterLegacyLoad();
   }
 );
 
@@ -44,11 +43,15 @@ function importScriptsFallback(scripts, onDone) {
 
 // After legacy game.js loads, we install settings UI and initial toggles.
 function bootstrapAfterLegacyLoad() {
-  if (window.__settingsBootstrapped) return;
-  window.__settingsBootstrapped = true;
+  // If we already initialized plugins, just ensure the settings button exists.
+  if (window.__pluginCtx) {
+    ensureSettingsButton(window.__pluginCtx);
+    return;
+  }
 
   if (!window.FeatureFlags || !window.PluginManager || !window.Plugins) {
-    // If something failed to load, don't crash the app.
+    // Scripts may still be loading.
+    setTimeout(bootstrapAfterLegacyLoad, 50);
     return;
   }
 
@@ -72,22 +75,41 @@ function bootstrapAfterLegacyLoad() {
 
   // Expose ctx for debugging.
   window.__pluginCtx = ctx;
+  window.__settingsBootstrapped = true;
 
-  // Add a Settings button to welcome page controls.
-  if (!document.getElementById('open-settings-btn')) {
-    const btn = document.createElement('button');
-    btn.id = 'open-settings-btn';
-    btn.className = 'btn btn-secondary';
-    btn.textContent = '设置';
-    btn.onclick = () => ctx.openSettings && ctx.openSettings();
+  ensureSettingsButton(ctx);
+}
 
-    // Prefer inserting next to the start button.
-    const startBtn = document.getElementById('start-game-btn');
-    const row = startBtn?.parentElement || document.querySelector('#welcome-page .control-box') || document.querySelector('#welcome-page');
-    if (row) {
-      row.appendChild(btn);
-    } else {
-      console.warn('[settings] failed to find welcome button row');
-    }
+function ensureSettingsButton(ctx) {
+  if (document.getElementById('open-settings-btn')) return true;
+
+  const startBtn = document.getElementById('start-game-btn');
+  if (!startBtn) {
+    // DOM not ready yet or unexpected markup.
+    setTimeout(() => ensureSettingsButton(ctx), 50);
+    return false;
   }
+
+  const btn = document.createElement('button');
+  btn.id = 'open-settings-btn';
+  btn.className = 'btn btn-secondary';
+  btn.textContent = '设置';
+  btn.onclick = () => ctx.openSettings && ctx.openSettings();
+
+  // Insert next to the start button (more robust than matching style attributes).
+  const row = startBtn.parentElement;
+  if (row) {
+    row.appendChild(btn);
+    return true;
+  }
+
+  // Last resort: append to welcome page.
+  const welcome = document.getElementById('welcome-page');
+  if (welcome) {
+    welcome.appendChild(btn);
+    return true;
+  }
+
+  setTimeout(() => ensureSettingsButton(ctx), 50);
+  return false;
 }
