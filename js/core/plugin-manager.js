@@ -9,8 +9,15 @@ function createPluginManager(flags) {
   function initAll(ctx) {
     for (const plugin of plugins.values()) {
       const enabled = window.FeatureFlags.isFeatureEnabled(flags, plugin.id);
-      if (enabled && typeof plugin.init === 'function') {
+
+      // Always init so plugins can wrap functions and capture originals.
+      if (typeof plugin.init === 'function') {
         plugin.init(ctx);
+      }
+
+      // Apply the current enabled state.
+      if (typeof plugin.onToggle === 'function') {
+        plugin.onToggle(enabled, ctx);
       }
     }
   }
@@ -20,15 +27,6 @@ function createPluginManager(flags) {
     window.FeatureFlags.saveFeatureFlags(flags);
     const plugin = plugins.get(id);
     if (plugin && typeof plugin.onToggle === 'function') {
-      plugin.onToggle(!!enabled, ctx);
-    }
-  }
-
-  return { register, initAll, toggle, plugins, flags };
-}
-
-window.PluginManager = { createPluginManager };
- if (plugin && typeof plugin.onToggle === 'function') {
       plugin.onToggle(!!enabled, ctx);
     }
   }

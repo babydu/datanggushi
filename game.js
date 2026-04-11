@@ -1486,7 +1486,7 @@ function unlockVolume(packId, volumeId) {
 // 通用属性更新函数
 function updateAttribute(key, changeValue) {
     const gameState = appState.gameState;
-    const attrConfig = appState.selectedPack.attributeConfig || DEFAULT_ATTRIBUTE_CONFIG;
+    const attrConfig = appState.selectedPack?.attributeConfig || DEFAULT_ATTRIBUTE_CONFIG;
     const config = attrConfig[key] || DEFAULT_ATTRIBUTE_CONFIG[key] || { max: Infinity, min: -Infinity };
 
     const currentValue = gameState[key];
