@@ -5,6 +5,30 @@ function createHelpPlugin() {
       const w = window;
       this._orig = this._orig || {};
 
+      // Install a delegated click handler so the help button works
+      // even if inline handlers / onclick properties are overridden.
+      if (!this._orig.delegatedHelpClick) {
+        const handler = (e) => {
+          const btn = e.target && (e.target.closest ? e.target.closest('#help-btn') : null);
+          if (!btn) return;
+
+          if (ctx.flags.help === false) {
+            // Normally the button is hidden; this is a fallback.
+            alert('求救功能已在设置中关闭');
+            return;
+          }
+
+          if (typeof w.useHelp === 'function') {
+            w.useHelp();
+            return;
+          }
+          console.warn('[help] window.useHelp is not a function');
+        };
+
+        document.addEventListener('click', handler, true);
+        this._orig.delegatedHelpClick = handler;
+      }
+
       if (typeof w.useHelp === 'function' && !this._orig.useHelp) {
         this._orig.useHelp = w.useHelp;
         w.useHelp = (...args) => {

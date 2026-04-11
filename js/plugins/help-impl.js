@@ -6,6 +6,7 @@ function createHelpImplPlugin() {
       // Provide a namespaced implementation and delegate from legacy globals.
 
       function useHelpImpl() {
+        console.log('[help] useHelpImpl');
         const appState = w.appState;
         if (!appState?.gameState) return;
         if (appState.gameState.helpTimes <= 0) {
@@ -38,6 +39,7 @@ function createHelpImplPlugin() {
       }
 
       function useDeathHelpImpl() {
+        console.log('[help] useDeathHelpImpl');
         const appState = w.appState;
         if (!appState?.gameState) return;
         document.getElementById('death-modal').classList.remove('active');
