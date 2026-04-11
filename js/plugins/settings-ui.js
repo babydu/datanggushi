@@ -79,6 +79,8 @@ function createSettingsPlugin() {
               const weaknessBox = document.getElementById('weakness-box');
               if (weaknessBox && !e.target.checked) weaknessBox.style.display = 'none';
             }
+
+            // Branching has no direct UI element.
           });
         });
       }

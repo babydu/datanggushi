@@ -5,6 +5,7 @@ importScriptsFallback([
   'js/core/config.js',
   'js/core/plugin-manager.js',
   'js/plugins/settings-ui.js',
+  'js/plugins/branching.js',
   'js/plugins/cloud-packs.js',
   'js/plugins/level-select.js',
   'js/plugins/help.js',
@@ -40,6 +41,7 @@ function bootstrapAfterLegacyLoad() {
   pm.register(window.Plugins.createSettingsPlugin());
 
   // Feature plugins
+  pm.register(window.Plugins.createBranchingPlugin());
   pm.register(window.Plugins.createCloudPacksPlugin());
   pm.register(window.Plugins.createLevelSelectPlugin());
   pm.register(window.Plugins.createHelpPlugin());
