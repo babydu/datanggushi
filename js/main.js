@@ -15,10 +15,12 @@ importScriptsFallback(
     'game.js'
   ],
   () => {
-    // Bootstrap immediately after scripts are loaded.
-    // Do NOT rely on the window load event: legacy game.js may consume it,
-    // and we can miss it if we attach too late.
-    bootstrapAfterLegacyLoad();
+    // Bootstrap after scripts are loaded, but ensure DOM is ready.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => bootstrapAfterLegacyLoad(), { once: true });
+    } else {
+      bootstrapAfterLegacyLoad();
+    }
   }
 );
 
@@ -72,13 +74,20 @@ function bootstrapAfterLegacyLoad() {
   window.__pluginCtx = ctx;
 
   // Add a Settings button to welcome page controls.
-  const welcomeBtnRow = document.querySelector('#welcome-page > div[style*="display: flex"]');
-  if (welcomeBtnRow && !document.getElementById('open-settings-btn')) {
+  if (!document.getElementById('open-settings-btn')) {
     const btn = document.createElement('button');
     btn.id = 'open-settings-btn';
     btn.className = 'btn btn-secondary';
     btn.textContent = '设置';
     btn.onclick = () => ctx.openSettings && ctx.openSettings();
-    welcomeBtnRow.appendChild(btn);
+
+    // Prefer inserting next to the start button.
+    const startBtn = document.getElementById('start-game-btn');
+    const row = startBtn?.parentElement || document.querySelector('#welcome-page .control-box') || document.querySelector('#welcome-page');
+    if (row) {
+      row.appendChild(btn);
+    } else {
+      console.warn('[settings] failed to find welcome button row');
+    }
   }
 }
